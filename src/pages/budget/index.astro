@@ -1,0 +1,19 @@
+---
+import Base from '../../layouts/Base.astro';
+import BudgetExplorer from '../../islands/BudgetExplorer.tsx';
+import Icon from '../../components/Icon.astro';
+import { url } from '../../config/site';
+import { BUDGET } from '../../lib/measures';
+import { fmtDate } from '../../lib/format';
+---
+<Base title="The Budget" description="Where the Australian Government's money comes from and where it goes, line by line from the Budget papers and the Final Budget Outcome." section="budget/">
+  <div class="wrap pt-10 md:pt-14">
+    <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div><p class="eyebrow">The Budget</p><h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Where the money comes from, and where it goes</h1>
+        <p class="lede mt-3">Every dollar the Commonwealth spends is raised from taxpayers or borrowed. These are the government’s own figures, category by category.</p></div>
+      <a class="btn btn-primary" href={url('budget/build/')}>Build your own Federal Budget <Icon name="arrow" /></a>
+    </div>
+    <div class="mt-10"><BudgetExplorer client:load years={BUDGET.years} /></div>
+    <p class="meta mt-8 max-w-[80ch]">{BUDGET.note} Figures read from the published papers and last verified {fmtDate(BUDGET.verified_on)}. Revenue and spending are on an accrual basis; the deficit shown is the underlying cash balance the Budget headlines, which is why it differs from revenue minus spending.</p>
+  </div>
+</Base>

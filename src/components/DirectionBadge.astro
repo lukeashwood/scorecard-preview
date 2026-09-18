@@ -1,0 +1,14 @@
+---
+import Icon from './Icon.astro';
+import type { Direction } from '../lib/types';
+interface Props { direction: Direction | null; showPeriod?: boolean }
+const { direction: d, showPeriod = false } = Astro.props;
+const word = d ? (d.trend === 'steady' ? 'Steady' : d.tone === 'good' ? 'Better' : d.tone === 'bad' ? 'Worse' : d.trend === 'up' ? 'Rising' : 'Falling') : '';
+const cls = d ? (d.tone === 'good' ? 'pill-good' : d.tone === 'bad' ? 'pill-bad' : 'pill-neutral') : '';
+---
+{d && (
+  <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+    <span class:list={['pill', cls]}><Icon name={d.trend} size={13} />{word}<span class="num font-semibold opacity-80">{d.changeLabel}</span></span>
+    {showPeriod && <span class="meta">over the year ({d.periodLabel})</span>}
+  </span>
+)}

@@ -1,0 +1,20 @@
+export interface Lesson { slug: string; title: string; question: string; minutes: number; intro: string[]; takeaways: string[]; related: { label: string; href: string }[]; tool: 'tax' | 'debt' | 'inflation' | 'mortgage' }
+
+export const LESSONS: Lesson[] = [
+  { slug: 'your-tax-receipt', tool: 'tax', minutes: 3, title: 'Your tax receipt', question: 'How much tax do you pay, and where does it go?',
+    intro: ['Australia’s income tax works in slices. The first slice of your income is tax-free, the next is taxed at a low rate, and only the top slice of a high income is taxed at the top rate. A pay rise never leaves you with less money after tax.', 'Move the slider to your income to see your own slices, and how your tax is shared across what the federal government spends on.'],
+    takeaways: ['Your “marginal rate” is the tax on your next dollar. Your “average rate” is the share of your whole income paid in tax, and it is always lower.', 'Welfare (including the age pension), health and payments to the states make up well over half of federal spending.', 'Interest on government debt is paid before anything else, and buys nothing new.'],
+    related: [{ label: 'Build your own Federal Budget', href: 'budget/build/' }, { label: 'The Budget, line by line', href: 'budget/' }] },
+  { slug: 'deficit-or-debt', tool: 'debt', minutes: 2, title: 'Deficit or debt?', question: 'They’re not the same thing. What’s the difference?',
+    intro: ['These two words are mixed up constantly, including by politicians. The deficit is about one year. The debt is about all the years added together.', 'Set a deficit or a surplus and watch what it does to the debt, and to the interest bill, over ten years.'],
+    takeaways: ['A smaller deficit still adds to the debt. It just adds more slowly.', 'Only a surplus pays debt down.', 'The interest bill depends on both how much is owed and the rate, and it has to be paid every year before a dollar goes to services.'],
+    related: [{ label: 'Gross government debt', href: 'measures/gross_debt/' }, { label: 'The budget balance', href: 'measures/budget_balance/' }, { label: 'Interest on the debt', href: 'measures/interest_costs/' }] },
+  { slug: 'inflation-and-your-pay', tool: 'inflation', minutes: 2, title: 'Inflation and your pay', question: 'Why can a pay rise still leave you worse off?',
+    intro: ['Inflation is the speed at which prices rise. A little is normal: the Reserve Bank aims for 2 to 3% a year. What matters to your household is whether your pay rises faster or slower than prices.', 'Try different combinations. Notice how a gap of just one percentage point compounds over the years.'],
+    takeaways: ['Falling inflation doesn’t mean prices fall. It means they rise more slowly.', 'If pay grows more slowly than prices, living standards fall even while pay packets grow.', 'Small differences compound: a 1-point gap for five years is a 5% change in what your pay buys.'],
+    related: [{ label: 'Inflation', href: 'measures/inflation/' }, { label: 'Real wages', href: 'measures/real_wages/' }, { label: 'Prices vs wages', href: 'measures/prices_vs_wages/' }] },
+  { slug: 'interest-rates-and-mortgages', tool: 'mortgage', minutes: 2, title: 'Interest rates and mortgages', question: 'Who decides your mortgage rate, and what does a rate rise really cost?',
+    intro: ['When the news says “rates went up”, it means the Reserve Bank lifted its cash rate. Banks pass that on to people with variable mortgages, usually within weeks.', 'Enter a loan and a rate to see the repayment, and what each quarter-point move adds or saves.'],
+    takeaways: ['The Reserve Bank sets the cash rate independently of the government.', 'Its job is to keep inflation between 2 and 3%. Higher rates slow spending; lower rates encourage it.', 'On a typical loan, each quarter-point rise costs roughly $100 a month.'],
+    related: [{ label: 'Interest rates', href: 'measures/interest_rates/' }, { label: 'Mortgage repayments', href: 'measures/mortgage/' }] },
+];

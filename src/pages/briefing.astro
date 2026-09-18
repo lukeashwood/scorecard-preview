@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import Briefing, { type BMeasure } from '../islands/Briefing.tsx';
+import '../styles/hud.css';
+import { url } from '../config/site';
+import { MEASURES, SECTIONS, GENERATED_AT, tally, byId } from '../lib/measures';
+import { fmtDate, headlineText } from '../lib/format';
+
+const toB = (m: (typeof MEASURES)[number]): BMeasure => ({ id: m.id, title: m.title, value: headlineText(m.headline), caption: m.headline.period ?? '', trend: m.direction?.trend ?? null, tone: m.direction?.tone ?? 'neutral', change: m.direction?.changeLabel ?? '', href: url(`measures/${m.id}/`) });
+const topics = SECTIONS.map((s) => ({ id: s.id, title: s.title, measures: MEASURES.filter((m) => m.section === s.id && m.ed.group !== 'context').map(toB) })).filter((t) => t.measures.length);
+const moved = MEASURES.filter((m) => m.direction && m.direction.tone !== 'neutral');
+const size = (m: (typeof MEASURES)[number]) => Math.abs(m.direction!.change);
+const better = moved.filter((m) => m.direction!.tone === 'good').sort((a, b) => size(b) - size(a)).slice(0, 4).map(toB);
+const worse = moved.filter((m) => m.direction!.tone === 'bad').sort((a, b) => size(b) - size(a)).slice(0, 4).map(toB);
+const due = MEASURES.filter((m) => m.recheck_by).sort((a, b) => a.recheck_by!.localeCompare(b.recheck_by!)).slice(0, 5).map((m) => ({ title: m.title, date: fmtDate(m.recheck_by!), href: url(`measures/${m.id}/`) }));
+const t = tally();
+const say = (id: string, f: (v: string) => string) => { const m = byId(id); return m ? f(headlineText(m.headline).replace('%', ' per cent')) : ''; };
+const nGood = moved.filter((m) => m.direction!.tone === 'good').length, nBad = moved.filter((m) => m.direction!.tone === 'bad').length;
+const script = [
+  `This is the Scorecard briefing, using official figures as at ${fmtDate(GENERATED_AT)}.`,
+  `Of ${t.total} government commitments tracked, ${t.good} are met or on track, ${t.progress} in progress, ${t.risk} at risk, and ${t.bad} off track or not met.`,
+  `Over the past year, ${nGood} measures moved in the direction most people would call better, and ${nBad} moved the other way.`,
+  better.length ? `The clearest improvements were in ${better.map((m) => m.title.toLowerCase()).join(', ')}.` : '',
+  worse.length ? `The clearest deteriorations were in ${worse.map((m) => m.title.toLowerCase()).join(', ')}.` : '',
+  [say('inflation', (v) => `Inflation is ${v}`), say('unemployment', (v) => `unemployment is ${v}`)].filter(Boolean).join(', ') + '.',
+  'That is the briefing. Every figure links to its official source.',
+].filter((s) => s && s !== '.');
+---
+<Base title="The briefing" description="A live command-centre view of every measure: what moved, what's due, and a spoken daily briefing generated from official figures." section="briefing/">
+  <h1 class="sr-only">The daily briefing</h1>
+  <Briefing client:only="react" topics={topics} tally={t} moves={{ better, worse }} due={due} script={script} asAt={fmtDate(GENERATED_AT)} targetsHref={url('targets/')} />
+  <noscript><p class="wrap py-10">The briefing needs JavaScript. Every figure is also on the <a href={url('measures/')}>measures page</a>.</p></noscript>
+</Base>

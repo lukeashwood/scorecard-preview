@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import BudgetBuilder from '../../islands/BudgetBuilder.tsx';
+import { url } from '../../config/site';
+import { BUDGET } from '../../lib/measures';
+const Y = BUDGET.years[0];
+---
+<Base title="Build your own Federal Budget" description="Start from the government's real Budget. Change any tax, spending line, tax rate or migration setting and see what it does to the deficit, debt and interest bill." section="budget/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow"><a href={url('budget/')} class="text-ink-3 no-underline hover:underline">← The Budget</a> · Educational tool</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Build your own Federal Budget</h1>
+    <p class="lede mt-3">You start with the government’s {Y.year} Budget, exactly as published. Move any line, in dollars or as a share of the economy, and watch the deficit, the debt and the interest bill respond.</p>
+    <div class="mt-6"><BudgetBuilder client:load year={Y} migration={BUDGET.migration ?? null} /></div>
+    <noscript><p class="card card-pad mt-6">This tool needs JavaScript. The published figures are on the <a href={url('budget/')}>Budget page</a>.</p></noscript>
+
+    <section class="mt-16 grid gap-10 lg:grid-cols-2">
+      <div class="prose"><h2 class="!mt-0">How this works</h2>
+        <p>Every starting figure is the government’s own, from Budget Paper No. 1 (<a href={Y.url} rel="noopener">source</a>). The bottom line here is revenue minus spending on an accrual basis, so it differs a little from the “underlying cash balance” in the headlines. Percentages are shares of the nominal GDP the Budget itself assumes ({(Y.gdp_m / 1e6).toFixed(2)} trillion dollars; the Budget doesn’t print this figure, so it is derived from the dollar amounts and GDP shares it does print).</p>
+        <p>The calculations are open: the engine is a single tested file, and every share link encodes your whole budget so anyone can check it.</p></div>
+      <div class="prose"><h2 class="!mt-0">What it doesn’t model</h2>
+        <ul><li><strong>Behaviour.</strong> A tax cut can change how much people work, spend and invest. This tool assumes nobody changes what they do.</li>
+          <li><strong>The wider economy.</strong> Large spending changes affect inflation, interest rates and jobs. None of that feeds back here.</li>
+          <li><strong>Time.</strong> Real changes take years to legislate and phase in. Here they happen at once, in one Budget year.</li>
+          <li><strong>The states.</strong> Cutting payments to the states doesn’t make the costs disappear; it moves them.</li></ul>
+        <p>Use it to understand the size of things and the trade-offs between them, not to predict the future.</p></div>
+    </section>
+  </div>
+</Base>
