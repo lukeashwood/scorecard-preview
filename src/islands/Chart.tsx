@@ -23,6 +23,7 @@ function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null); const [w, setW] = useState(0);
   useEffect(() => {
     if (!ref.current) return;
+    setW(Math.round(ref.current.getBoundingClientRect().width)); // measure at once: a background tab may never get a resize callback
     const ro = new ResizeObserver((e) => setW(Math.round(e[0].contentRect.width)));
     ro.observe(ref.current); return () => ro.disconnect();
   }, []);
