@@ -8,7 +8,7 @@ interface Props { title?: string; description?: string; section?: string; jsonld
 const { title, description = SITE.description, section = '', jsonld, immersive = false } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImage = new URL(url('og.png'), Astro.site).href;
+const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 ---
 <!doctype html>
 <html lang="en-AU" data-immersive={immersive ? '' : undefined}>
@@ -28,13 +28,14 @@ const ogImage = new URL(url('og.png'), Astro.site).href;
   <meta property="og:title" content={title ?? SITE.name} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
-  <meta property="og:image" content={ogImage} />
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:card" content="summary" />
+  {preview && <meta name="robots" content="noindex, nofollow" />}
   <link rel="sitemap" href={url('sitemap-index.xml')} />
   {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+  {preview && <p class="no-print bg-ink px-4 py-1.5 text-center text-[13px] font-semibold text-paper">Private preview. Not launched, not for sharing. Some sections are still being finalised.</p>}
   <header class="site sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
     <div class="wrap flex h-16 items-center gap-4">
       <a href={url()} class="flex items-center gap-2.5 text-ink no-underline" aria-label={`${SITE.name} home`}>
