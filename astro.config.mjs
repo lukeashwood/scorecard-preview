@@ -13,5 +13,6 @@ export default defineConfig({
   base,
   trailingSlash: 'always',
   integrations: [react(), sitemap()],
-  vite: { plugins: [tailwindcss()] },
+  // Pre-bundle the heavier libraries up front so the local dev server never serves a half-optimised copy.
+  vite: { plugins: [tailwindcss()], optimizeDeps: { include: ['react', 'react-dom', 'react-dom/client', 'three', 'd3-scale', 'd3-shape'] } },
 });

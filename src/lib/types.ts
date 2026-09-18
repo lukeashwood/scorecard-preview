@@ -79,6 +79,11 @@ export interface Editorial {
   chartNote?: string;
   chartTitle?: string;
   supports?: string;
+  /** Leave this measure out of since-office comparisons (e.g. an unadjusted quarterly series, where comparing a June
+      quarter with a March quarter would mostly measure the season). */
+  noSince?: boolean;
+  /** An honest note about the starting point in mid-2022, shown beside every since-office comparison. */
+  baselineNote?: string;
   /** Context lines from the data feed that are dropped because they argue rather than inform. */
   dropContext?: RegExp[];
   target?: TargetSpec;
@@ -96,7 +101,8 @@ export interface Measure extends RawMetric {
   ed: Editorial;
   sectionTitle: string;
   direction: Direction | null;
-  sinceElection: { from: Point; to: Point; change: number; label: string } | null;
+  /** The change since the government took office: the site's primary comparison. */
+  sinceElection: { from: Point; to: Point; change: number; label: string; trend: Trend; tone: 'good' | 'bad' | 'neutral'; periodLabel: string } | null;
   verdict: { verdict: Verdict; reason: string } | null;
   lastDataDate: string | null;
   isForecastHeadline: boolean;

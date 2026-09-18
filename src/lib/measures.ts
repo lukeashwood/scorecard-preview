@@ -2,7 +2,7 @@ import raw from '../data/metrics.json';
 import commitmentsRaw from '../data/commitments.json';
 import { SITE } from '../config/site';
 import { EDITORIAL } from './editorial';
-import { daysBetween, fmtPeriod, inferFreq, signed } from './format';
+import { daysBetween, fmtPeriod, inferFreq, signed, withUnit } from './format';
 import type { Direction, Measure, Point, RawMetric, Trend, Verdict } from './types';
 
 const data = raw as unknown as {
@@ -49,23 +49,24 @@ function direction(m: RawMetric): Direction | null {
   const yearAgo = new Date(Date.UTC(+latest[0].slice(0, 4) - 1, +latest[0].slice(5, 7) - 1, +latest[0].slice(8, 10))).toISOString().slice(0, 10);
   const prior = freq === 'fy' ? pts[pts.length - 2] : nearest(pts.slice(0, -1), yearAgo, freq === 'q' ? 50 : 20);
   if (!prior) return null;
-  const isRate = rs.unit === '%';
-  const change = isRate ? latest[1] - prior[1] : prior[1] !== 0 ? ((latest[1] - prior[1]) / Math.abs(prior[1])) * 100 : 0;
-  // "Steady" band: a fifth of a percentage point for rates, 1% for levels and indexes.
-  const band = isRate ? 0.2 : 1;
+  const isRate = rs.unit === '%', isMoney = rs.unit === '$bn';
+  const change = isRate || isMoney ? latest[1] - prior[1] : prior[1] !== 0 ? ((latest[1] - prior[1]) / Math.abs(prior[1])) * 100 : 0;
+  // "Steady" band: a fifth of a percentage point for rates, 1% for levels and indexes. Dollar series (which can be
+  // negative, like the budget balance) are compared in dollars, never as a percentage of a negative number.
+  const band = isRate ? 0.2 : isMoney ? Math.max(0.5, Math.abs(prior[1]) * 0.01) : 1;
   const trend: Trend = Math.abs(change) < band ? 'steady' : change > 0 ? 'up' : 'down';
   const tone = trend === 'steady' || ed.better === 'none' ? 'neutral' : (trend === 'up') === (ed.better === 'higher') ? 'good' : 'bad';
   const d = isRate ? (Math.abs(change) < 1 ? 2 : 1) : 1;
   return {
     trend, tone, latest, prior, change,
-    changeLabel: isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : d)} pts` : `${signed(change, 1)}%`,
+    changeLabel: isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : d)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`,
     periodLabel: `${fmtPeriod(prior[0], freq)} → ${fmtPeriod(latest[0], freq)}`,
   };
 }
 
 function sinceElection(m: RawMetric) {
   const ed = EDITORIAL[m.id]; const rs = ratedSeries(m);
-  if (!ed || ed.group === 'context' || !rs) return null;
+  if (!ed || ed.group === 'context' || ed.noSince || !rs) return null;
   let pts = actuals(m, rs.points);
   // A newer series (the monthly CPI began in 2025) can't reach back to 2022: fall back to the long-running first series.
   if ((!pts.length || pts[0][0] > '2022-09-30') && ed.useExtra == null && m.chart.series?.[0]) pts = actuals(m, m.chart.series[0].points);
@@ -74,9 +75,13 @@ function sinceElection(m: RawMetric) {
   const anchor = freq === 'fy' || freq === 'q' ? '2022-06-30' : '2022-05-31';
   const from = nearest(pts, anchor, freq === 'fy' ? 10 : 50); const to = pts[pts.length - 1];
   if (!from || from[0] === to[0]) return null;
-  const isRate = rs.unit === '%';
-  const change = isRate ? to[1] - from[1] : from[1] !== 0 ? ((to[1] - from[1]) / Math.abs(from[1])) * 100 : 0;
-  return { from, to, change, label: isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : 1)} pts` : `${signed(change, 1)}%` };
+  const isRate = rs.unit === '%', isMoney = rs.unit === '$bn';
+  const change = isRate || isMoney ? to[1] - from[1] : from[1] !== 0 ? ((to[1] - from[1]) / Math.abs(from[1])) * 100 : 0;
+  const band = isRate ? 0.2 : isMoney ? Math.max(0.5, Math.abs(from[1]) * 0.01) : 1;
+  const trend: Trend = Math.abs(change) < band ? 'steady' : change > 0 ? 'up' : 'down';
+  const tone = trend === 'steady' || ed.better === 'none' ? 'neutral' : (trend === 'up') === (ed.better === 'higher') ? 'good' : 'bad';
+  const label = isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : 1)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`;
+  return { from, to, change, trend, tone, periodLabel: `${fmtPeriod(from[0], freq)} → ${fmtPeriod(to[0], freq)}`, label };
 }
 
 function lastDataDate(m: RawMetric): string | null {
@@ -133,6 +138,12 @@ export function freshness(m: Measure) {
   const age = daysBetween(m.lastDataDate, TODAY);
   const limit = freq === 'fy' ? 500 : freq === 'q' ? 200 : freq === 'm' ? 80 : 45;
   return { age, stale: age > limit, freq };
+}
+
+/** The record since taking office, counted only over measures where nearly everyone agrees which way is better. */
+export function record() {
+  const rated = MEASURES.filter((m) => m.sinceElection && m.ed.group !== 'context' && m.ed.better !== 'none');
+  return { better: rated.filter((m) => m.sinceElection!.tone === 'good'), worse: rated.filter((m) => m.sinceElection!.tone === 'bad'), steady: rated.filter((m) => m.sinceElection!.tone === 'neutral'), total: rated.length };
 }
 
 export const GOVERNMENT = SITE.government;

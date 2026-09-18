@@ -47,12 +47,12 @@ const jsonld = {
         <dd class="mt-2"><span class="num font-display text-[40px] font-semibold leading-none tracking-tight">{headlineText(m.headline)}</span><span class="meta mt-2 block">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</span></dd>
       </div>
       <div class="bg-surface p-5">
-        <dt class="eyebrow">Over the past year</dt>
-        <dd class="mt-3">{m.direction ? <><DirectionBadge direction={m.direction} /><span class="meta mt-2 block">{rs?.name ? `${rs.name.split('(')[0].trim()}: ` : ''}{withUnit(m.direction.prior[1], rs!.unit, rs!.decimals)} → {withUnit(m.direction.latest[1], rs!.unit, rs!.decimals)} ({m.direction.periodLabel})</span>{m.ed.betterNote && <span class="meta mt-1 block">{m.ed.betterNote}</span>}</> : <span class="meta">Not a time series, so no yearly change is shown.</span>}</dd>
+        <dt class="eyebrow">Since the government took office</dt>
+        <dd class="mt-3">{m.sinceElection ? <><DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} /><span class="meta mt-2 block">{withUnit(m.sinceElection.from[1], rs!.unit, rs!.decimals)} → {withUnit(m.sinceElection.to[1], rs!.unit, rs!.decimals)} ({m.sinceElection.periodLabel})</span>{m.ed.baselineNote && <span class="meta mt-1.5 block"><b class="text-ink-2">Starting point:</b> {m.ed.baselineNote}</span>}{m.ed.betterNote && <span class="meta mt-1 block">{m.ed.betterNote}</span>}</> : <span class="meta">No comparable figure from mid-2022.</span>}</dd>
       </div>
       <div class="bg-surface p-5">
-        <dt class="eyebrow">Since the {SITE.government.elections[0].label}</dt>
-        <dd class="mt-3">{m.sinceElection ? <><span class="num font-display text-[28px] font-semibold leading-none">{m.sinceElection.label}</span><span class="meta mt-2 block">{withUnit(m.sinceElection.from[1], rs!.unit, rs!.decimals)} → {withUnit(m.sinceElection.to[1], rs!.unit, rs!.decimals)} ({fmtMonth(m.sinceElection.from[0])} to {fmtMonth(m.sinceElection.to[0])}). A fact, not a verdict: much of it may be outside the government’s control.</span></> : <span class="meta">No comparable figure from mid-2022.</span>}</dd>
+        <dt class="eyebrow">Over the past year</dt>
+        <dd class="mt-3">{m.direction ? <><DirectionBadge change={{ trend: m.direction.trend, tone: m.direction.tone, label: m.direction.changeLabel }} /><span class="meta mt-2 block">{withUnit(m.direction.prior[1], rs!.unit, rs!.decimals)} → {withUnit(m.direction.latest[1], rs!.unit, rs!.decimals)} ({m.direction.periodLabel})</span></> : <span class="meta">Not a time series, so no yearly change is shown.</span>}</dd>
       </div>
     </dl>
 
@@ -61,7 +61,7 @@ const jsonld = {
         <h2 class="h3">{m.ed.chartTitle ?? ((m.chart.series?.length ?? 0) > 1 ? m.title : rs?.name ?? m.title)}</h2>
         <ul class="flex flex-wrap gap-1.5">{m.ed.labels.map((l) => <li class="pill pill-neutral !font-semibold">{l}</li>)}</ul>
       </div>
-      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections]} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} />
+      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
     </section>
 

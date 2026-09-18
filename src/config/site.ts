@@ -2,9 +2,9 @@
 export const SITE = {
   name: 'The Scorecard',
   edition: 'Australia',
-  tagline: 'Government performance, in the government’s own numbers.',
+  tagline: 'Holding the federal government to account, in its own numbers.',
   description:
-    'Official Australian figures on the cost of living, housing, jobs, the Budget and more: sourced, checked daily, explained in plain English.',
+    'Holding the Australian Government to account with official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, checked daily, in plain English.',
   locale: 'en-AU',
   currency: 'AUD',
   government: {
@@ -19,7 +19,7 @@ export const SITE = {
   /* Who publishes the site and who pays for it. Left null until the publisher confirms the wording; the About page
      shows a plain "being finalised" note rather than inventing details. */
   publisher: null as null | { name: string; statement: string; funding: string; contact: string },
-  rulesVersion: '2.0',
+  rulesVersion: '2.1',
   rulesDate: '2026-09-18',
   repo: 'https://github.com/lukeashwood',
   // Formspree form that receives sign-ups and error reports (emailed to the publisher).

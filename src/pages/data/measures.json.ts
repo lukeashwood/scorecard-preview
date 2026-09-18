@@ -11,6 +11,7 @@ export const GET: APIRoute = () =>
       id: m.id, title: m.title, topic: m.sectionTitle, kind: m.ed.group, federal_influence: m.ed.influence,
       latest: { value: m.headline.value, unit: m.headline.unit ?? '', period: m.headline.period ?? null, description: m.headline.caption },
       verdict: m.verdict ? { verdict: m.verdict.verdict, reason: m.verdict.reason, commitment: m.ed.target!.commitment, rule: m.ed.target!.rule } : null,
+      change_since_took_office: m.sinceElection ? { trend: m.sinceElection.trend, change: Number(m.sinceElection.change.toFixed(3)), label: m.sinceElection.label, from: m.sinceElection.from, to: m.sinceElection.to, starting_point_note: m.ed.baselineNote ?? null } : null,
       change_over_year: m.direction ? { trend: m.direction.trend, change: Number(m.direction.change.toFixed(3)), from: m.direction.prior, to: m.direction.latest } : null,
       labels: m.ed.labels, unit: m.ed.unitOverride ?? m.chart.unit,
       series: m.chart.series ?? [], categories: m.chart.bars ?? [], forecast_from: m.chart.estimateFrom ?? null,

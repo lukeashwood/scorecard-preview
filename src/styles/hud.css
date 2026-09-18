@@ -39,3 +39,49 @@
 .hud-brief li[data-on="1"] { border-left-color: var(--h-cy); color: #fff; }
 .hud :focus-visible { outline: 2px solid var(--h-cy); outline-offset: 2px; }
 @media (max-width: 1080px) { .hud-grid { grid-template-columns: 1fr; } .hud-stage-wrap { order: -1; height: 420px; min-height: 0; } }
+
+/* ---- briefing v2: stage + detail panel, guided tour, ticker */
+.hud-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 16px; margin-top: 16px; position: relative; align-items: stretch; }
+.hud-stage-wrap { height: min(74vh, 720px); min-height: 520px; border: 1px solid var(--h-line); border-radius: 12px; overflow: hidden; background: radial-gradient(700px 420px at 50% 45%, rgba(40, 90, 150, 0.22), transparent 70%); }
+.hud-corner { position: absolute; width: 18px; height: 18px; border: 2px solid var(--h-cy); opacity: 0.7; pointer-events: none; }
+.hud-corner.tl { left: 8px; top: 8px; border-right: 0; border-bottom: 0; } .hud-corner.tr { right: 8px; top: 8px; border-left: 0; border-bottom: 0; }
+.hud-corner.bl { left: 8px; bottom: 8px; border-right: 0; border-top: 0; } .hud-corner.br { right: 8px; bottom: 8px; border-left: 0; border-top: 0; }
+.hud-tag small { display: block; font-size: 10px; letter-spacing: 0.04em; color: var(--h-dim); text-transform: none; margin-top: 1px; }
+.hud-tag small i, .hud-tag small b { font-style: normal; font-weight: 500; }
+.hud-tag small b { color: var(--h-ink); }
+.hud-tag { transition: opacity 220ms ease, border-color 160ms ease, color 160ms ease; text-align: center; line-height: 1.25; }
+.hud-tag-moon { font-size: 10px; padding: 2px 7px; background: rgba(6, 10, 19, 0.85); }
+.hud-tag-core { border-color: var(--h-cy); color: var(--h-cy); }
+.hud-tour { position: absolute; left: 16px; right: 16px; bottom: 34px; display: grid; gap: 8px; justify-items: center; pointer-events: none; }
+.hud-tour > * { pointer-events: auto; }
+.hud-say { max-width: 760px; margin: 0; padding: 10px 14px; background: rgba(6, 10, 19, 0.86); border: 1px solid var(--h-line); border-left: 2px solid var(--h-cy); border-radius: 8px; font-size: 14.5px; line-height: 1.5; color: #dbe9fb; min-height: 44px; }
+.hud-tourctl { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--h-dim); }
+.hud-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--h-dim); cursor: pointer; }
+.hud-toggle input { accent-color: var(--h-cy); }
+.hud-legend { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--h-dim); }
+.hud-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 5px 0 12px; }
+.hud-detail { overflow-y: auto; max-height: min(74vh, 720px); }
+.hud-back { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; color: var(--h-cy); background: none; border: 0; padding: 0; margin: 0 0 10px; cursor: pointer; }
+.hud-title { font-family: var(--font-display); font-size: 25px; line-height: 1.15; font-weight: 600; margin: 0; color: #fff; }
+.hud-dim { font-size: 13.5px; color: var(--h-dim); margin: 6px 0 0; line-height: 1.5; }
+.hud-big { font-family: var(--font-display); font-size: 40px; font-weight: 600; line-height: 1; margin: 16px 0 4px; color: #fff; font-variant-numeric: tabular-nums; }
+.hud-big small { display: block; font-family: var(--font-sans); font-size: 12.5px; font-weight: 400; color: var(--h-dim); margin-top: 6px; line-height: 1.4; }
+.hud-fact { display: grid; grid-template-columns: 118px 1fr; gap: 10px; align-items: baseline; font-size: 13.5px; color: #c4d4ea; margin: 0; padding: 9px 0; border-top: 1px solid rgba(28, 49, 80, 0.7); }
+.hud-fact b { font-variant-numeric: tabular-nums; font-size: 14px; color: #fff; }
+.hud-note { font-size: 12.5px; color: var(--h-dim); background: rgba(95, 212, 255, 0.06); border-radius: 8px; padding: 9px 11px; margin: 10px 0 0; line-height: 1.5; }
+.hud-note b { color: #c4d4ea; font-weight: 600; }
+.hud-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 6px; }
+.hud-stats div { border: 1px solid var(--h-line); border-radius: 10px; padding: 9px 10px; font-size: 11.5px; color: var(--h-dim); line-height: 1.3; }
+.hud-stats b { display: block; font-family: var(--font-display); font-size: 28px; line-height: 1.05; color: #fff; }
+.hud-list button { all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; font-size: 14px; cursor: pointer; transition: color 140ms ease; }
+.hud-list button:hover, .hud-list button:focus-visible { color: var(--h-cy); }
+.hud-btn-block { display: block; text-align: center; margin-top: 14px; color: var(--h-bg) !important; }
+.hud-ticker { display: flex; align-items: center; gap: 12px; margin-top: 16px; border: 1px solid var(--h-line); border-radius: 10px; padding: 8px 12px; font-family: var(--font-mono); font-size: 12px; overflow: hidden; position: relative; }
+.hud-ticker > b { color: var(--h-bg); background: var(--h-cy); border-radius: 4px; padding: 1px 7px; font-weight: 500; letter-spacing: 0.08em; flex: none; }
+.hud-ticker div { overflow: hidden; flex: 1; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.hud-ticker p { display: inline-flex; gap: 34px; margin: 0; white-space: nowrap; animation: hud-marquee 90s linear infinite; color: var(--h-dim); }
+.hud-ticker em { font-style: normal; color: var(--h-ink); } .hud-ticker i { font-style: normal; }
+@keyframes hud-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .hud-ticker p { animation: none; } }
+.hud-under { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 16px; position: relative; }
+@media (max-width: 1080px) { .hud-main { grid-template-columns: 1fr; } .hud-stage-wrap { height: 480px; min-height: 0; order: 0; } .hud-detail { max-height: none; } .hud-under { grid-template-columns: 1fr; } .hud-legend { font-size: 9.5px; } .hud-say { font-size: 13.5px; } }

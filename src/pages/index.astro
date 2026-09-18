@@ -5,11 +5,13 @@ import MeasureCard from '../components/MeasureCard.astro';
 import VerdictPill from '../components/VerdictPill.astro';
 import Icon from '../components/Icon.astro';
 import { SITE, url } from '../config/site';
-import { CONDITIONS, GOV_TARGETS, TARGETS, DELIVERIES, SECTIONS, CHECKS, GENERATED_AT, tally } from '../lib/measures';
+import { CONDITIONS, GOV_TARGETS, TARGETS, DELIVERIES, SECTIONS, CHECKS, GENERATED_AT, tally, record } from '../lib/measures';
+import { headlineText } from '../lib/format';
 import { VERDICT_TONE } from '../lib/editorial';
 import { fmtStamp } from '../lib/format';
 
 const t = tally();
+const rec = record();
 const official = TARGETS.filter((m) => m.ed.target!.owner === 'official');
 const groups = SECTIONS.map((s) => ({ ...s, items: CONDITIONS.filter((m) => m.section === s.id) })).filter((g) => g.items.length);
 const segs = [
@@ -25,11 +27,11 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
     <div class="wrap grid gap-10 py-12 md:py-16 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
       <div>
         <p class="eyebrow">{SITE.edition} · {SITE.government.name}</p>
-        <h1 class="display mt-3 text-[clamp(38px,5.6vw,64px)]">How is the government going? <span class="text-brand">Here are its own numbers.</span></h1>
-        <p class="lede mt-5">Official figures from the ABS, the Reserve Bank and the Budget papers, each one linked to its source and checked every day. Where the government made a measurable promise, we say whether it’s being kept. Everywhere else, we show you what’s happening and let you judge.</p>
+        <h1 class="display mt-3 text-[clamp(38px,5.6vw,64px)]">Holding the government to account, <span class="text-brand">in its own numbers.</span></h1>
+        <p class="lede mt-5">What the {SITE.government.name} promised, what it has delivered, and what has changed since it took office in May 2022. Every figure is official, linked to its source and checked every day. The facts are laid out plainly so you can judge for yourself.</p>
         <div class="mt-7 flex flex-wrap gap-3">
-          <a class="btn btn-primary" href="#commitments">See the commitments <Icon name="arrow" /></a>
-          <a class="btn btn-ghost" href={url('budget/build/')}>Build your own Federal Budget</a>
+          <a class="btn btn-primary" href="#record">See the record <Icon name="arrow" /></a>
+          <a class="btn btn-ghost" href="#commitments">Promises kept and broken</a>
         </div>
       </div>
 
@@ -75,6 +77,24 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
     </div>
   </section>
 
+  <section class="wrap pt-16" id="record">
+    <p class="eyebrow">The record · May 2022 to now</p>
+    <h2 class="h2 mt-2">What has changed since the government took office</h2>
+    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
+    <div class="mt-7 grid gap-5 md:grid-cols-2">
+      {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
+        <div class="card overflow-hidden">
+          <div class:list={['flex items-center justify-between gap-3 px-5 py-3', g.bg]}><h3 class:list={['h3', g.tx]}>{g.h}</h3><span class:list={['num font-display text-[26px] font-semibold', g.tx]}>{g.list.length}</span></div>
+          <ul>{g.list.map((m) => (
+            <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
+              <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
+              <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}
+            {g.list.length === 0 && <li class="rule-t px-5 py-4 text-ink-2">None on the latest figures.</li>}</ul>
+        </div>))}
+    </div>
+    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown below without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
+  </section>
+
   <section id="commitments" class="wrap pt-16">
     <p class="eyebrow">Commitments</p>
     <h2 class="h2 mt-2">What the government said it would do</h2>
@@ -93,9 +113,9 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
   </section>
 
   <section class="wrap pt-20">
-    <p class="eyebrow">Conditions</p>
-    <h2 class="h2 mt-2">The state of things</h2>
-    <p class="lede mt-3">No verdicts here, just the latest official figure and which way it moved over the past year.</p>
+    <p class="eyebrow">Every measure</p>
+    <h2 class="h2 mt-2">The figures, topic by topic</h2>
+    <p class="lede mt-3">The latest official figure for each measure, how it has moved since the government took office, and how it moved over the past year.</p>
     <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13.5px] text-ink-2">
       <span class="inline-flex items-center gap-2"><span class="pill pill-good"><Icon name="up" size={13} />Better</span><span class="pill pill-bad"><Icon name="down" size={13} />Worse</span> used only where nearly everyone agrees which way is good</span>
       <span class="inline-flex items-center gap-2"><span class="pill pill-neutral"><Icon name="up" size={13} />Rising</span> used where that’s a matter of political opinion</span>

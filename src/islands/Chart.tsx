@@ -9,6 +9,8 @@ interface Props {
   title: string;
   unitOverride?: string;
   elections?: { date: string; label: string }[];
+  /** The government's time in office: shaded on every chart, with earlier periods faded. */
+  term?: { start: string; label: string };
   /** Plot this extra series (e.g. % of GDP) instead of series[0]. */
   useExtra?: number;
   csvName?: string;
@@ -17,7 +19,7 @@ interface Props {
 
 const COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 const roleColor = (role: string | undefined, i: number) => (role === 'muted' ? 'var(--c4)' : COLORS[i % COLORS.length]);
-const RANGES = [{ id: '5y', label: '5 years', years: 5 }, { id: '10y', label: '10 years', years: 10 }, { id: 'all', label: 'All', years: 0 }] as const;
+const RANGES = [{ id: 'term', label: 'This government', years: -1 }, { id: '5y', label: '5 years', years: 5 }, { id: '10y', label: '10 years', years: 10 }, { id: 'all', label: 'All', years: 0 }] as const;
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null); const [w, setW] = useState(0);
@@ -30,7 +32,7 @@ function useWidth<T extends HTMLElement>() {
   return [ref, w] as const;
 }
 
-export default function Chart({ spec, title, unitOverride, elections = [], useExtra, csvName = 'data', height = 340 }: Props) {
+export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', height = 340 }: Props) {
   const unit = unitOverride ?? (useExtra != null ? spec.extra![useExtra].unit : spec.unit);
   const decimals = useExtra != null ? spec.extra![useExtra].decimals : spec.decimals;
   const series = useMemo(() => {
@@ -46,6 +48,8 @@ export default function Chart({ spec, title, unitOverride, elections = [], useEx
   const cut = useMemo(() => {
     const r = RANGES.find((x) => x.id === range)!;
     if (!r.years || !allDates.length) return '0000';
+    // "This government": from the start of the year it took office, so the starting point stays in view.
+    if (r.years < 0) return term ? `${term.start.slice(0, 4)}-01-01` : '0000';
     const end = parseDate(allDates[allDates.length - 1]);
     return new Date(Date.UTC(end.getUTCFullYear() - r.years, end.getUTCMonth(), end.getUTCDate())).toISOString().slice(0, 10);
   }, [range, allDates]);
@@ -69,7 +73,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], useEx
     <figure className="m-0">
       <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-1" role="group" aria-label="Time range">
-          {spec.kind !== 'hbar' && spanYears > 6 && view === 'chart' && RANGES.map((r) => (
+          {spec.kind !== 'hbar' && spanYears > 6 && view === 'chart' && RANGES.filter((r) => r.years >= 0 || (term && allDates[0] < term.start)).map((r) => (
             <button key={r.id} type="button" className="btn btn-sm btn-quiet" aria-pressed={range === r.id} onClick={() => setRange(r.id)}
               style={range === r.id ? { background: 'var(--ink)', color: 'var(--paper)' } : undefined}>{r.label}</button>
           ))}
@@ -82,7 +86,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], useEx
 
       {view === 'table' ? <DataTable spec={spec} series={series} unit={unit} decimals={decimals} freq={freq} />
         : spec.kind === 'hbar' ? <HBars spec={spec} unit={unit} decimals={decimals} title={title} />
-        : <TimeChart spec={spec} series={shown} fmt={fmt} freq={freq} elections={elections} title={title} height={height} plottingExtra={useExtra != null} />}
+        : <TimeChart spec={spec} series={shown} fmt={fmt} freq={freq} elections={elections} term={term} title={title} height={height} plottingExtra={useExtra != null} />}
 
       {series.length > 1 && view === 'chart' && spec.kind !== 'hbar' && (
         <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[13.5px] text-ink-2">
@@ -95,14 +99,14 @@ export default function Chart({ spec, title, unitOverride, elections = [], useEx
 }
 
 /* ------------------------------------------------------------------ time charts: line, step, bar */
-function TimeChart({ spec, series, fmt, freq, elections, title, height, plottingExtra }: {
+function TimeChart({ spec, series, fmt, freq, elections, term, title, height, plottingExtra }: {
   spec: ChartSpec; series: { name: string; role?: string; points: Point[] }[]; fmt: (v: number) => string; freq: 'q' | 'fy' | 'm' | 'd';
-  elections: { date: string; label: string }[]; title: string; height: number; plottingExtra: boolean;
+  elections: { date: string; label: string }[]; term?: { start: string; label: string }; title: string; height: number; plottingExtra: boolean;
 }) {
   const [ref, W] = useWidth<HTMLDivElement>();
   const [hover, setHover] = useState<number | null>(null);
   const isBar = spec.kind === 'bar';
-  const m = { t: 26, r: 18, b: 30, l: 52 };
+  const m = { t: 34, r: 18, b: 30, l: 52 };
   const w = Math.max(280, W), h = height, iw = w - m.l - m.r, ih = h - m.t - m.b;
 
   const dates = useMemo(() => [...new Set(series.flatMap((s) => s.points.map((p) => p[0])))].sort(), [series]);
@@ -119,6 +123,13 @@ function TimeChart({ spec, series, fmt, freq, elections, title, height, plotting
   const xb = scaleBand<string>().domain(series[0]?.points.map((p) => p[0]) ?? []).range([0, iw]).paddingInner(0.22).paddingOuter(0.1);
   const px = (d: string) => (isBar ? (xb(d) ?? 0) + xb.bandwidth() / 2 : x(parseDate(d)));
   const est = spec.estimateFrom;
+  // A period belongs to the government's term if it ENDS after the term began and isn't the baseline period itself:
+  // the June quarter 2022 and the 2021–22 financial year are the starting point, not the government's record.
+  const baseEnd = term ? (freq === 'm' || freq === 'd' ? `${term.start.slice(0, 7)}-31` : `${term.start.slice(0, 4)}-06-30`) : '';
+  const inTerm = (d: string) => !!term && d > baseEnd;
+  const firstIn = term ? dates.find(inTerm) : undefined;
+  const termX = !term || !firstIn ? null : isBar ? Math.max(0, (xb(firstIn) ?? 0) - xb.step() * 0.11) : Math.max(0, Math.min(iw, x(parseDate(term.start))));
+  const uid = useMemo(() => 'c' + Math.random().toString(36).slice(2, 8), []);
 
   const yTicks = y.ticks(5);
   // Axis labels drop needless decimals ("4%" not "4.0%") unless the ticks themselves are fractional.
@@ -153,6 +164,8 @@ function TimeChart({ spec, series, fmt, freq, elections, title, height, plotting
         <svg width={w} height={h} role="img" aria-label={`${title}. ${series.map((s) => s.name).join(', ')}. Use the table view for exact figures.`}
           tabIndex={0} onKeyDown={onKey} onBlur={() => setHover(null)} className="block touch-pan-y select-none rounded-lg focus-visible:outline-offset-4">
           <g transform={`translate(${m.l},${m.t})`}>
+            {termX != null && termX < iw && <g><rect x={termX} y={-8} width={iw - termX} height={ih + 8} fill="var(--brand-tint)" opacity={0.6} /><line x1={termX} x2={termX} y1={-8} y2={ih} stroke="var(--brand)" strokeWidth={1.5} /><text x={termX + 6} y={-12} fontSize="11" fill="var(--brand)" fontWeight={700} fontFamily="var(--font-mono)">{term!.label.toUpperCase()} →</text>
+              <clipPath id={`${uid}-pre`}><rect x={-4} y={-20} width={termX + 4} height={ih + 40} /></clipPath><clipPath id={`${uid}-in`}><rect x={termX} y={-20} width={iw - termX + 8} height={ih + 40} /></clipPath></g>}
             {est && dates.some((d) => d >= est) && (() => { const first = dates.find((d) => d >= est)!; const sx = isBar ? (xb(first) ?? 0) - xb.step() * 0.11 : x(parseDate(first)); return (
               <g><rect x={sx} y={-8} width={Math.max(0, iw - sx)} height={ih + 8} fill="var(--panel)" /><text x={sx + 6} y={4} fontSize="11" fill="var(--ink-3)" fontFamily="var(--font-mono)">BUDGET FORECAST →</text></g>); })()}
             {band && <g><rect x={0} y={y(band.hi)} width={iw} height={Math.max(1, y(band.lo) - y(band.hi))} fill="var(--good-tint)" /><text x={6} y={y(band.hi) - 5} fontSize="11.5" fill="var(--good)" fontWeight={700}>{band.label}</text></g>}
@@ -167,8 +180,10 @@ function TimeChart({ spec, series, fmt, freq, elections, title, height, plotting
             {refs.map((r) => <g key={r.label + r.value}><line x1={0} x2={iw} y1={y(r.value)} y2={y(r.value)} stroke="var(--ink-2)" strokeDasharray="5 4" strokeWidth={1.2} />{r.label && <text x={iw} y={y(r.value) - 5} textAnchor="end" fontSize="11.5" fill="var(--ink-2)" fontWeight={600}>{r.label}</text>}</g>)}
 
             {isBar ? series[0]?.points.map((p) => { const y0 = y(0), yv = y(p[1]); const bh = Math.max(1, Math.abs(yv - y0)); const fc = est && p[0] >= est; return (
-              <rect key={p[0]} x={xb(p[0])} y={Math.min(y0, yv)} width={xb.bandwidth()} height={bh} rx={Math.min(3, xb.bandwidth() / 3)} fill="var(--c1)" opacity={fc ? 0.42 : hd && hd !== p[0] ? 0.55 : 1} />); })
-              : series.map((s, i) => <path key={s.name} d={mk(s.points) ?? ''} fill="none" stroke={roleColor(s.role, i)} strokeWidth={s.role === 'muted' ? 1.6 : 2.2} strokeLinejoin="round" strokeLinecap="round" />)}
+              <rect key={p[0]} x={xb(p[0])} y={Math.min(y0, yv)} width={xb.bandwidth()} height={bh} rx={Math.min(3, xb.bandwidth() / 3)} fill={term && !inTerm(p[0]) ? 'var(--c4)' : 'var(--c1)'} opacity={fc ? 0.42 : term && !inTerm(p[0]) ? 0.5 : hd && hd !== p[0] ? 0.6 : 1} />); })
+              : series.map((s, i) => { const d = mk(s.points) ?? '', sw = s.role === 'muted' ? 1.6 : 2.4, c = roleColor(s.role, i); return termX != null
+                ? <g key={s.name}><path d={d} fill="none" stroke={c} strokeWidth={sw * 0.8} opacity={0.38} strokeLinejoin="round" strokeLinecap="round" clipPath={`url(#${uid}-pre)`} /><path d={d} fill="none" stroke={c} strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round" clipPath={`url(#${uid}-in)`} /></g>
+                : <path key={s.name} d={d} fill="none" stroke={c} strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round" />; })}
             {!isBar && last && hover == null && <circle cx={px(last[0])} cy={y(last[1])} r={4} fill="var(--c1)" stroke="var(--surface)" strokeWidth={2} />}
 
             {hd && <g pointerEvents="none"><line x1={hx} x2={hx} y1={0} y2={ih} stroke="var(--ink-3)" strokeWidth={1} />
@@ -179,7 +194,7 @@ function TimeChart({ spec, series, fmt, freq, elections, title, height, plotting
       )}
       {hd && (
         <div role="status" className="pointer-events-none absolute top-2 z-10 w-[188px] rounded-lg border border-rule bg-surface p-2.5 text-[13px] shadow-card" style={{ left: tipLeft }}>
-          <p className="mono mb-1 text-[11.5px] uppercase text-ink-3">{fmtPeriod(hd, freq)}{est && hd >= est ? ' · forecast' : ''}</p>
+          <p className="mono mb-1 text-[11.5px] uppercase text-ink-3">{fmtPeriod(hd, freq)}{est && hd >= est ? ' · forecast' : term && !inTerm(hd) ? ' · before this government' : ''}</p>
           {series.map((s, i) => { const p = s.points.find((q) => q[0] === hd); return p ? (
             <p key={s.name} className="flex items-baseline justify-between gap-2"><span className="flex items-center gap-1.5 text-ink-2"><span aria-hidden className="inline-block h-2 w-2 rounded-full" style={{ background: roleColor(s.role, i) }} />{series.length > 1 ? s.name.split(/[,(]/)[0].slice(0, 22) : 'Value'}</span><b className="num">{fmt(p[1])}</b></p>) : null; })}
         </div>

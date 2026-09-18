@@ -20,8 +20,11 @@ const pts = (rs?.points ?? []).filter((p) => !m.chart.estimateFrom || p[0] < m.c
     <p class="num font-display text-[34px] font-semibold leading-none tracking-tight">{headlineText(m.headline)}</p>
     <p class="meta mt-1.5">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</p>
   </div>
-  <div class="mt-auto flex flex-wrap items-center justify-between gap-2 pt-1">
-    <DirectionBadge direction={m.direction} />
-    <InfluenceChip influence={m.ed.influence} />
+  <div class="mt-auto grid gap-1.5 pt-1">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      {m.sinceElection ? <DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} prefix="Since May 2022" /> : <span class="meta">No mid-2022 figure to compare</span>}
+      <InfluenceChip influence={m.ed.influence} />
+    </div>
+    {m.direction && <DirectionBadge quiet prefix="Past year" change={{ trend: m.direction.trend, tone: m.direction.tone, label: m.direction.changeLabel }} />}
   </div>
 </a>

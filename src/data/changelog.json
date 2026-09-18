@@ -1,6 +1,15 @@
 {
   "corrections": [],
   "rules": [
-    { "date": "2026-09-18", "version": "2.0", "summary": "Verdicts are now given only on measurable commitments the government itself made. All other measures show their direction over the past year with no verdict. Each measure states how much control the federal government has over it. Gross debt is judged as a share of GDP, the way the government's own fiscal strategy states it." }
+    {
+      "date": "2026-09-18",
+      "version": "2.1",
+      "summary": "The change since the government took office (mid-2022) is now the main comparison on every measure, with the change over the past year shown second. Charts shade the government's term. Each comparison carries a note where the mid-2022 starting point was unusual. Dollar figures that can be negative, such as the budget balance, are compared in dollars rather than percentages. Housing completions are left out of since-office comparisons because the series is not seasonally adjusted."
+    },
+    {
+      "date": "2026-09-18",
+      "version": "2.0",
+      "summary": "Verdicts are now given only on measurable commitments the government itself made. All other measures show their direction over the past year with no verdict. Each measure states how much control the federal government has over it. Gross debt is judged as a share of GDP, the way the government's own fiscal strategy states it."
+    }
   ]
 }
