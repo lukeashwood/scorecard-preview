@@ -138,7 +138,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
       {[
         { href: 'budget/build/', eyebrow: 'Interactive', h: 'Build your own Federal Budget', p: 'Start from the real Budget. Change any tax or spending line and watch the deficit, debt and interest bill respond.' },
         { href: 'learn/', eyebrow: 'Plain English', h: 'Learn how it works', p: 'Deficit or debt? Who sets interest rates? Short, interactive explainers with no jargon.' },
-        { href: 'briefing/', eyebrow: 'Command centre', h: 'The daily briefing', p: 'Every measure on one live screen: what changed, what’s due next, and where to look.' },
+        { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'Each topic is a sphere and each measure a moon, coloured by whether it is better or worse than when the government took office.' },
       ].map((c, i) => (
         <a href={url(c.href)} class="card card-link card-pad rise flex flex-col" style={`--i:${i}`}>
           <p class="eyebrow">{c.eyebrow}</p>

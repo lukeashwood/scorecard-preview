@@ -32,6 +32,7 @@ export const NAV = [
   { href: 'budget/', label: 'Budget' },
   { href: 'learn/', label: 'Learn' },
   { href: 'laws/', label: 'Laws' },
+  { href: 'controversies/', label: 'Controversies' },
   { href: 'briefing/', label: 'Briefing' },
 ] as const;
 

@@ -4,19 +4,19 @@ import { SITE, NAV, FOOTER_NAV, url } from '../config/site';
 import { GENERATED_AT } from '../lib/measures';
 import { fmtStamp } from '../lib/format';
 
-interface Props { title?: string; description?: string; section?: string; jsonld?: Record<string, unknown>; immersive?: boolean }
-const { title, description = SITE.description, section = '', jsonld, immersive = false } = Astro.props;
+interface Props { title?: string; description?: string; section?: string; jsonld?: Record<string, unknown>; bodyClass?: string; forceDark?: boolean }
+const { title, description = SITE.description, section = '', jsonld, bodyClass, forceDark = false } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 ---
 <!doctype html>
-<html lang="en-AU" data-immersive={immersive ? '' : undefined}>
+<html lang="en-AU" data-force-dark={forceDark ? '' : undefined}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script is:inline>
-    (function (d) { var t; try { t = localStorage.getItem('sc_theme'); } catch (e) {} if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t); d.classList.add('js'); })(document.documentElement);
+    (function (d) { var t; try { t = localStorage.getItem('sc_theme'); } catch (e) {} if (d.hasAttribute('data-force-dark')) t = 'dark'; if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t); d.classList.add('js'); })(document.documentElement);
   </script>
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
@@ -33,7 +33,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <link rel="sitemap" href={url('sitemap-index.xml')} />
   {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
 </head>
-<body>
+<body class={bodyClass}>
   <a class="skip" href="#main">Skip to content</a>
   {preview && <p class="no-print bg-ink px-4 py-1.5 text-center text-[13px] font-semibold text-paper">Private preview. Not launched, not for sharing. Some sections are still being finalised.</p>}
   <header class="site sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
