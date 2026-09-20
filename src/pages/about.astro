@@ -18,13 +18,16 @@ const p = SITE.publisher;
         <li><strong>Mistakes are fixed in public.</strong> See the <a href={url('corrections/')}>corrections log</a>.</li>
       </ul>
       <h2>Who publishes it and who pays</h2>
-      {p ? <><p><strong>{p.name}.</strong> {p.statement}</p><p>{p.funding}</p><p>Contact: {p.contact}</p></>
-        : <p class="rounded-lg bg-warn-tint p-4 text-[15.5px] text-warn"><strong>Being finalised before launch.</strong> This section will name the publisher, state any political memberships or affiliations of the people involved, and say exactly who funds the site. A site that asks for your trust owes you that, and this one won’t launch without it.</p>}
+      {p ? <><p><strong>{p.name}.</strong> {p.statement}</p><p>{p.funding}</p><p>{p.authorisation}</p><p>Contact: {p.contact}</p></>
+        : <p class="rounded-lg bg-warn-tint p-4 text-[15.5px] text-warn"><strong>To be stated before launch.</strong> This section will name the publisher, say plainly whether the people behind the site belong to or are standing for a political party, say who funds it, and carry any authorisation that electoral law requires. You are entitled to know who is showing you these figures. The site won’t launch without it.</p>}
+      <h2>Why you can trust the figures whoever we are</h2>
+      <p>You don’t have to take our word for anything. Every figure links to the official page it came from, every verdict follows a rule published in full on the <a href={url('methodology/')}>methodology page</a>, and everything can be downloaded and checked. If a number here doesn’t match its source, <a href={url('corrections/#report')}>tell us</a> and the fix will be logged in public.</p>
       <h2>What we won’t do</h2>
       <ul>
-        <li>Take money from political parties, or let any funder see or shape a verdict before it’s published.</li>
-        <li>Run advertising that tracks you. The site sets no tracking cookies.</li>
-        <li>Sell or share subscriber email addresses.</li>
+        <li>Hide who publishes or pays for this site.</li>
+        <li>Publish a figure we can’t trace to an official source, or a claim we can’t attribute.</li>
+        <li>Change a figure or a verdict to suit anyone. Verdicts follow the published rules, whoever they flatter.</li>
+        <li>Run advertising that tracks you, or sell or share subscriber email addresses.</li>
       </ul>
       <h2>Get in touch</h2>
       <p>Use the <a href={url('corrections/#report')}>report form</a> for errors, missing commitments or anything else. Every message is read.</p>

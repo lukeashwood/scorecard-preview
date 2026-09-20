@@ -16,9 +16,11 @@ export const SITE = {
       { date: '2025-05-03', label: '2025 election' },
     ],
   },
-  /* Who publishes the site and who pays for it. Left null until the publisher confirms the wording; the About page
-     shows a plain "being finalised" note rather than inventing details. */
-  publisher: null as null | { name: string; statement: string; funding: string; contact: string },
+  /* Who publishes the site, who pays for it, and any political affiliation. Left null until the publisher supplies the
+     facts; the About page and footer say so plainly rather than inventing details or implying independence. If the
+     publisher is a party, candidate or associated entity, `authorisation` carries the "Authorised by …" line that
+     electoral law generally requires on material intended to influence votes. */
+  publisher: null as null | { name: string; statement: string; funding: string; contact: string; authorisation: string },
   rulesVersion: '2.1',
   rulesDate: '2026-09-18',
   repo: 'https://github.com/lukeashwood',

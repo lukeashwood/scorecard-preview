@@ -95,7 +95,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     <div class="border-t border-rule">
       <div class="wrap flex flex-wrap items-center justify-between gap-3 py-5 text-[13px] text-ink-3">
         <p>ABS and RBA material is used under Creative Commons Attribution 4.0. Verdicts and explanations are this site’s own, made under the published rules.</p>
-        <p><a class="text-ink-3" href={url('corrections/')}>Spotted a mistake? Tell us.</a></p>
+        <p>{SITE.publisher ? SITE.publisher.authorisation : <a class="text-ink-3" href={url('about/')}>Publisher and authorisation details: to be stated before launch.</a>} · <a class="text-ink-3" href={url('corrections/')}>Spotted a mistake? Tell us.</a></p>
       </div>
     </div>
   </footer>
