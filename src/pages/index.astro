@@ -9,6 +9,10 @@ import { CONDITIONS, GOV_TARGETS, TARGETS, DELIVERIES, SECTIONS, CHECKS, GENERAT
 import { headlineText } from '../lib/format';
 import { VERDICT_TONE } from '../lib/editorial';
 import { fmtStamp } from '../lib/format';
+import HouseholdCalc from '../islands/HouseholdCalc.tsx';
+import { byId, BUDGET } from '../lib/measures';
+import { incomeTax, RULES_2122, RULES_2223, RULES_2526, type TaxRules } from '../lib/personalTax';
+import MEDIAN from '../data/median-earnings.json';
 
 const t = tally();
 const rec = record();
@@ -20,6 +24,28 @@ const segs = [
   { n: t.risk, label: 'at risk', color: 'var(--warn)' },
   { n: t.bad, label: 'off track or not met', color: 'var(--bad)' },
 ].filter((s) => s.n > 0);
+// ---- household calculator and median earner: price and wage growth since the June quarter 2022, from the site's data
+const pvw = byId('prices_vs_wages')!;
+const bar = (re: RegExp) => pvw.chart.bars?.find((x) => re.test(x.name))?.value ?? NaN;
+const CPI = bar(/^All prices/), WPI = bar(/^Wages/);
+const periodLabel = pvw.headline.period ?? '';
+const mp = byId('mortgage')?.chart.series?.[0]?.points ?? [];
+const mThen = mp.find((p) => p[0] === '2022-05-31'), mNow = mp[mp.length - 1];
+const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1], thenLabel: 'May 2022', nowLabel: new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
+const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
+const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace('–', '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
+// Median employee: ABS weekly median x 52, taxed under each year's rules; the August 2022 figure lifted to August 2025
+// prices by chaining the three year-to-September CPI rises.
+const infl = byId('inflation')!.chart.series![0].points;
+const cpiR = MEDIAN.cpi_quarters.reduce((r, q) => { const p = infl.find((x) => x[0] === q); return p && r != null ? r * (1 + p[1] / 100) : null; }, 1 as number | null);
+const med = (() => {
+  if (cpiR == null) return null;
+  const a0 = MEDIAN.then.weekly * 52, a1 = MEDIAN.now.weekly * 52;
+  const net0 = a0 - incomeTax(a0, RULES_2223), net1 = a1 - incomeTax(a1, RULES_2526);
+  return { a0, a1, net0, net1, real0: net0 * cpiR, diff: net1 - net0 * cpiR, cpiPct: (cpiR - 1) * 100 };
+})();
+const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
+
 const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, description: SITE.description, url: new URL(url(), Astro.site).href };
 ---
 <Base jsonld={jsonld}>
@@ -80,7 +106,16 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
   <section class="wrap pt-16" id="record">
     <p class="eyebrow">The record · May 2022 to now</p>
     <h2 class="h2 mt-2">What has changed since the government took office</h2>
-    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
+    {med && (
+      <div class="card mt-6 grid gap-px overflow-hidden bg-rule sm:grid-cols-3" style="border-color:var(--rule)">
+        <div class="bg-surface p-5"><p class="eyebrow">Median pay, {MEDIAN.then.period}</p><p class="num mt-2 font-display text-[32px] font-semibold leading-none">{$(med.a0)}</p><p class="meta mt-1.5">a year ({$(MEDIAN.then.weekly)} a week), {$(med.net0)} after tax. Three months after the government took office.</p></div>
+        <div class="bg-surface p-5"><p class="eyebrow">Median pay, {MEDIAN.now.period}</p><p class="num mt-2 font-display text-[32px] font-semibold leading-none">{$(med.a1)}</p><p class="meta mt-1.5">a year ({$(MEDIAN.now.weekly)} a week), {$(med.net1)} after tax. The latest ABS figure.</p></div>
+        <div class:list={['p-5', med.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}><p class="eyebrow">After tax and inflation</p><p class:list={['num mt-2 font-display text-[32px] font-semibold leading-none', med.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(med.diff))} {med.diff >= 0 ? 'better off' : 'worse off'}</p><p class="meta mt-1.5">a year. The 2022 take-home pay is {$(med.real0)} in {MEDIAN.now.period.split(' ')[1]} prices (up {med.cpiPct.toFixed(1)}%).</p></div>
+      </div>
+    )}
+    <p class="meta mt-2">Median weekly earnings in main job, all employees: ABS Employee Earnings (<a href={MEDIAN.then.url}>{MEDIAN.then.period}</a>, <a href={MEDIAN.now.url}>{MEDIAN.now.period}</a>). Taxed at {RULES_2223.label} and {RULES_2526.label} resident rates with the Medicare levy; prices from the CPI.</p>
+    {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:visible then={RULES_2122} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} /></div>}
+    <p class="lede mt-10">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
     <div class="mt-7 grid gap-5 md:grid-cols-2">
       {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
         <div class="card overflow-hidden">
