@@ -37,7 +37,7 @@ const cashAt = (d: string) => { const x = steps.filter((p) => p[0] <= d); return
 const lift = mNow && cashAt(mNow[0]) != null && steps.length ? steps[steps.length - 1][1] - cashAt(mNow[0])! : 0;
 const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1] + lift, thenLabel: 'May 2022', nowLabel: lift ? 'estimate after the latest rate decision' : new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
 const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
-const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace('–', '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
+const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[–—]/g, '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
 const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
 
@@ -49,10 +49,11 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
       <div>
         <p class="eyebrow">{SITE.edition} · {SITE.government.name}</p>
         <h1 class="display mt-3 text-[clamp(38px,5.6vw,64px)]">Holding the government to account, <span class="text-brand">in its own numbers.</span></h1>
-        <p class="lede mt-5">What the {SITE.government.name} promised, what it has delivered, and what has changed since it took office in May 2022. Every figure is official, linked to its source and checked every day. The facts are laid out plainly so you can judge for yourself.</p>
+        <p class="lede mt-5">What the {SITE.government.name} promised, what it has delivered, and what has changed since it took office in May 2022. Every figure is official and linked to its source. The automatic ones are tested every day, and everything entered by hand shows the date it was checked. The facts are laid out plainly so you can judge for yourself.</p>
         <div class="mt-7 flex flex-wrap gap-3">
           <a class="btn btn-primary" href="#record">See the record <Icon name="arrow" /></a>
           <a class="btn btn-ghost" href="#commitments">Promises kept and broken</a>
+          <a class="btn btn-ghost" href={url('in-60-seconds/')}>Australia in 60 seconds</a>
         </div>
       </div>
 
@@ -86,7 +87,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
     <div class="wrap grid gap-x-8 gap-y-5 py-7 sm:grid-cols-2 lg:grid-cols-4">
       {[
         { icon: 'ext', h: 'Every figure is sourced', p: 'Each number links to the official release it came from.' },
-        { icon: 'shield', h: 'Checked every day', p: `${CHECKS.checks_total} automated checks ran on the latest update.` },
+        { icon: 'shield', h: 'Tested every day', p: `${CHECKS.checks_total} automated checks on the latest data run: sources reached, figures in range, totals adding up.` },
         { icon: 'scale', h: 'Verdicts only on real promises', p: 'No pass or fail on things the government never committed to.' },
         { icon: 'quote', h: 'Mistakes are published', p: 'Corrections are logged in public, with dates.' },
       ].map((x) => (
@@ -107,6 +108,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
           <div>
             <p class="eyebrow">A typical household, June 2022 and now</p>
             <h3 class="mt-1 font-display text-[24px] font-semibold leading-tight">A couple on the median wage, with a car and a weekly shop</h3>
+            <p class="mt-1.5 max-w-[70ch] text-[14.5px] text-ink-2">This shows what has changed for the household, not who caused it. Interest rates are set by the independent Reserve Bank, fuel prices by world markets, and rents by the housing market.</p>
           </div>
           <div class="flex gap-1" role="tablist" aria-label="Home">
             <button type="button" role="tab" class="btn btn-sm btn-quiet" data-tenure="owner" aria-selected="true">Paying a mortgage</button>

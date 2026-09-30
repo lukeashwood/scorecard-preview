@@ -5,6 +5,8 @@ import VerdictPill from '../../components/VerdictPill.astro';
 import DirectionBadge from '../../components/DirectionBadge.astro';
 import InfluenceChip from '../../components/InfluenceChip.astro';
 import Icon from '../../components/Icon.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import { shareText } from '../../lib/share';
 import { SITE, url } from '../../config/site';
 import { MEASURES, GENERATED_AT, freshness, ratedSeries } from '../../lib/measures';
 import { g20For } from '../../lib/g20';
@@ -31,13 +33,14 @@ const jsonld = {
 <Base title={m.title} description={`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}.`} section="measures/" jsonld={jsonld}>
   <article class="wrap pt-8 md:pt-12">
     <nav class="meta flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
-      <a href={url('measures/')} class="text-ink-3">Measures</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>
+      <a href={url('measures/')} class="text-ink-3">Results</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>
     </nav>
     <header class="mt-4 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
       <div>
         <p class="eyebrow">{kind}</p>
         <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{m.title}</h1>
         <p class="lede mt-3">{m.question}</p>
+        <div class="no-print mt-4"><ShareButton text={shareText(m)} href={pageUrl} label="Share this figure" /></div>
       </div>
       {m.verdict && <div class="lg:text-right"><VerdictPill verdict={m.verdict.verdict} label={m.ed.target?.verdictLabels?.[m.verdict.verdict]} large /><p class="meta mt-2 max-w-[38ch] lg:ml-auto">{t?.owner === 'official' ? m.verdict.reason : VERDICT_MEANING[m.verdict.verdict]}</p></div>}
     </header>

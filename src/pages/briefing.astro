@@ -116,7 +116,7 @@ const base = url();
 
   <script is:inline define:vars={{ data, base }}>
     window.SCORECARD = data; window.SCORECARD_BASE = base;
-    window.Charts = { fmtNum: function (v, unit, decimals, opts) { opts = opts || {}; if (v == null || isNaN(v)) return '–'; var d = decimals == null ? 1 : decimals, abs = Math.abs(v), s;
+    window.Charts = { fmtNum: function (v, unit, decimals, opts) { opts = opts || {}; if (v == null || isNaN(v)) return '-'; var d = decimals == null ? 1 : decimals, abs = Math.abs(v), s;
       if (opts.compact && abs >= 1e6) s = (abs / 1e6).toFixed(abs >= 1e7 ? 1 : 2).replace(/\.0+$/, '') + 'M'; else if (opts.compact && abs >= 1e4) s = Math.round(abs / 1e3).toLocaleString('en-AU') + 'k'; else s = abs.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
       var sign = v < 0 ? '−' : (opts.signed && v > 0 ? '+' : ''); if (unit === '$') return sign + '$' + s; if (unit === '%') return sign + s + '%'; return sign + s; } };
     (function () { // text version (also the no-WebGL fallback), built from the same data as the model

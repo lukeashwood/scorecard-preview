@@ -11,7 +11,7 @@ const p = SITE.publisher;
       <p>{SITE.name} exists so that anyone, whether a parent at the kitchen table, a journalist on deadline or a student, can find out how the country is going without wading through a dozen government websites, and without being told what to think.</p>
       <h2>Our standards</h2>
       <ul>
-        <li><strong>Official figures only.</strong> Every number comes from an official publisher and links to the page it came from.</li>
+        <li><strong>Official figures wherever they exist.</strong> Every number links to the page it came from. The one exception is market rents for new leases, which no agency publishes; that figure comes from Cotality and is labelled as such.</li>
         <li><strong>Verdicts only on real commitments.</strong> The government is judged against what it said it would do, under rules published in full. Everything else is shown without a verdict.</li>
         <li><strong>The same rules for whoever governs.</strong> The rules don’t mention a party. When the government changes, the same yardsticks apply to the next one.</li>
         <li><strong>Plain words.</strong> No jargon without an explanation, and no adjectives doing the work of evidence.</li>
@@ -20,6 +20,18 @@ const p = SITE.publisher;
       <h2>Who publishes it and who pays</h2>
       {p ? <><p><strong>{p.name}.</strong> {p.statement}</p><p>{p.funding}</p><p>{p.authorisation}</p><p>Contact: {p.contact}</p></>
         : <p class="rounded-lg bg-warn-tint p-4 text-[15.5px] text-warn"><strong>To be stated before launch.</strong> This section will name the publisher, say plainly whether the people behind the site belong to or are standing for a political party, say who funds it, and carry any authorisation that electoral law requires. You are entitled to know who is showing you these figures. The site won’t launch without it.</p>}
+      <h2>How the site works, in one table</h2>
+      <table>
+        <tbody>
+          <tr><th scope="row">Data sources</th><td>ABS, Reserve Bank, Treasury and Budget papers, AOFM, program agencies; IMF and World Bank for G20 comparisons; Cotality for market rents. Listed on every page.</td></tr>
+          <tr><th scope="row">Automated systems</th><td>A daily program fetches the official series, recalculates every figure and runs hundreds of tests. A failed test holds the last verified figure back. <a href={url('methodology/#checks')}>What “checked” means</a>.</td></tr>
+          <tr><th scope="row">Human review</th><td>Commitments, verdict rules, hand-entered figures and controversies are checked by a person against the source, and dated.</td></tr>
+          <tr><th scope="row">Verdict rules</th><td>Published in full on the <a href={url('methodology/')}>methodology page</a>, version {SITE.rulesVersion} ({SITE.rulesDate}). Every verdict has a “Show the evidence” panel.</td></tr>
+          <tr><th scope="row">Corrections</th><td>Logged in public with dates on the <a href={url('corrections/')}>corrections page</a>.</td></tr>
+          <tr><th scope="row">Data downloads</th><td>Every series as CSV and JSON on the <a href={url('data/')}>data page</a>.</td></tr>
+          <tr><th scope="row">Publisher, funding, affiliations, editorial control</th><td>{p ? `${p.name}. ${p.funding}` : 'To be stated before launch (see above).'}</td></tr>
+        </tbody>
+      </table>
       <h2>Why you can trust the figures whoever we are</h2>
       <p>You don’t have to take our word for anything. Every figure links to the official page it came from, every verdict follows a rule published in full on the <a href={url('methodology/')}>methodology page</a>, and everything can be downloaded and checked. If a number here doesn’t match its source, <a href={url('corrections/#report')}>tell us</a> and the fix will be logged in public.</p>
       <h2>What we won’t do</h2>

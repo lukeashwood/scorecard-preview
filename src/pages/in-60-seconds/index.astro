@@ -1,0 +1,68 @@
+---
+/* The country in 60 seconds: the handful of figures most people ask about, each with its change since the government
+   took office and its source. Everything is read from the same data as the rest of the site. */
+import Base from '../../layouts/Base.astro';
+import DirectionBadge from '../../components/DirectionBadge.astro';
+import VerdictPill from '../../components/VerdictPill.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import { SITE, url } from '../../config/site';
+import { byId, GENERATED_AT, tally, BUDGET } from '../../lib/measures';
+import { headlineText, fmtStamp } from '../../lib/format';
+import { shareText } from '../../lib/share';
+import { typicalHousehold } from '../../lib/typicalHousehold';
+import type { TaxRules } from '../../lib/personalTax';
+
+const IDS = ['inflation', 'real_wages', 'unemployment', 'gdp_per_capita', 'household_income', 'mortgage', 'home_prices', 'electricity', 'housing_accord', 'gross_debt', 'spending_gdp', 'migration'];
+const tiles = IDS.map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
+const t = tally();
+const tx = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
+const NOW_RULES: TaxRules | null = tx ? { label: tx.income_year.replace(/[–—]/g, '-'), brackets: tx.brackets, medicareRate: tx.medicare_levy, medicareLow: tx.medicare_low, lito: tx.lito } : null;
+const TH = typicalHousehold(NOW_RULES);
+const $ = (v: number) => '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
+const pub = (m: (typeof tiles)[number]) => [...new Set(m.sources.map((s) => s.publisher))].slice(0, 2).join(', ');
+---
+<Base title="Australia in 60 seconds" description="The figures most people ask about, each with its change since the government took office in May 2022 and its official source." section="in-60-seconds/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">What happened? · In 60 seconds</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Australia since May 2022, in 60 seconds</h1>
+    <p class="lede mt-3">The figures most people ask about. Each shows the latest official number, how it has moved since the government took office, and where it comes from. Tap any one for the full chart and sources.</p>
+    <p class="meta mono mt-3">Figures as at {fmtStamp(GENERATED_AT)}</p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-3">
+      <a href={url('targets/')} class="card card-link card-pad">
+        <p class="eyebrow">Promises</p>
+        <p class="mt-2 font-display text-[30px] font-semibold leading-tight">{t.total} commitments</p>
+        <p class="mt-1 text-[15px] text-ink-2">with a measurable test: {t.good} met or on track, {t.progress} in progress, {t.risk} at risk, {t.bad} off track or not met.</p>
+      </a>
+      {TH && <a href={url('#typical')} class="card card-link card-pad">
+        <p class="eyebrow">Typical household, with a mortgage</p>
+        <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.owner.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.owner.diff)} a year</p>
+        <p class="mt-1 text-[15px] text-ink-2">{TH.owner.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for a couple on the median wage, after tax, prices and mortgage.</p>
+      </a>}
+      {TH && <a href={url('#typical')} class="card card-link card-pad">
+        <p class="eyebrow">Typical household, renting</p>
+        <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.renter.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.renter.diff)} a year</p>
+        <p class="mt-1 text-[15px] text-ink-2">{TH.renter.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for the same couple paying the median rent.</p>
+      </a>}
+    </div>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {tiles.map((m, i) => (
+        <article class="card card-pad rise flex flex-col" style={`--i:${i}`}>
+          <div class="flex items-start justify-between gap-3">
+            <a href={url(`measures/${m.id}/`)} class="h3 text-ink no-underline hover:text-brand">{m.title}</a>
+            {m.verdict && m.ed.target?.owner === 'government' && <VerdictPill verdict={m.verdict.verdict} label={m.ed.target?.verdictLabels?.[m.verdict.verdict]} />}
+          </div>
+          <p class="num mt-3 font-display text-[34px] font-semibold leading-none tracking-tight">{headlineText(m.headline)}</p>
+          <p class="meta mt-1.5">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</p>
+          <div class="mt-3">{m.sinceElection ? <DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} prefix="Since May 2022" /> : <span class="meta">No comparable mid-2022 figure</span>}</div>
+          <div class="mt-auto flex items-center justify-between gap-2 pt-4">
+            <span class="meta">Source: {pub(m)}</span>
+            <ShareButton text={shareText(m)} href={new URL(url(`measures/${m.id}/`), Astro.site).href} />
+          </div>
+        </article>
+      ))}
+    </div>
+    <p class="meta mt-6 max-w-[80ch]">Green and red are used only where nearly everyone agrees which direction is better. Measures where that is a matter of opinion (house prices, migration, the size of government) are shown without colour. Not all of this is the government’s doing: each measure’s page says how much control Canberra has. <a href={url('methodology/')}>How this is worked out</a>.</p>
+  </div>
+</Base>

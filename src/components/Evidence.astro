@@ -1,0 +1,39 @@
+---
+/* "Show the evidence": everything a sceptical reader needs to check a verdict themselves, in one place.
+   Commitment and its source, deadline, the latest official figure and where it comes from, the published rule,
+   the result, and when the figure was last checked. Nothing here is typed by hand: it is read from the same data
+   and rules that produce the verdict. */
+import VerdictPill from './VerdictPill.astro';
+import Icon from './Icon.astro';
+import { url } from '../config/site';
+import { fmtDate, fmtMonth, headlineText } from '../lib/format';
+import { GENERATED_AT } from '../lib/measures';
+import type { Measure } from '../lib/types';
+interface Props { m: Measure; open?: boolean }
+const { m, open = false } = Astro.props;
+const t = m.ed.target!;
+const src = m.sources[0];
+const checked = m.updated_at ?? m.verified_on ?? GENERATED_AT;
+---
+<details class="evidence group mt-3 rounded-lg border border-rule bg-panel/60" open={open}>
+  <summary class="flex cursor-pointer list-none items-center gap-2 px-3.5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden">
+    <span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> Show the evidence
+  </summary>
+  <dl class="grid gap-x-5 gap-y-2.5 border-t border-rule px-3.5 py-3.5 text-[14px] sm:grid-cols-[170px_1fr]">
+    <dt class="font-semibold text-ink-3">Commitment</dt>
+    <dd>{t.commitment} <span class="text-ink-3">· {t.ownerLabel}</span></dd>
+    <dt class="font-semibold text-ink-3">Where it was made</dt>
+    <dd><a href={t.sourceUrl} rel="noopener">{t.sourceLabel} <Icon name="ext" size={12} class="inline" /></a></dd>
+    {t.deadline && <><dt class="font-semibold text-ink-3">Deadline</dt><dd>{fmtMonth(t.deadline)}</dd></>}
+    <dt class="font-semibold text-ink-3">Latest official figure</dt>
+    <dd><b class="num">{headlineText(m.headline)}</b> {m.headline.caption}{m.headline.period ? ` (${m.headline.period})` : ''}</dd>
+    {src && <><dt class="font-semibold text-ink-3">Figure comes from</dt><dd><a href={src.url} rel="noopener">{src.publisher}: {src.title} <Icon name="ext" size={12} class="inline" /></a></dd></>}
+    <dt class="font-semibold text-ink-3">The rule</dt>
+    <dd>{t.rule}</dd>
+    <dt class="font-semibold text-ink-3">Result</dt>
+    <dd class="flex flex-wrap items-center gap-2"><VerdictPill verdict={m.verdict!.verdict} label={t.verdictLabels?.[m.verdict!.verdict]} /> <span>{m.verdict!.reason}</span></dd>
+    <dt class="font-semibold text-ink-3">Last checked</dt>
+    <dd>{fmtDate(checked)} · {m.automated ? 'read automatically from the official release' : 'entered by hand from the official document'}{m.recheck_by ? `; next review due ${fmtDate(m.recheck_by)}` : ''}</dd>
+  </dl>
+  <p class="border-t border-rule px-3.5 py-2.5 text-[13px] text-ink-3">Think this is wrong? <a href={url(`corrections/`)}>Report it</a> · <a href={url('methodology/')}>How verdicts work</a> · <a href={url(`measures/${m.id}/`)}>Full chart and sources</a></p>
+</details>

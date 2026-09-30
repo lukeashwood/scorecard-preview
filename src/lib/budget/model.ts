@@ -107,7 +107,7 @@ export function createModel(Y: BudgetYear) {
   const pitFromRates = (t: Rates) => Math.max(0, base.revenue[I.pit] * totalTax(t) / BASE_TOTAL - splitCost(t));
   const gstFromRates = (t: Rates) => base.revenue[I.gst] * t.gst / (baseRates!.gst || 1);
 
-  /** Thresholds must rise from bracket to bracket; rates live in 0–100; GST 0–50; Medicare levy 0–10. */
+  /** Thresholds must rise from bracket to bracket; rates live in 0-100; GST 0-50; Medicare levy 0-10. */
   function validRates(t: Rates | null | undefined): t is Rates {
     if (!t || !baseRates || !Array.isArray(t.br) || t.br.length !== baseRates.br.length) return false;
     if (![t.gst, t.ml].every(finite) || t.gst < 0 || t.gst > 50 || t.ml < 0 || t.ml > 10 || ![0, 1, 2].includes(t.split)) return false;
@@ -183,9 +183,9 @@ export const cloneState = (s: State): State => ({ revenue: [...s.revenue], expen
 
 /** "$12.3bn" from $ million. Never prints NaN, Infinity or scientific notation. */
 export function bn(m: number, d = 1): string {
-  if (!Number.isFinite(m)) return '–';
+  if (!Number.isFinite(m)) return '-';
   const v = Math.abs(m) / 1000; const body = v >= 1e6 ? 'over $1,000,000' : '$' + v.toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d });
   return (m < 0 && v >= 0.05 ? '−' : '') + body + 'bn';
 }
-export const pctOf = (v: number, of: number, d = 1) => (of > 0 && Number.isFinite(v) ? (v / of * 100).toFixed(d) + '%' : '–');
-export const dollars = (v: number) => (Number.isFinite(v) ? '$' + Math.round(Math.abs(v)).toLocaleString('en-AU') : '–');
+export const pctOf = (v: number, of: number, d = 1) => (of > 0 && Number.isFinite(v) ? (v / of * 100).toFixed(d) + '%' : '-');
+export const dollars = (v: number) => (Number.isFinite(v) ? '$' + Math.round(Math.abs(v)).toLocaleString('en-AU') : '-');

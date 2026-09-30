@@ -17,7 +17,7 @@ import { fmtStamp, fmtPeriod } from '../../lib/format';
     <div class="card mt-10 overflow-hidden">
       <div class="table-scroll"><table class="dt">
         <thead><tr><th>Measure</th><th>Topic</th><th>Latest data</th><th>Collected</th><th class="r">Download</th></tr></thead>
-        <tbody>{MEASURES.map((m) => <tr><td><a class="font-semibold" href={url(`measures/${m.id}/`)}>{m.title}</a></td><td class="text-ink-2">{m.sectionTitle}</td><td class="num whitespace-nowrap">{m.lastDataDate ? fmtPeriod(m.lastDataDate, m.chart.freq) : m.headline.period ?? '–'}</td><td class="text-ink-2">{m.automated ? 'Automatic feed' : 'By hand from source'}</td><td class="r"><a href={url(`data/${m.id}.csv`)} download class="whitespace-nowrap font-semibold">CSV</a></td></tr>)}</tbody>
+        <tbody>{MEASURES.map((m) => <tr><td><a class="font-semibold" href={url(`measures/${m.id}/`)}>{m.title}</a></td><td class="text-ink-2">{m.sectionTitle}</td><td class="num whitespace-nowrap">{m.lastDataDate ? fmtPeriod(m.lastDataDate, m.chart.freq) : m.headline.period ?? '-'}</td><td class="text-ink-2">{m.automated ? 'Automatic feed' : 'By hand from source'}</td><td class="r"><a href={url(`data/${m.id}.csv`)} download class="whitespace-nowrap font-semibold">CSV</a></td></tr>)}</tbody>
       </table></div>
     </div>
     <div class="prose mt-10">

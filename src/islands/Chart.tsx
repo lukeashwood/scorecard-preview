@@ -142,7 +142,7 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   const px = (d: string) => (isBar ? (xb(d) ?? 0) + xb.bandwidth() / 2 : x(parseDate(d)));
   const est = spec.estimateFrom;
   // A period belongs to the government's term if it ENDS after the term began and isn't the baseline period itself:
-  // the June quarter 2022 and the 2021–22 financial year are the starting point, not the government's record.
+  // the June quarter 2022 and the 2021-22 financial year are the starting point, not the government's record.
   const baseEnd = term ? (freq === 'm' || freq === 'd' ? `${term.start.slice(0, 7)}-31` : `${term.start.slice(0, 4)}-06-30`) : '';
   const inTerm = (d: string) => !!term && d > baseEnd;
   const firstIn = term ? dates.find(inTerm) : undefined;
@@ -192,7 +192,7 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
                 <text x={-8} y={y(tv)} dy="0.32em" textAnchor="end" fontSize="12" fill="var(--ink-3)" style={{ fontVariantNumeric: 'tabular-nums' }}>{tickFmt(tv)}</text></g>
             ))}
             {yearTicks.map((yr) => { const d = `${yr}-${isBar && freq === 'fy' ? '06-30' : '01-01'}`; const xx = isBar ? (xb(series[0].points.find((p) => p[0].startsWith(String(yr)))?.[0] ?? '') ?? null) : x(parseDate(d)); if (xx == null || xx < 0 || xx > iw) return null;
-              return <text key={yr} x={isBar ? xx + xb.bandwidth() / 2 : xx} y={ih + 20} textAnchor="middle" fontSize="12" fill="var(--ink-3)">{freq === 'fy' ? `${String(yr - 1).slice(2)}–${String(yr).slice(2)}` : yr}</text>; })}
+              return <text key={yr} x={isBar ? xx + xb.bandwidth() / 2 : xx} y={ih + 20} textAnchor="middle" fontSize="12" fill="var(--ink-3)">{freq === 'fy' ? `${String(yr - 1).slice(2)}-${String(yr).slice(2)}` : yr}</text>; })}
             {elections.map((el) => { const ex = isBar ? null : x(parseDate(el.date)); if (ex == null || ex < 0 || ex > iw) return null; return (
               <g key={el.date}><line x1={ex} x2={ex} y1={-4} y2={ih} stroke="var(--rule-strong)" strokeDasharray="3 4" /><text x={ex + 4} y={ih - 6} fontSize="10.5" fill="var(--ink-3)" fontFamily="var(--font-mono)">{el.label.toUpperCase()}</text></g>); })}
             {refs.map((r) => <g key={r.label + r.value}><line x1={0} x2={iw} y1={y(r.value)} y2={y(r.value)} stroke="var(--ink-2)" strokeDasharray="5 4" strokeWidth={1.2} />{r.label && <text x={iw} y={y(r.value) - 5} textAnchor="end" fontSize="11.5" fill="var(--ink-2)" fontWeight={600}>{r.label}</text>}</g>)}
@@ -255,5 +255,5 @@ function DataTable({ spec, series, unit, decimals, freq }: { spec: ChartSpec; se
   const dates = [...new Set(series.flatMap((s) => s.points.map((p) => p[0])))].sort().reverse(); const maps = series.map((s) => new Map(s.points));
   return (
     <div className="table-scroll max-h-[340px] overflow-y-auto rounded-lg border border-rule"><table className="dt"><thead><tr><th>Period</th>{series.map((s) => <th key={s.name} className="r">{s.name}</th>)}</tr></thead>
-      <tbody>{dates.map((d) => <tr key={d}><td className="whitespace-nowrap">{fmtPeriod(d, freq)}{spec.estimateFrom && d >= spec.estimateFrom ? ' (forecast)' : ''}</td>{maps.map((mm, i) => <td key={i} className="r num">{mm.has(d) ? f(mm.get(d)!) : '–'}</td>)}</tr>)}</tbody></table></div>);
+      <tbody>{dates.map((d) => <tr key={d}><td className="whitespace-nowrap">{fmtPeriod(d, freq)}{spec.estimateFrom && d >= spec.estimateFrom ? ' (forecast)' : ''}</td>{maps.map((mm, i) => <td key={i} className="r num">{mm.has(d) ? f(mm.get(d)!) : '-'}</td>)}</tr>)}</tbody></table></div>);
 }

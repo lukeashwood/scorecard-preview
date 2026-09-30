@@ -4,7 +4,7 @@ export const SITE = {
   edition: 'Australia',
   tagline: 'Holding the federal government to account, in its own numbers.',
   description:
-    'Holding the Australian Government to account with official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, checked daily, in plain English.',
+    'Holding the Australian Government to account with official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, dated and tested daily, in plain English.',
   locale: 'en-AU',
   currency: 'AUD',
   government: {
@@ -28,17 +28,14 @@ export const SITE = {
   formEndpoint: 'https://formspree.io/f/xnpnqgvj',
 } as const;
 
-export const NAV = [
-  { href: 'targets/', label: 'Targets' },
-  { href: 'measures/', label: 'Measures' },
-  { href: 'charts/', label: 'Charts' },
-  { href: 'relationships/', label: 'Relationships' },
-  { href: 'budget/', label: 'Budget' },
-  { href: 'learn/', label: 'Learn' },
-  { href: 'laws/', label: 'Laws' },
-  { href: 'controversies/', label: 'Controversies' },
-  { href: 'briefing/', label: 'Briefing' },
+/* The site is organised around 3 questions. The top bar shows the main pages; the rest sit under "More". */
+export const NAV_GROUPS = [
+  { q: 'What did they promise?', items: [{ href: 'targets/', label: 'Promises', top: true }] },
+  { q: 'What happened?', items: [{ href: 'measures/', label: 'Results', top: true }, { href: 'charts/', label: 'Charts', top: true }, { href: 'in-60-seconds/', label: 'In 60 seconds', top: false }] },
+  { q: 'Why did it happen?', items: [{ href: 'relationships/', label: 'Connections', top: true }, { href: 'budget/', label: 'Budget', top: true }, { href: 'laws/', label: 'Laws', top: false }] },
+  { q: 'More', items: [{ href: 'controversies/', label: 'Controversies', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'briefing/', label: 'Briefing (3D)', top: false }] },
 ] as const;
+export const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 export const FOOTER_NAV = [
   { href: 'methodology/', label: 'Methodology' },

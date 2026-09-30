@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE, NAV, FOOTER_NAV, url } from '../config/site';
+import { SITE, NAV, NAV_GROUPS, FOOTER_NAV, url } from '../config/site';
 import { GENERATED_AT } from '../lib/measures';
 import { fmtStamp } from '../lib/format';
 
@@ -28,7 +28,10 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <meta property="og:title" content={title ?? SITE.name} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content={new URL(url('og.png'), Astro.site).href} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
   {preview && <meta name="robots" content="noindex, nofollow" />}
   <link rel="sitemap" href={url('sitemap-index.xml')} />
   {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
@@ -50,26 +53,38 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
           <span class="mono block pt-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-3">{SITE.edition}</span>
         </span>
       </a>
-      <nav class="ml-auto hidden items-center gap-0.5 xl:flex" aria-label="Main">
-        {NAV.map((n) => (
+      <nav class="ml-auto hidden items-center gap-0.5 lg:flex" aria-label="Main">
+        {NAV.filter((n) => n.top).map((n) => (
           <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined}
              class="rounded-lg px-2.5 py-2 text-[14.5px] font-semibold text-ink-2 no-underline transition-colors hover:bg-panel hover:text-ink aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>
         ))}
+        <details class="nav-more relative" id="nav-more">
+          <summary class:list={['flex cursor-pointer list-none items-center gap-1 rounded-lg px-2.5 py-2 text-[14.5px] font-semibold text-ink-2 hover:bg-panel hover:text-ink [&::-webkit-details-marker]:hidden', NAV.some((n) => !n.top && n.href === section) && 'bg-brand-tint text-brand']}>More <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg></summary>
+          <div class="absolute right-0 z-50 mt-2 w-[260px] rounded-xl border border-rule bg-surface p-2 shadow-card">
+            {NAV_GROUPS.filter((g) => g.items.some((n) => !n.top)).map((g) => (
+              <div class="py-1"><p class="px-2.5 pb-1 pt-1.5 text-[11.5px] font-bold uppercase tracking-[0.08em] text-ink-3">{g.q}</p>
+                {g.items.filter((n) => !n.top).map((n) => <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined} class="block rounded-lg px-2.5 py-2 text-[14.5px] font-semibold text-ink no-underline hover:bg-panel aria-[current=page]:text-brand">{n.label}</a>)}</div>
+            ))}
+          </div>
+        </details>
       </nav>
-      <div class="ml-auto flex items-center gap-2 xl:ml-2">
+      <div class="ml-auto flex items-center gap-2 lg:ml-2">
         <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden sm:inline-flex">Get updates</a>
         <button type="button" id="theme-btn" class="btn btn-ghost btn-sm w-9 !px-0" aria-label="Switch between light and dark">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
         </button>
-        <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 xl:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+        <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 lg:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
       </div>
     </div>
-    <nav id="mobile-nav" class="border-t border-rule bg-paper xl:hidden" aria-label="Main (mobile)" hidden>
-      <div class="wrap grid gap-1 py-3">
-        {NAV.map((n) => <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined} class="rounded-lg px-3 py-3 text-[16px] font-semibold text-ink no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>)}
-        <a href={url('subscribe/')} class="btn btn-primary mt-2">Get updates</a>
+    <nav id="mobile-nav" class="max-h-[calc(100vh-64px)] overflow-y-auto border-t border-rule bg-paper lg:hidden" aria-label="Main (mobile)" hidden>
+      <div class="wrap grid gap-3 py-4">
+        {NAV_GROUPS.map((g) => (
+          <div><p class="px-3 pb-1 text-[11.5px] font-bold uppercase tracking-[0.08em] text-ink-3">{g.q}</p>
+            <div class="grid">{g.items.map((n) => <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined} class="rounded-lg px-3 py-2.5 text-[16px] font-semibold text-ink no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>)}</div></div>
+        ))}
+        <a href={url('subscribe/')} class="btn btn-primary mt-1">Get updates</a>
       </div>
     </nav>
   </header>
@@ -80,7 +95,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     <div class="wrap grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
       <div class="max-w-md">
         <p class="font-display text-[22px] font-semibold">{SITE.name}</p>
-        <p class="mt-2 text-[14.5px] text-ink-2">Official Australian figures, sourced line by line and checked every day. Verdicts are given only where someone in authority made a measurable commitment. Everything else is shown as it is.</p>
+        <p class="mt-2 text-[14.5px] text-ink-2">Official Australian figures, sourced line by line. Automatic figures are tested every day; figures entered by hand show the date they were checked. Verdicts are given only where someone in authority made a measurable commitment. Everything else is shown as it is.</p>
         <p class="meta mt-4">Data last checked <span class="mono">{fmtStamp(GENERATED_AT)}</span> · Rating rules v{SITE.rulesVersion}</p>
       </div>
       <div>
@@ -110,6 +125,14 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
         document.dispatchEvent(new CustomEvent('themechange', { detail: next }));
       });
       mb && mb.addEventListener('click', function () { var open = mn.hidden; mn.hidden = !open; mb.setAttribute('aria-expanded', String(open)); });
+      document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-share]'); if (!b) return;
+        var text = b.getAttribute('data-text'), link = b.getAttribute('data-url'), lab = b.querySelector('[data-share-label]'), old = lab ? lab.textContent : '';
+        var done = function (msg) { if (lab) { lab.textContent = msg; setTimeout(function () { lab.textContent = old; }, 2200); } };
+        if (navigator.share) { navigator.share({ text: text, url: link }).catch(function () {}); return; }
+        var all = text + ' ' + link;
+        if (navigator.clipboard) navigator.clipboard.writeText(all).then(function () { done('Copied'); }, function () { done('Copy failed'); }); else done('Copy failed'); });
+      var more = document.getElementById('nav-more');
+      if (more) { document.addEventListener('click', function (e) { if (more.open && !more.contains(e.target)) more.open = false; }); document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && more.open) { more.open = false; more.querySelector('summary').focus(); } }); }
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && mn && !mn.hidden) { mn.hidden = true; mb.setAttribute('aria-expanded', 'false'); mb.focus(); } });
     })();
   </script>

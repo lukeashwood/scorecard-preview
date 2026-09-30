@@ -10,6 +10,8 @@ import { SITE, url } from '../../config/site';
 import { MEASURES, SECTIONS, GENERATED_AT, ALL_METRICS } from '../../lib/measures';
 import { EDITORIAL } from '../../lib/editorial';
 import { g20For } from '../../lib/g20';
+import ShareButton from '../../components/ShareButton.astro';
+import { shareText } from '../../lib/share';
 import { fmtStamp, headlineText } from '../../lib/format';
 import type { RawMetric } from '../../lib/types';
 
@@ -81,7 +83,7 @@ const groups = [
               <div class="mt-4">
                 <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} g20={g20For(i.id)} />
               </div>
-              {i.hasPage && <a class="mt-4 inline-flex items-center gap-1.5 self-start text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a>}
+              {i.hasPage && <div class="no-print mt-4 flex flex-wrap items-center justify-between gap-2"><a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a><ShareButton text={shareText(measure[i.id])} href={new URL(url(`measures/${i.id}/`), Astro.site).href} /></div>}
             </article>
           ))}
         </div>

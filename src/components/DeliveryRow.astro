@@ -1,7 +1,9 @@
 ---
 import VerdictPill from './VerdictPill.astro';
 import Icon from './Icon.astro';
-import { fmtMonth } from '../lib/format';
+import { fmtMonth, fmtDate } from '../lib/format';
+import { DELIVERIES_VERIFIED } from '../lib/measures';
+import { url } from '../config/site';
 import type { Delivery } from '../lib/measures';
 interface Props { d: Delivery; i?: number }
 const { d, i = 0 } = Astro.props;
@@ -11,7 +13,18 @@ const { d, i = 0 } = Astro.props;
     <p class="eyebrow">{d.owner}{d.deadline ? ` · due ${fmtMonth(d.deadline)}` : ''}</p>
     <h3 class="mt-1.5 font-display text-[21px] font-semibold leading-snug">{d.commitment}</h3>
     <p class="mt-2 text-[14.5px] text-ink-2">{d.reason}</p>
-    <p class="meta mt-2.5 flex flex-wrap gap-x-4 gap-y-1">{d.sources.map((s) => <a href={s.url} rel="noopener" class="inline-flex items-center gap-1">{s.label} <Icon name="ext" size={12} /></a>)}</p>
+    <details class="group mt-3 rounded-lg border border-rule bg-panel/60">
+      <summary class="flex cursor-pointer list-none items-center gap-2 px-3.5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden"><span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> Show the evidence</summary>
+      <dl class="grid gap-x-5 gap-y-2.5 border-t border-rule px-3.5 py-3.5 text-[14px] sm:grid-cols-[170px_1fr]">
+        <dt class="font-semibold text-ink-3">Commitment</dt><dd>{d.commitment} <span class="text-ink-3">· {d.owner}</span></dd>
+        {d.deadline && <><dt class="font-semibold text-ink-3">Deadline</dt><dd>{fmtMonth(d.deadline)}</dd></>}
+        <dt class="font-semibold text-ink-3">The test</dt><dd>Met when the thing promised has been done, as shown on the official page (a law passed, a scheme open, a payment made). Judged on delivery, not on whether it worked.</dd>
+        <dt class="font-semibold text-ink-3">Result</dt><dd>{d.reason}</dd>
+        <dt class="font-semibold text-ink-3">Official record</dt><dd class="grid gap-1">{d.sources.map((s) => <a href={s.url} rel="noopener" class="inline-flex items-center gap-1">{s.label} <Icon name="ext" size={12} /></a>)}</dd>
+        <dt class="font-semibold text-ink-3">Last checked</dt><dd>{fmtDate(DELIVERIES_VERIFIED)} · checked by hand against the pages above</dd>
+      </dl>
+      <p class="border-t border-rule px-3.5 py-2.5 text-[13px] text-ink-3">Think this is wrong? <a href={url('corrections/')}>Report it</a> · <a href={url('methodology/')}>How verdicts work</a></p>
+    </details>
   </div>
   <VerdictPill verdict={d.verdict} large />
 </article>

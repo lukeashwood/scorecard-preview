@@ -2,12 +2,12 @@ const LOCALE = 'en-AU';
 const MINUS = '−';
 
 export function num(v: number, d = 0): string {
-  if (!Number.isFinite(v)) return '–';
+  if (!Number.isFinite(v)) return '-';
   const s = Math.abs(v).toLocaleString(LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
   return (v < 0 && Number(s.replace(/[^\d.]/g, '')) !== 0 ? MINUS : '') + s;
 }
 export function signed(v: number, d = 0): string {
-  if (!Number.isFinite(v)) return '–';
+  if (!Number.isFinite(v)) return '-';
   const s = num(Math.abs(v), d);
   if (Number(s.replace(/[^\d.]/g, '')) === 0) return s;
   return (v > 0 ? '+' : MINUS) + s;
@@ -15,7 +15,7 @@ export function signed(v: number, d = 0): string {
 
 /** Format a value in a chart/headline unit: "%", "$", "$bn", "$'000", "index", "people", "homes", "" … */
 export function withUnit(v: number, unit = '', d = 0, opts: { signed?: boolean; compact?: boolean } = {}): string {
-  if (!Number.isFinite(v)) return '–';
+  if (!Number.isFinite(v)) return '-';
   const f = (x: number, dd = d) => (opts.signed ? signed(x, dd) : num(x, dd));
   switch (unit) {
     case '%': return f(v) + '%';
@@ -48,17 +48,17 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export function parseDate(s: string): Date { const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(Date.UTC(y, (m || 1) - 1, d || 1)); }
 export function fmtDate(s: string): string { const d = parseDate(s); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
 export function fmtMonth(s: string): string { const d = parseDate(s); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
-/** Label a data point by its frequency: "Jun qtr 2026", "2025–26", "Jul 2026". */
+/** Label a data point by its frequency: "Jun qtr 2026", "2025-26", "Jul 2026". */
 export function fmtPeriod(s: string, freq?: 'q' | 'fy' | 'm' | 'd' | 'y'): string {
   const d = parseDate(s); const y = d.getUTCFullYear(); const m = d.getUTCMonth();
   if (freq === 'y') return String(y);
-  if (freq === 'fy') return `${m >= 6 ? y : y - 1}–${String((m >= 6 ? y + 1 : y) % 100).padStart(2, '0')}`;
+  if (freq === 'fy') return `${m >= 6 ? y : y - 1}-${String((m >= 6 ? y + 1 : y) % 100).padStart(2, '0')}`;
   if (freq === 'q') return `${MONTHS[m]} qtr ${y}`;
   if (freq === 'd') return fmtDate(s);
   return `${MONTHS[m]} ${y}`;
 }
 export function fmtStamp(iso?: string): string {
-  if (!iso) return '–';
+  if (!iso) return '-';
   const d = new Date(iso);
   return d.toLocaleString(LOCALE, { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'Australia/Sydney', timeZoneName: 'short' });
 }

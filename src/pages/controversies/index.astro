@@ -11,9 +11,15 @@ const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 
 <Base title="Controversies" description="Policies in dispute and questions about ministers' conduct under the current Australian Government: what happened, what the government says, what critics say and what the record shows, each linked to its sources." section="controversies/">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Controversies · since May 2022</p>
-    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Where the government’s decisions and conduct have been challenged</h1>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Contested decisions and conduct: the claims, the evidence, and where each stands</h1>
     <p class="lede mt-3">Two kinds of entry: policies and decisions whose effects are in dispute, and questions about a minister’s own conduct. Each sets out what happened, what the government says, who is criticising it and on what grounds, and what the official record shows. Being listed here is not a finding of wrongdoing.</p>
 
+    <div class="mt-5 flex max-w-[900px] flex-wrap gap-x-5 gap-y-2 rounded-xl bg-panel p-4 text-[14px] text-ink-2">
+      <span class="font-bold text-ink">In-depth entries test each claim:</span>
+      <span class="inline-flex items-center gap-1.5"><span class="pill pill-neutral">{STANDING_LABEL.established}</span> the official record shows it</span>
+      <span class="inline-flex items-center gap-1.5"><span class="pill pill-warn">{STANDING_LABEL.contested}</span> credible sources disagree</span>
+      <span class="inline-flex items-center gap-1.5"><span class="pill pill-bad">{STANDING_LABEL.unverified}</span> the claim goes further than the evidence</span>
+    </div>
     <div class="no-print mt-7 flex flex-wrap gap-2" id="con-type" role="group" aria-label="Filter by kind">
       <button type="button" class="btn btn-sm btn-ghost" data-t="all" aria-pressed="true">All <span class="num text-ink-3">{CONTROVERSIES.length}</span></button>
       <button type="button" class="btn btn-sm btn-ghost" data-t="policy" aria-pressed="false">Policies and decisions <span class="num text-ink-3">{nPolicy}</span></button>
