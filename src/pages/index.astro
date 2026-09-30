@@ -12,7 +12,7 @@ import { fmtStamp } from '../lib/format';
 import HouseholdCalc from '../islands/HouseholdCalc.tsx';
 import { byId, BUDGET } from '../lib/measures';
 import { incomeTax, RULES_2122, RULES_2223, RULES_2526, type TaxRules } from '../lib/personalTax';
-import MEDIAN from '../data/median-earnings.json';
+import { typicalHousehold, SRC } from '../lib/typicalHousehold';
 
 const t = tally();
 const rec = record();
@@ -31,19 +31,14 @@ const CPI = bar(/^All prices/), WPI = bar(/^Wages/);
 const periodLabel = pvw.headline.period ?? '';
 const mp = byId('mortgage')?.chart.series?.[0]?.points ?? [];
 const mThen = mp.find((p) => p[0] === '2022-05-31'), mNow = mp[mp.length - 1];
-const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1], thenLabel: 'May 2022', nowLabel: new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
+const steps = byId('interest_rates')?.chart.series?.[0]?.points ?? [];
+const cashAt = (d: string) => { const x = steps.filter((p) => p[0] <= d); return x.length ? x[x.length - 1][1] : null; };
+// The RBA's mortgage rate table lags by a month or two: add any cash rate change announced since, assumed passed on in full.
+const lift = mNow && cashAt(mNow[0]) != null && steps.length ? steps[steps.length - 1][1] - cashAt(mNow[0])! : 0;
+const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1] + lift, thenLabel: 'May 2022', nowLabel: lift ? 'estimate after the latest rate decision' : new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
 const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
 const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace('–', '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
-// Median employee: ABS weekly median x 52, taxed under each year's rules; the August 2022 figure lifted to August 2025
-// prices by chaining the three year-to-September CPI rises.
-const infl = byId('inflation')!.chart.series![0].points;
-const cpiR = MEDIAN.cpi_quarters.reduce((r, q) => { const p = infl.find((x) => x[0] === q); return p && r != null ? r * (1 + p[1] / 100) : null; }, 1 as number | null);
-const med = (() => {
-  if (cpiR == null) return null;
-  const a0 = MEDIAN.then.weekly * 52, a1 = MEDIAN.now.weekly * 52;
-  const net0 = a0 - incomeTax(a0, RULES_2223), net1 = a1 - incomeTax(a1, RULES_2526);
-  return { a0, a1, net0, net1, real0: net0 * cpiR, diff: net1 - net0 * cpiR, cpiPct: (cpiR - 1) * 100 };
-})();
+const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
 
 const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, description: SITE.description, url: new URL(url(), Astro.site).href };
@@ -106,14 +101,31 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
   <section class="wrap pt-16" id="record">
     <p class="eyebrow">The record · May 2022 to now</p>
     <h2 class="h2 mt-2">What has changed since the government took office</h2>
-    {med && (
-      <div class="card mt-6 grid gap-px overflow-hidden bg-rule sm:grid-cols-3" style="border-color:var(--rule)">
-        <div class="bg-surface p-5"><p class="eyebrow">Median pay, {MEDIAN.then.period}</p><p class="num mt-2 font-display text-[32px] font-semibold leading-none">{$(med.a0)}</p><p class="meta mt-1.5">a year ({$(MEDIAN.then.weekly)} a week), {$(med.net0)} after tax. Three months after the government took office.</p></div>
-        <div class="bg-surface p-5"><p class="eyebrow">Median pay, {MEDIAN.now.period}</p><p class="num mt-2 font-display text-[32px] font-semibold leading-none">{$(med.a1)}</p><p class="meta mt-1.5">a year ({$(MEDIAN.now.weekly)} a week), {$(med.net1)} after tax. The latest ABS figure.</p></div>
-        <div class:list={['p-5', med.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}><p class="eyebrow">After tax and inflation</p><p class:list={['num mt-2 font-display text-[32px] font-semibold leading-none', med.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(med.diff))} {med.diff >= 0 ? 'better off' : 'worse off'}</p><p class="meta mt-1.5">a year. The 2022 take-home pay is {$(med.real0)} in {MEDIAN.now.period.split(' ')[1]} prices (up {med.cpiPct.toFixed(1)}%).</p></div>
+    {TH && (
+      <div class="card mt-6 overflow-hidden shadow-card">
+        <div class:list={['grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-end md:p-7', TH.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}>
+          <div>
+            <p class="eyebrow">A typical household, June 2022 and now</p>
+            <h3 class="mt-1 font-display text-[24px] font-semibold leading-tight">A couple on the median wage, with an average mortgage, a car and a weekly shop</h3>
+          </div>
+          <div class="md:text-right">
+            <p class:list={['num font-display text-[clamp(36px,5vw,48px)] font-semibold leading-none tracking-tight', TH.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(TH.diff))}</p>
+            <p class:list={['mt-1 font-bold', TH.diff >= 0 ? 'text-good' : 'text-bad']}>a year {TH.diff >= 0 ? 'better off' : 'worse off'} ({$(Math.abs(TH.diff) / 52)} a week)</p>
+          </div>
+        </div>
+        <div class="table-scroll p-5 md:p-7">
+          <table class="dt w-full">
+            <thead><tr><th>A year</th><th class="r">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
+            <tbody>
+              {TH.rows.map((r) => <tr><td><b>{r.l}</b><span class="meta block">{r.n}</span></td><td class="r num">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
+              <tr><td><b>Left for everything else</b><span class="meta block">Rent is not counted: this household owns with a mortgage</span></td><td class="r num font-bold">{$(TH.left0)}</td><td class="r num font-bold">{$(TH.left1)}</td><td class="r num"></td></tr>
+              <tr><td><b>2022 amount in today’s prices</b><span class="meta block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num">{$(TH.left0Today)}</td><td class="r num">{$(TH.left1)}</td><td class:list={['r num font-bold', TH.diff >= 0 ? 'text-good' : 'text-bad']}>{(TH.diff >= 0 ? '+' : '') + $(TH.diff)}</td></tr>
+            </tbody>
+          </table>
+          <p class="meta mt-4 max-w-[90ch]"><b>Where the numbers come from.</b> Pay: ABS median weekly earnings, all employees, <a href={SRC.earnings2022}>August 2022</a> (${TH.weekly0.toLocaleString('en-AU')} a week each), grown by the Wage Price Index to the latest quarter (about ${Math.round(TH.weekly1).toLocaleString('en-AU')} a week each). The ABS has published no median household income since 2019-20 (<a href={SRC.sih}>the later surveys were cancelled or withheld</a>), so the household is 2 median earners. Mortgage: ABS <a href={SRC.lending}>average new owner-occupier loan</a>, June quarter 2022; RBA average variable rate on existing loans, May 2022 and {new Date(TH.rateMonth + 'T00:00:00Z').toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' })}{TH.lift ? `, plus ${TH.lift.toFixed(2)} points of cash rate rises announced since, assumed passed on in full` : ''}. Spending: ABS <a href={SRC.hes}>Household Expenditure Survey</a> 2015-16 averages (groceries $162, petrol $38, car registration and insurance $36.80 a week), brought to 2022 and to now with the matching <a href={SRC.cpi}>CPI</a> price indexes. Fuel is the June quarter; pump prices jumped again in August 2026. Home, health and life insurance are left in “everything else”. Interest rates are set by the independent Reserve Bank and fuel prices by world markets, so this shows what has changed for the household, not who caused each part. A guide, not financial advice.</p>
+        </div>
       </div>
     )}
-    <p class="meta mt-2">Median weekly earnings in main job, all employees: ABS Employee Earnings (<a href={MEDIAN.then.url}>{MEDIAN.then.period}</a>, <a href={MEDIAN.now.url}>{MEDIAN.now.period}</a>). Taxed at {RULES_2223.label} and {RULES_2526.label} resident rates with the Medicare levy; prices from the CPI.</p>
     {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:visible then={RULES_2122} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} /></div>}
     <p class="lede mt-10">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
     <div class="mt-7 grid gap-5 md:grid-cols-2">
