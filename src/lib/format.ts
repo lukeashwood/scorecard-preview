@@ -49,8 +49,9 @@ export function parseDate(s: string): Date { const [y, m, d] = s.slice(0, 10).sp
 export function fmtDate(s: string): string { const d = parseDate(s); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
 export function fmtMonth(s: string): string { const d = parseDate(s); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
 /** Label a data point by its frequency: "Jun qtr 2026", "2025–26", "Jul 2026". */
-export function fmtPeriod(s: string, freq?: 'q' | 'fy' | 'm' | 'd'): string {
+export function fmtPeriod(s: string, freq?: 'q' | 'fy' | 'm' | 'd' | 'y'): string {
   const d = parseDate(s); const y = d.getUTCFullYear(); const m = d.getUTCMonth();
+  if (freq === 'y') return String(y);
   if (freq === 'fy') return `${m >= 6 ? y : y - 1}–${String((m >= 6 ? y + 1 : y) % 100).padStart(2, '0')}`;
   if (freq === 'q') return `${MONTHS[m]} qtr ${y}`;
   if (freq === 'd') return fmtDate(s);
@@ -64,7 +65,7 @@ export function fmtStamp(iso?: string): string {
 export function daysBetween(a: string, b: string): number { return Math.round((parseDate(b).getTime() - parseDate(a).getTime()) / 864e5); }
 
 /** Guess the frequency of a series from the spacing of its last points. */
-export function inferFreq(points: [string, number][], hint?: 'q' | 'fy'): 'q' | 'fy' | 'm' | 'd' {
+export function inferFreq(points: [string, number][], hint?: 'q' | 'fy' | 'y'): 'q' | 'fy' | 'm' | 'd' | 'y' {
   if (hint) return hint;
   if (points.length < 3) return 'm';
   const gaps: number[] = [];

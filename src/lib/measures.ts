@@ -12,6 +12,11 @@ const data = raw as unknown as {
   budget: unknown;
 };
 
+// Use the full history wherever the pipeline supplies it.
+for (const m of data.metrics) if (m.chart?.long?.length) m.chart = { ...m.chart, series: m.chart.long, long: undefined };
+/** Every metric in the data feed (including any without an editorial entry yet), with full history. */
+export const ALL_METRICS = data.metrics;
+
 export const GENERATED_AT = data.summary.generated_at;
 export const TODAY = GENERATED_AT.slice(0, 10);
 export const CHECKS = data.summary;

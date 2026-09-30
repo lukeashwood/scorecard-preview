@@ -32,6 +32,7 @@ export const NAV = [
   { href: 'targets/', label: 'Targets' },
   { href: 'measures/', label: 'Measures' },
   { href: 'charts/', label: 'Charts' },
+  { href: 'relationships/', label: 'Relationships' },
   { href: 'budget/', label: 'Budget' },
   { href: 'learn/', label: 'Learn' },
   { href: 'laws/', label: 'Laws' },

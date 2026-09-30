@@ -3,6 +3,9 @@ import { scaleLinear, scaleTime, scaleBand } from 'd3-scale';
 import { line as d3line, curveStepAfter, curveMonotoneX } from 'd3-shape';
 import { fmtPeriod, inferFreq, withUnit, parseDate } from '../lib/format';
 import type { ChartSpec, Point } from '../lib/types';
+import G20Panel, { type G20Ind } from './G20Panel';
+
+type Freq = 'q' | 'fy' | 'm' | 'd' | 'y';
 
 interface Props {
   spec: ChartSpec;
@@ -15,11 +18,13 @@ interface Props {
   useExtra?: number;
   csvName?: string;
   height?: number;
+  /** G20 comparisons that fit this measure (empty when there is no like-for-like international series). */
+  g20?: G20Ind[];
 }
 
 const COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 const roleColor = (role: string | undefined, i: number) => (role === 'muted' ? 'var(--c4)' : COLORS[i % COLORS.length]);
-const RANGES = [{ id: 'term', label: 'This government', years: -1 }, { id: '5y', label: '5 years', years: 5 }, { id: '10y', label: '10 years', years: 10 }, { id: 'all', label: 'All', years: 0 }] as const;
+const RANGES = [{ id: 'term', label: 'This government', years: -1 }, { id: '10y', label: '10 years', years: 10 }, { id: '20y', label: '20 years', years: 20 }, { id: 'all', label: 'All years', years: 0 }] as const;
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null); const [w, setW] = useState(0);
@@ -32,7 +37,7 @@ function useWidth<T extends HTMLElement>() {
   return [ref, w] as const;
 }
 
-export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', height = 340 }: Props) {
+export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', height = 340, g20 = [] }: Props) {
   const unit = unitOverride ?? (useExtra != null ? spec.extra![useExtra].unit : spec.unit);
   const decimals = useExtra != null ? spec.extra![useExtra].decimals : spec.decimals;
   const series = useMemo(() => {
@@ -42,15 +47,19 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
   const [view, setView] = useState<'chart' | 'table'>('chart');
   const allDates = useMemo(() => series.flatMap((s) => s.points.map((p) => p[0])).sort(), [series]);
   const spanYears = allDates.length ? (parseDate(allDates[allDates.length - 1]).getTime() - parseDate(allDates[0]).getTime()) / 31557600000 : 0;
-  const [range, setRange] = useState<(typeof RANGES)[number]['id']>(spanYears > 11 ? '10y' : 'all');
+  const [range, setRange] = useState<(typeof RANGES)[number]['id']>('10y');
+  const [mode, setMode] = useState<'time' | 'g20'>('time');
   const fmt = (v: number) => withUnit(v, unit, decimals);
 
   const cut = useMemo(() => {
     const r = RANGES.find((x) => x.id === range)!;
-    if (!r.years || !allDates.length) return '0000';
+    if (!allDates.length) return '0000';
     // "This government": from the start of the year it took office, so the starting point stays in view.
     if (r.years < 0) return term ? `${term.start.slice(0, 4)}-01-01` : '0000';
-    const end = parseDate(allDates[allDates.length - 1]);
+    if (r.years === 0) return '0000';
+    // Count back from the latest published figure, not from the end of any Budget forecast.
+    const actual = spec.estimateFrom ? allDates.filter((d) => d < spec.estimateFrom!) : allDates;
+    const end = parseDate((actual.length ? actual : allDates)[(actual.length ? actual : allDates).length - 1]);
     return new Date(Date.UTC(end.getUTCFullYear() - r.years, end.getUTCMonth(), end.getUTCDate())).toISOString().slice(0, 10);
   }, [range, allDates]);
   const shown = useMemo(() => series.map((s) => ({ ...s, points: s.points.filter((p) => p[0] >= cut) })), [series, cut]);
@@ -69,20 +78,28 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
+  const isTime = spec.kind !== 'hbar';
+  const on = { background: 'var(--ink)', color: 'var(--paper)' };
+  const rangeYears = RANGES.find((r) => r.id === range)!.years;
+  const short = isTime && mode === 'time' && allDates.length > 0 && (rangeYears < 0 ? !!term && allDates[0] > term.start : spanYears + 0.3 < rangeYears);
   return (
     <figure className="m-0">
       <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1" role="group" aria-label="Time range">
-          {spec.kind !== 'hbar' && spanYears > 6 && view === 'chart' && RANGES.filter((r) => r.years >= 0 || (term && allDates[0] < term.start)).map((r) => (
-            <button key={r.id} type="button" className="btn btn-sm btn-quiet" aria-pressed={range === r.id} onClick={() => setRange(r.id)}
-              style={range === r.id ? { background: 'var(--ink)', color: 'var(--paper)' } : undefined}>{r.label}</button>
+        <div className="flex flex-wrap gap-1" role="group" aria-label="What to show">
+          {isTime && RANGES.filter((r) => r.years !== 0 || spanYears > 22).map((r) => (
+            <button key={r.id} type="button" className="btn btn-sm btn-quiet" aria-pressed={mode === 'time' && range === r.id} onClick={() => { setMode('time'); setRange(r.id); }}
+              style={mode === 'time' && range === r.id ? on : undefined}>{r.label}</button>
           ))}
+          {!isTime && g20.length > 0 && <button type="button" className="btn btn-sm btn-quiet" aria-pressed={mode === 'time'} onClick={() => setMode('time')} style={mode === 'time' ? on : undefined}>This chart</button>}
+          {g20.length > 0 && <button type="button" className="btn btn-sm btn-quiet" aria-pressed={mode === 'g20'} onClick={() => setMode('g20')} style={mode === 'g20' ? on : undefined}>G20</button>}
         </div>
-        <div className="flex gap-1">
+        {mode === 'time' && <div className="flex gap-1">
           <button type="button" className="btn btn-sm btn-ghost" aria-pressed={view === 'table'} onClick={() => setView(view === 'chart' ? 'table' : 'chart')}>{view === 'chart' ? 'Show as table' : 'Show as chart'}</button>
           <button type="button" className="btn btn-sm btn-ghost" onClick={downloadCsv}>Download CSV</button>
-        </div>
+        </div>}
       </div>
+      {mode === 'g20' ? <G20Panel indicators={g20} csvName={csvName} /> : <>
+      {short && view === 'chart' && <p className="meta -mt-1 mb-2">This series starts in {fmtPeriod(allDates[0], freq)}, so this shows its full history.</p>}
 
       {view === 'table' ? <DataTable spec={spec} series={series} unit={unit} decimals={decimals} freq={freq} />
         : spec.kind === 'hbar' ? <HBars spec={spec} unit={unit} decimals={decimals} title={title} />
@@ -94,13 +111,14 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
         </ul>
       )}
       {spec.note && <figcaption className="meta mt-3 max-w-[80ch]">{spec.note}</figcaption>}
+      </>}
     </figure>
   );
 }
 
 /* ------------------------------------------------------------------ time charts: line, step, bar */
 function TimeChart({ spec, series, fmt, freq, elections, term, title, height, plottingExtra }: {
-  spec: ChartSpec; series: { name: string; role?: string; points: Point[] }[]; fmt: (v: number) => string; freq: 'q' | 'fy' | 'm' | 'd';
+  spec: ChartSpec; series: { name: string; role?: string; points: Point[] }[]; fmt: (v: number) => string; freq: Freq;
   elections: { date: string; label: string }[]; term?: { start: string; label: string }; title: string; height: number; plottingExtra: boolean;
 }) {
   const [ref, W] = useWidth<HTMLDivElement>();
@@ -229,7 +247,7 @@ function HBars({ spec, unit, decimals, title }: { spec: ChartSpec; unit: string;
 }
 
 /* ------------------------------------------------------------------ table view (also the accessible fallback) */
-function DataTable({ spec, series, unit, decimals, freq }: { spec: ChartSpec; series: { name: string; points: Point[] }[]; unit: string; decimals: number; freq: 'q' | 'fy' | 'm' | 'd' }) {
+function DataTable({ spec, series, unit, decimals, freq }: { spec: ChartSpec; series: { name: string; points: Point[] }[]; unit: string; decimals: number; freq: Freq }) {
   const f = (v: number) => withUnit(v, unit, decimals);
   if (spec.kind === 'hbar') return (
     <div className="table-scroll max-h-[340px] overflow-y-auto rounded-lg border border-rule"><table className="dt"><thead><tr><th>Category</th><th className="r">Value{unit ? ` (${unit})` : ''}</th></tr></thead>

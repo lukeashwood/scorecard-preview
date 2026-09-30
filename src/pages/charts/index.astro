@@ -6,14 +6,14 @@ import Base from '../../layouts/Base.astro';
 import Chart from '../../islands/Chart.tsx';
 import VerdictPill from '../../components/VerdictPill.astro';
 import DirectionBadge from '../../components/DirectionBadge.astro';
-import raw from '../../data/metrics.json';
 import { SITE, url } from '../../config/site';
-import { MEASURES, SECTIONS, GENERATED_AT } from '../../lib/measures';
+import { MEASURES, SECTIONS, GENERATED_AT, ALL_METRICS } from '../../lib/measures';
 import { EDITORIAL } from '../../lib/editorial';
+import { g20For } from '../../lib/g20';
 import { fmtStamp, headlineText } from '../../lib/format';
 import type { RawMetric } from '../../lib/types';
 
-const all = (raw as unknown as { metrics: RawMetric[] }).metrics;
+const all: RawMetric[] = ALL_METRICS;
 const measure = Object.fromEntries(MEASURES.map((m) => [m.id, m]));
 const items = all.map((r) => {
   const m = measure[r.id]; const ed = EDITORIAL[r.id];
@@ -34,7 +34,7 @@ const groups = [
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Charts</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every chart, one page</h1>
-    <p class="lede mt-3">All {items.length} charts we track, with their full history. Pick the ones you want to see and the page remembers your choice on this device. Open any chart for its sources and a plain-English explanation.</p>
+    <p class="lede mt-3">All {items.length} charts we track. Switch each one between this government, the last 10 or 20 years, and how Australia compares with the G20 where a fair comparison exists. Pick the ones you want to see and the page remembers your choice on this device. Open any chart for its sources and a plain-English explanation.</p>
     <p class="meta mono mt-3">Figures as at {fmtStamp(GENERATED_AT)}</p>
 
     <div class="no-print sticky top-16 z-20 -mx-4 mt-6 border-b border-rule bg-paper px-4 py-3">
@@ -79,7 +79,7 @@ const groups = [
               </div>
               {i.since && <div class="mt-3"><DirectionBadge change={{ trend: i.since.trend, tone: i.since.tone, label: i.since.label }} prefix="Since May 2022" /></div>}
               <div class="mt-4">
-                <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} />
+                <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} g20={g20For(i.id)} />
               </div>
               {i.hasPage && <a class="mt-4 inline-flex items-center gap-1.5 self-start text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a>}
             </article>

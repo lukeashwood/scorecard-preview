@@ -15,10 +15,12 @@ export interface ChartSpec {
   ref?: RefLine[];
   refValue?: number;
   estimateFrom?: string;
-  freq?: 'q' | 'fy';
+  freq?: 'q' | 'fy' | 'y';
   note?: string;
   legend?: { name: string; role: Role }[];
   extra?: { name: string; unit: string; decimals: number; points: Point[] }[];
+  /** The same series with their full 20-year history (the pipeline keeps `series` short for the original site). */
+  long?: Series[];
 }
 
 export interface Source {

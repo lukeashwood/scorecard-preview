@@ -50,23 +50,23 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
           <span class="mono block pt-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-3">{SITE.edition}</span>
         </span>
       </a>
-      <nav class="ml-auto hidden items-center gap-1 lg:flex" aria-label="Main">
+      <nav class="ml-auto hidden items-center gap-0.5 xl:flex" aria-label="Main">
         {NAV.map((n) => (
           <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined}
-             class="rounded-lg px-3 py-2 text-[14.5px] font-semibold text-ink-2 no-underline transition-colors hover:bg-panel hover:text-ink aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>
+             class="rounded-lg px-2.5 py-2 text-[14.5px] font-semibold text-ink-2 no-underline transition-colors hover:bg-panel hover:text-ink aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>
         ))}
       </nav>
-      <div class="ml-auto flex items-center gap-2 lg:ml-2">
+      <div class="ml-auto flex items-center gap-2 xl:ml-2">
         <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden sm:inline-flex">Get updates</a>
         <button type="button" id="theme-btn" class="btn btn-ghost btn-sm w-9 !px-0" aria-label="Switch between light and dark">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
         </button>
-        <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 lg:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+        <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 xl:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
       </div>
     </div>
-    <nav id="mobile-nav" class="border-t border-rule bg-paper lg:hidden" aria-label="Main (mobile)" hidden>
+    <nav id="mobile-nav" class="border-t border-rule bg-paper xl:hidden" aria-label="Main (mobile)" hidden>
       <div class="wrap grid gap-1 py-3">
         {NAV.map((n) => <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined} class="rounded-lg px-3 py-3 text-[16px] font-semibold text-ink no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>)}
         <a href={url('subscribe/')} class="btn btn-primary mt-2">Get updates</a>
