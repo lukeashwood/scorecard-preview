@@ -13,6 +13,8 @@ export const SRC = {
   lending: 'https://www.abs.gov.au/statistics/economy/finance/lending-indicators/latest-release',
   cpi: 'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release',
   census: 'https://www.abs.gov.au/census/find-census-data/quickstats/2021/AUS',
+  rentNow: 'https://www.cotality.com/au/insights/articles/rental-growth-accelerates-annually-as-perth-and-brisbane-close-the-gap-to-sydney',
+  rent2022: 'https://www.theurbandeveloper.com/articles/corelogic-rental-report-third-quarter-september-2022',
   sih: 'https://www.abs.gov.au/statistics/detailed-methodology-information/information-papers/survey-income-and-housing-2023-24-review-report',
 };
 
@@ -26,9 +28,11 @@ const LOAN = 611000;
 // CPI index numbers (8 capitals, Sept qtr 2025 = 100) used to bring 2015-16 amounts to the June quarter 2022:
 //   food 74.93 -> 86.87; automotive fuel 66.29 -> 104.25; insurance 58.97 -> 72.86; other motor vehicle services 78.75 -> 87.86
 const TO_2022 = { food: 86.87 / 74.93, fuel: 104.25 / 66.29, insurance: 72.86 / 58.97, motor: 87.86 / 78.75 };
-// ABS 2021 Census: median weekly rent, Australia, $375 (August 2021). Brought to the June quarter 2022 with CPI rents
-// (Sept qtr 2021 81.32 -> June qtr 2022 82.49).
-const RENT_2022 = 375 * (82.49 / 81.32);
+// Market rents (what a new lease costs): Cotality (formerly CoreLogic) national median rent, all dwellings.
+//   June quarter 2026: $705 a week (Cotality Rental Review, Q2 2026).
+//   June quarter 2022: about $532, from the September quarter 2022 median of $544 less that quarter's 2.3% rise
+//   (CoreLogic Quarterly Rental Review, September 2022). Update both each quarter.
+export const RENT = { then: 544 / 1.023, now: 705, nowLabel: 'June quarter 2026' };
 // Other services in respect of motor vehicles (includes registration), June qtr 2022 -> June qtr 2026: +14.8%.
 const MOTOR_SINCE_2022 = 14.8;
 
@@ -37,7 +41,7 @@ const repay = (loan: number, rate: number) => { const i = rate / 1200, n = 360; 
 export function typicalHousehold(now: TaxRules | null) {
   const pvw = byId('prices_vs_wages'); if (!pvw || !now) return null;
   const bar = (re: RegExp) => pvw.chart.bars?.find((b) => re.test(b.name))?.value;
-  const cpi = bar(/^All prices/), wpi = bar(/^Wages/), food = bar(/^Food/), fuel = bar(/^Petrol/), ins = bar(/^Insurance/), rents = bar(/^Rents/);
+  const cpi = bar(/^All prices/), wpi = bar(/^Wages/), food = bar(/^Food/), fuel = bar(/^Petrol/), ins = bar(/^Insurance/), rents = bar(/^Rents/); // ABS CPI rents: all existing leases, shown for comparison
   if ([cpi, wpi, food, fuel, ins, rents].some((v) => v == null)) return null;
   const g = (p: number) => 1 + p / 100;
 
@@ -62,7 +66,7 @@ export function typicalHousehold(now: TaxRules | null) {
   const groc1 = groc0 * g(food!), fuel1 = fuel0 * g(fuel!), car1 = week(36.8 * (TO_2022.insurance * g(ins!) + TO_2022.motor * g(MOTOR_SINCE_2022)) / 2);
   const mort0 = 12 * repay(LOAN, rate0), mort1 = 12 * repay(LOAN, rate1);
 
-  const rent0 = week(RENT_2022), rent1 = rent0 * g(rents!);
+  const rent0 = week(RENT.then), rent1 = week(RENT.now), rentGrowth = (RENT.now / RENT.then - 1) * 100;
   const common = [
     { l: 'Household income, before tax', a: pay0, b: pay1, n: `2 people on the median wage, grown by the Wage Price Index (+${wpi!.toFixed(1)}%)` },
     { l: 'Income tax and Medicare levy', a: -tax0, b: -tax1, n: `${RULES_2223.label} rates, then ${now.label} rates` },
@@ -80,8 +84,8 @@ export function typicalHousehold(now: TaxRules | null) {
   return {
     period: pvw.headline.period ?? '', cpi: cpi!, wpi: wpi!, food: food!, fuel: fuel!, ins: ins!, rents: rents!, motor: MOTOR_SINCE_2022,
     loan: LOAN, rate0, rate1, rateMonth: m1[0], lift, weekly0: MEDIAN_WEEKLY_2022, weekly1: (pay1 / 2) / 52, taxLabel: now.label,
-    rentWeek0: rent0 / 52, rentWeek1: rent1 / 52,
+    rentWeek0: rent0 / 52, rentWeek1: rent1 / 52, rentGrowth,
     owner: variant({ l: 'Mortgage repayments', a: -mort0, b: -mort1, n: `$${(LOAN / 1000).toFixed(0)}k average loan, 30 years, ${rate0.toFixed(2)}% then, ${rate1.toFixed(2)}% now` }),
-    renter: variant({ l: 'Rent', a: -rent0, b: -rent1, n: `Median rent, $${Math.round(rent0 / 52)} a week then, $${Math.round(rent1 / 52)} now (rents +${rents!.toFixed(1)}%)` }),
+    renter: variant({ l: 'Rent', a: -rent0, b: -rent1, n: `Median market rent, about $${Math.round(rent0 / 52)} a week then, $${Math.round(rent1 / 52)} now (+${rentGrowth.toFixed(1)}%)` }),
   };
 }

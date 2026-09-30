@@ -10,8 +10,10 @@ interface Props {
   then: TaxRules; now: TaxRules;
   cpi: number; wpi: number; periodLabel: string;
   mortgage: { then: number; now: number; thenLabel: string; nowLabel: string } | null;
-  /** CPI rents, % change over the same period. */
+  /** Market rents (new leases), % change over the same period. */
   rentGrowth?: number;
+  /** ABS CPI rents (all existing leases), % change, for someone who has stayed in the same home. */
+  sittingRentGrowth?: number;
 }
 
 const repay = (loan: number, rate: number) => { const i = rate / 1200, n = 360; return i ? loan * i / (1 - Math.pow(1 + i, -n)) : loan / n; };
@@ -31,7 +33,7 @@ function Money({ id, label, value, onChange, hint }: { id: string; label: string
   );
 }
 
-export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortgage, rentGrowth }: Props) {
+export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortgage, rentGrowth, sittingRentGrowth }: Props) {
   const [a, setA] = useState('90,000');
   const [b, setB] = useState('');
   const [aThen, setAThen] = useState('');
@@ -39,6 +41,7 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
   const [loan, setLoan] = useState('');
   const [tenure, setTenure] = useState<'none' | 'mortgage' | 'rent'>('none');
   const [rent, setRent] = useState('');
+  const [stayed, setStayed] = useState(false);
   const [more, setMore] = useState(false);
   const [dropLmito, setDropLmito] = useState(false);
   const cpiR = 1 + cpi / 100, wpiR = 1 + wpi / 100;
@@ -53,10 +56,10 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
     // Same loan both times; the 2022 repayment is lifted to today's prices, like the 2022 pay it came out of.
     const L = tenure === 'mortgage' ? num(loan) : 0; const mort = mortgage && L > 0 ? -12 * (repay(L, mortgage.now) - repay(L, mortgage.then) * cpiR) : 0;
     // Rent: today's rent against the same home's rent in 2022 (CPI rents), with the 2022 rent lifted to today's prices.
-    const R = tenure === 'rent' && rentGrowth != null ? num(rent) : 0; const rentCost = R > 0 ? -52 * (R - (R / (1 + rentGrowth! / 100)) * cpiR) : 0;
+    const R = tenure === 'rent' && rentGrowth != null ? num(rent) : 0; const rg = stayed && sittingRentGrowth != null ? sittingRentGrowth : rentGrowth!; const rentCost = R > 0 ? -52 * (R - (R / (1 + rg / 100)) * cpiR) : 0;
     const takeNow = people.reduce((s, p) => s + p.nowInc - p.tax1, 0), takeThen = people.reduce((s, p) => s + (p.inc0 - p.tax0) * cpiR, 0);
     return { people, pay, tax, mort, rentCost, total: pay + tax + mort + rentCost, takeNow, takeThen };
-  }, [a, b, aThen, bThen, loan, rent, tenure, dropLmito, then, now, cpiR, wpiR, mortgage, rentGrowth]);
+  }, [a, b, aThen, bThen, loan, rent, tenure, stayed, dropLmito, then, now, cpiR, wpiR, mortgage, rentGrowth, sittingRentGrowth]);
 
   const has = r.people.length > 0;
   const better = r.total >= 0;
@@ -78,7 +81,8 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
               <button key={k} type="button" className="btn btn-sm btn-ghost" aria-pressed={tenure === k} onClick={() => setTenure(k)} style={tenure === k ? { background: 'var(--ink)', color: 'var(--paper)' } : undefined}>{l}</button>))}</div>
           </fieldset>
           {tenure === 'mortgage' && mortgage && <Money id="hc-l" label="Mortgage owing" value={loan} onChange={setLoan} hint={`Variable rate ${mortgage.thenLabel} ${mortgage.then.toFixed(2)}%, now ${mortgage.now.toFixed(2)}% (${mortgage.nowLabel})`} />}
-          {tenure === 'rent' && rentGrowth != null && <Money id="hc-r" label="Rent now, a week" value={rent} onChange={setRent} hint={`Rents are up ${rentGrowth.toFixed(1)}% since ${periodLabel.split(' → ')[0]} (CPI rents). New leases have risen faster than that.`} />}
+          {tenure === 'rent' && rentGrowth != null && <Money id="hc-r" label="Rent now, a week" value={rent} onChange={setRent} hint={`Market rents are up ${rentGrowth.toFixed(1)}% since June 2022 (Cotality median, new leases).`} />}
+          {tenure === 'rent' && sittingRentGrowth != null && <label className="flex items-start gap-2 text-[14px]"><input type="checkbox" className="mt-1 h-4 w-4 accent-[var(--brand)]" checked={stayed} onChange={(e) => setStayed(e.target.checked)} /><span>I’ve been in the same rental since 2022 <span className="text-ink-3">(uses the ABS rent index for existing leases, +{sittingRentGrowth.toFixed(1)}%)</span></span></label>}
           <button type="button" className="justify-self-start text-[14px] font-semibold text-brand underline" aria-expanded={more} onClick={() => setMore(!more)}>{more ? 'Hide' : 'More options'}</button>
           {more && <div className="grid gap-4 rounded-lg bg-panel p-4">
             <p className="text-[14px] text-ink-2">If you know what you earned in {then.label}, enter it. Otherwise we assume your pay rose in line with average wages ({wpi.toFixed(1)}%).</p>
@@ -101,7 +105,7 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
                 { l: 'Pay compared with prices', v: r.pay, n: `Prices are up ${cpi.toFixed(1)}% since ${periodLabel.split(' → ')[0]}.` },
                 { l: 'Income tax and Medicare levy', v: r.tax, n: `${now.label} rates compared with ${then.label}.` },
                 ...(r.mort ? [{ l: 'Mortgage repayments', v: r.mort, n: 'Same loan, 30 year term, compared in today’s prices. Interest is not counted in the CPI.' }] : []),
-                ...(r.rentCost ? [{ l: 'Rent', v: r.rentCost, n: `Rent up ${rentGrowth!.toFixed(1)}% against prices up ${cpi.toFixed(1)}%, on the rent you pay now.` }] : []),
+                ...(r.rentCost ? [{ l: 'Rent', v: r.rentCost, n: `Rent up ${(stayed && sittingRentGrowth != null ? sittingRentGrowth : rentGrowth!).toFixed(1)}% against prices up ${cpi.toFixed(1)}%, on the rent you pay now.` }] : []),
               ].map((x) => (
                 <div key={x.l} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 border-t border-rule py-2.5">
                   <dt className="font-semibold">{x.l}</dt><dd className={`num font-bold ${x.v >= 0 ? 'text-good' : 'text-bad'}`}>{signed$(x.v)}</dd>
