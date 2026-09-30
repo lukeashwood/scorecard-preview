@@ -12,7 +12,7 @@ const groups = SECTIONS.map((s) => ({ ...s, items: MEASURES.filter((m) => m.sect
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Measures</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every figure we track</h1>
-    <p class="lede mt-3">{MEASURES.length} official series, grouped by topic. Open any one for the full chart, its sources, and a plain-English explanation.</p>
+    <p class="lede mt-3">{MEASURES.length} official series, grouped by topic. Open any one for the full chart, its sources, and a plain-English explanation, or <a href={url('charts/')} class="font-bold">see every chart on one page</a>.</p>
     <div class="no-print mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter by federal control" id="filters">
       {[['all', 'All'], ['direct', 'Direct federal control'], ['shared', 'Shared control'], ['indirect', 'Indirect influence']].map(([v, l]) => <button type="button" class="btn btn-sm btn-ghost" data-filter={v} aria-pressed={v === 'all' ? 'true' : 'false'}>{l}</button>)}
     </div>

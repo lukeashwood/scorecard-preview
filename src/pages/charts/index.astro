@@ -1,0 +1,116 @@
+---
+/* Every chart on one page, like the original Scorecard. Built from the raw data feed, so any chart the pipeline adds
+   shows up here automatically, even before it has an editorial entry. Visitors pick which charts they see; the choice
+   is kept in their browser for now. When the paid tier starts, this picker is where the free/paid limit will sit. */
+import Base from '../../layouts/Base.astro';
+import Chart from '../../islands/Chart.tsx';
+import VerdictPill from '../../components/VerdictPill.astro';
+import DirectionBadge from '../../components/DirectionBadge.astro';
+import raw from '../../data/metrics.json';
+import { SITE, url } from '../../config/site';
+import { MEASURES, SECTIONS, GENERATED_AT } from '../../lib/measures';
+import { EDITORIAL } from '../../lib/editorial';
+import { fmtStamp, headlineText } from '../../lib/format';
+import type { RawMetric } from '../../lib/types';
+
+const all = (raw as unknown as { metrics: RawMetric[] }).metrics;
+const measure = Object.fromEntries(MEASURES.map((m) => [m.id, m]));
+const items = all.map((r) => {
+  const m = measure[r.id]; const ed = EDITORIAL[r.id];
+  return {
+    id: r.id, section: r.section, title: r.title, question: r.question,
+    headline: (m ?? r).headline, chart: ed?.chartNote ? { ...(m ?? r).chart, note: ed.chartNote } : (m ?? r).chart,
+    chartTitle: ed?.chartTitle, unitOverride: ed?.unitOverride, useExtra: ed?.useExtra,
+    verdict: m?.verdict ?? null, verdictLabels: ed?.target?.verdictLabels, since: m?.sinceElection ?? null, hasPage: !!m,
+  };
+});
+const known = new Set(SECTIONS.map((s) => s.id));
+const groups = [
+  ...SECTIONS.map((s) => ({ id: s.id, title: s.title, blurb: s.blurb, items: items.filter((i) => i.section === s.id) })),
+  { id: 'other', title: 'Other figures', blurb: '', items: items.filter((i) => !known.has(i.section)) },
+].filter((g) => g.items.length);
+---
+<Base title="All charts" description={`Every chart ${SITE.name} tracks on one page: ${items.length} official series with their full history, sources and download options.`} section="charts/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">Charts</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every chart, one page</h1>
+    <p class="lede mt-3">All {items.length} charts we track, with their full history. Pick the ones you want to see and the page remembers your choice on this device. Open any chart for its sources and a plain-English explanation.</p>
+    <p class="meta mono mt-3">Figures as at {fmtStamp(GENERATED_AT)}</p>
+
+    <div class="no-print sticky top-16 z-20 -mx-4 mt-6 border-b border-rule bg-paper px-4 py-3">
+      <div class="flex items-center gap-2">
+        <button type="button" id="pick-btn" class="btn btn-primary btn-sm shrink-0" aria-expanded="false" aria-controls="picker">Choose charts <span id="pick-count" class="num opacity-80">({items.length} of {items.length})</span></button>
+        <nav class="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Jump to topic">{groups.map((g) => <a class="btn btn-quiet btn-sm shrink-0 whitespace-nowrap" href={`#t-${g.id}`} data-jump={g.id}>{g.title}</a>)}</nav>
+      </div>
+      <div id="picker" class="card card-pad mt-3 max-h-[60vh] overflow-y-auto" hidden>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="h3">Which charts do you want to see?</p>
+          <div class="flex gap-1.5"><button type="button" class="btn btn-ghost btn-sm" data-all="1">Show all</button><button type="button" class="btn btn-ghost btn-sm" data-all="0">Clear</button><button type="button" class="btn btn-quiet btn-sm" id="pick-done">Done</button></div>
+        </div>
+        <div class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {groups.map((g) => (
+            <fieldset>
+              <legend class="flex w-full items-center justify-between gap-2 font-bold"><span>{g.title}</span><button type="button" class="text-[12.5px] font-semibold text-brand underline" data-topic={g.id}>all</button></legend>
+              <ul class="mt-2 grid gap-1.5">{g.items.map((i) => <li><label class="flex items-start gap-2 text-[14px] leading-snug"><input type="checkbox" class="mt-0.5 h-4 w-4 accent-[var(--brand)]" value={i.id} data-topic-of={g.id} checked />{i.title}</label></li>)}</ul>
+            </fieldset>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <p id="none-msg" class="card card-pad mt-8 text-ink-2" hidden>No charts selected. Use <b>Choose charts</b> to pick some.</p>
+
+    {groups.map((g) => (
+      <section class="mt-12 scroll-mt-40" id={`t-${g.id}`} data-group={g.id}>
+        <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-rule-strong pb-2"><h2 class="font-display text-[24px] font-semibold">{g.title}</h2>{g.blurb && <p class="meta">{g.blurb}</p>}</div>
+        <div class="mt-5 grid gap-5 lg:grid-cols-2">
+          {g.items.map((i) => (
+            <article class="card card-pad flex min-w-0 flex-col" data-chart={i.id} id={i.id}>
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h3 class="h3">{i.chartTitle ?? i.title}</h3>
+                  <p class="meta mt-1">{i.question}</p>
+                </div>
+                {i.verdict && <VerdictPill verdict={i.verdict.verdict} label={i.verdictLabels?.[i.verdict.verdict]} />}
+              </div>
+              <div class="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                <p class="num font-display text-[30px] font-semibold leading-none tracking-tight">{headlineText(i.headline)}</p>
+                <p class="meta max-w-[40ch]">{i.headline.caption}{i.headline.period ? ` · ${i.headline.period}` : ''}</p>
+              </div>
+              {i.since && <div class="mt-3"><DirectionBadge change={{ trend: i.since.trend, tone: i.since.tone, label: i.since.label }} prefix="Since May 2022" /></div>}
+              <div class="mt-4">
+                <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} />
+              </div>
+              {i.hasPage && <a class="mt-4 inline-flex items-center gap-1.5 self-start text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a>}
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <script is:inline>
+    (function () {
+      var KEY = 'sc_charts_hidden', boxes = Array.prototype.slice.call(document.querySelectorAll('#picker input[type=checkbox]'));
+      var btn = document.getElementById('pick-btn'), panel = document.getElementById('picker'), count = document.getElementById('pick-count');
+      var hidden = []; try { hidden = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) {}
+      // Store what is switched OFF, so charts added later show up for everyone by default.
+      boxes.forEach(function (b) { b.checked = hidden.indexOf(b.value) < 0; });
+      function apply(save) {
+        var off = boxes.filter(function (b) { return !b.checked; }).map(function (b) { return b.value; });
+        boxes.forEach(function (b) { var c = document.querySelector('[data-chart="' + b.value + '"]'); if (c) c.hidden = !b.checked; });
+        document.querySelectorAll('[data-group]').forEach(function (g) { var any = !!g.querySelector('[data-chart]:not([hidden])'); g.hidden = !any; var j = document.querySelector('[data-jump="' + g.dataset.group + '"]'); if (j) j.hidden = !any; });
+        var on = boxes.length - off.length; count.textContent = '(' + on + ' of ' + boxes.length + ')';
+        document.getElementById('none-msg').hidden = on > 0;
+        if (save) try { localStorage.setItem(KEY, JSON.stringify(off)); } catch (e) {}
+      }
+      function toggle(open) { panel.hidden = !open; btn.setAttribute('aria-expanded', String(open)); }
+      btn.addEventListener('click', function () { toggle(panel.hidden); });
+      document.getElementById('pick-done').addEventListener('click', function () { toggle(false); });
+      boxes.forEach(function (b) { b.addEventListener('change', function () { apply(true); }); });
+      document.querySelectorAll('[data-all]').forEach(function (x) { x.addEventListener('click', function () { var v = x.dataset.all === '1'; boxes.forEach(function (b) { b.checked = v; }); apply(true); }); });
+      document.querySelectorAll('[data-topic]').forEach(function (x) { x.addEventListener('click', function () { var t = boxes.filter(function (b) { return b.dataset.topicOf === x.dataset.topic; }); var v = t.some(function (b) { return !b.checked; }); t.forEach(function (b) { b.checked = v; }); apply(true); }); });
+      apply(false);
+    })();
+  </script>
+</Base>
