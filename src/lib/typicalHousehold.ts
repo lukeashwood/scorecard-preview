@@ -12,6 +12,7 @@ export const SRC = {
   hes: 'https://www.abs.gov.au/statistics/economy/finance/household-expenditure-survey-australia-summary-results/latest-release',
   lending: 'https://www.abs.gov.au/statistics/economy/finance/lending-indicators/latest-release',
   cpi: 'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release',
+  census: 'https://www.abs.gov.au/census/find-census-data/quickstats/2021/AUS',
   sih: 'https://www.abs.gov.au/statistics/detailed-methodology-information/information-papers/survey-income-and-housing-2023-24-review-report',
 };
 
@@ -25,6 +26,9 @@ const LOAN = 611000;
 // CPI index numbers (8 capitals, Sept qtr 2025 = 100) used to bring 2015-16 amounts to the June quarter 2022:
 //   food 74.93 -> 86.87; automotive fuel 66.29 -> 104.25; insurance 58.97 -> 72.86; other motor vehicle services 78.75 -> 87.86
 const TO_2022 = { food: 86.87 / 74.93, fuel: 104.25 / 66.29, insurance: 72.86 / 58.97, motor: 87.86 / 78.75 };
+// ABS 2021 Census: median weekly rent, Australia, $375 (August 2021). Brought to the June quarter 2022 with CPI rents
+// (Sept qtr 2021 81.32 -> June qtr 2022 82.49).
+const RENT_2022 = 375 * (82.49 / 81.32);
 // Other services in respect of motor vehicles (includes registration), June qtr 2022 -> June qtr 2026: +14.8%.
 const MOTOR_SINCE_2022 = 14.8;
 
@@ -33,8 +37,8 @@ const repay = (loan: number, rate: number) => { const i = rate / 1200, n = 360; 
 export function typicalHousehold(now: TaxRules | null) {
   const pvw = byId('prices_vs_wages'); if (!pvw || !now) return null;
   const bar = (re: RegExp) => pvw.chart.bars?.find((b) => re.test(b.name))?.value;
-  const cpi = bar(/^All prices/), wpi = bar(/^Wages/), food = bar(/^Food/), fuel = bar(/^Petrol/), ins = bar(/^Insurance/);
-  if ([cpi, wpi, food, fuel, ins].some((v) => v == null)) return null;
+  const cpi = bar(/^All prices/), wpi = bar(/^Wages/), food = bar(/^Food/), fuel = bar(/^Petrol/), ins = bar(/^Insurance/), rents = bar(/^Rents/);
+  if ([cpi, wpi, food, fuel, ins, rents].some((v) => v == null)) return null;
   const g = (p: number) => 1 + p / 100;
 
   // Mortgage rates: RBA average variable rate on existing owner-occupier loans, May 2022 and the latest month, plus any
@@ -58,19 +62,26 @@ export function typicalHousehold(now: TaxRules | null) {
   const groc1 = groc0 * g(food!), fuel1 = fuel0 * g(fuel!), car1 = week(36.8 * (TO_2022.insurance * g(ins!) + TO_2022.motor * g(MOTOR_SINCE_2022)) / 2);
   const mort0 = 12 * repay(LOAN, rate0), mort1 = 12 * repay(LOAN, rate1);
 
-  const left0 = take0 - mort0 - groc0 - fuel0 - car0, left1 = take1 - mort1 - groc1 - fuel1 - car1;
-  const left0Today = left0 * g(cpi!);
+  const rent0 = week(RENT_2022), rent1 = rent0 * g(rents!);
+  const common = [
+    { l: 'Household income, before tax', a: pay0, b: pay1, n: `2 people on the median wage, grown by the Wage Price Index (+${wpi!.toFixed(1)}%)` },
+    { l: 'Income tax and Medicare levy', a: -tax0, b: -tax1, n: `${RULES_2223.label} rates, then ${now.label} rates` },
+  ];
+  const living = [
+    { l: 'Groceries', a: -groc0, b: -groc1, n: `Food prices +${food!.toFixed(1)}%` },
+    { l: 'Petrol, including driving to work', a: -fuel0, b: -fuel1, n: `Fuel prices ${fuel! >= 0 ? '+' : ''}${fuel!.toFixed(1)}% (June quarters)` },
+    { l: 'Car registration and insurance', a: -car0, b: -car1, n: `Insurance +${ins!.toFixed(1)}%, registration and other car services +${MOTOR_SINCE_2022}%` },
+  ];
+  const variant = (home: { l: string; a: number; b: number; n: string }) => {
+    const rows = [...common, home, ...living];
+    const left0 = rows.reduce((t, r) => t + r.a, 0), left1 = rows.reduce((t, r) => t + r.b, 0), left0Today = left0 * g(cpi!);
+    return { rows, left0, left1, left0Today, diff: left1 - left0Today };
+  };
   return {
-    period: pvw.headline.period ?? '', cpi: cpi!, wpi: wpi!, food: food!, fuel: fuel!, ins: ins!, motor: MOTOR_SINCE_2022,
+    period: pvw.headline.period ?? '', cpi: cpi!, wpi: wpi!, food: food!, fuel: fuel!, ins: ins!, rents: rents!, motor: MOTOR_SINCE_2022,
     loan: LOAN, rate0, rate1, rateMonth: m1[0], lift, weekly0: MEDIAN_WEEKLY_2022, weekly1: (pay1 / 2) / 52, taxLabel: now.label,
-    rows: [
-      { l: 'Household income, before tax', a: pay0, b: pay1, n: `2 people on the median wage, grown by the Wage Price Index (+${wpi!.toFixed(1)}%)` },
-      { l: 'Income tax and Medicare levy', a: -tax0, b: -tax1, n: `${RULES_2223.label} rates, then ${now.label} rates` },
-      { l: 'Mortgage repayments', a: -mort0, b: -mort1, n: `$${(LOAN / 1000).toFixed(0)}k average loan, 30 years, ${rate0.toFixed(2)}% then, ${rate1.toFixed(2)}% now` },
-      { l: 'Groceries', a: -groc0, b: -groc1, n: `Food prices +${food!.toFixed(1)}%` },
-      { l: 'Petrol, including driving to work', a: -fuel0, b: -fuel1, n: `Fuel prices ${fuel! >= 0 ? '+' : ''}${fuel!.toFixed(1)}% (June quarters)` },
-      { l: 'Car registration and insurance', a: -car0, b: -car1, n: `Insurance +${ins!.toFixed(1)}%, registration and other car services +${MOTOR_SINCE_2022}%` },
-    ],
-    left0, left1, left0Today, diff: left1 - left0Today,
+    rentWeek0: rent0 / 52, rentWeek1: rent1 / 52,
+    owner: variant({ l: 'Mortgage repayments', a: -mort0, b: -mort1, n: `$${(LOAN / 1000).toFixed(0)}k average loan, 30 years, ${rate0.toFixed(2)}% then, ${rate1.toFixed(2)}% now` }),
+    renter: variant({ l: 'Rent', a: -rent0, b: -rent1, n: `Median rent, $${Math.round(rent0 / 52)} a week then, $${Math.round(rent1 / 52)} now (rents +${rents!.toFixed(1)}%)` }),
   };
 }

@@ -102,31 +102,45 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SIT
     <p class="eyebrow">The record · May 2022 to now</p>
     <h2 class="h2 mt-2">What has changed since the government took office</h2>
     {TH && (
-      <div class="card mt-6 overflow-hidden shadow-card">
-        <div class:list={['grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-end md:p-7', TH.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}>
+      <div class="card mt-6 overflow-hidden shadow-card" id="typical">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-5 pt-5 pb-4 md:px-7">
           <div>
             <p class="eyebrow">A typical household, June 2022 and now</p>
-            <h3 class="mt-1 font-display text-[24px] font-semibold leading-tight">A couple on the median wage, with an average mortgage, a car and a weekly shop</h3>
+            <h3 class="mt-1 font-display text-[24px] font-semibold leading-tight">A couple on the median wage, with a car and a weekly shop</h3>
           </div>
-          <div class="md:text-right">
-            <p class:list={['num font-display text-[clamp(36px,5vw,48px)] font-semibold leading-none tracking-tight', TH.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(TH.diff))}</p>
-            <p class:list={['mt-1 font-bold', TH.diff >= 0 ? 'text-good' : 'text-bad']}>a year {TH.diff >= 0 ? 'better off' : 'worse off'} ({$(Math.abs(TH.diff) / 52)} a week)</p>
+          <div class="flex gap-1" role="tablist" aria-label="Home">
+            <button type="button" role="tab" class="btn btn-sm btn-quiet" data-tenure="owner" aria-selected="true">Paying a mortgage</button>
+            <button type="button" role="tab" class="btn btn-sm btn-quiet" data-tenure="renter" aria-selected="false">Renting</button>
           </div>
         </div>
-        <div class="table-scroll p-5 md:p-7">
-          <table class="dt w-full">
-            <thead><tr><th>A year</th><th class="r">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
-            <tbody>
-              {TH.rows.map((r) => <tr><td class="min-w-[150px]"><b>{r.l}</b><span class="meta hidden sm:block">{r.n}</span></td><td class="r num">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
-              <tr><td class="min-w-[150px]"><b>Left for everything else</b><span class="meta hidden sm:block">Rent is not counted: this household owns with a mortgage</span></td><td class="r num font-bold">{$(TH.left0)}</td><td class="r num font-bold">{$(TH.left1)}</td><td class="r num"></td></tr>
-              <tr><td class="min-w-[150px]"><b>2022 amount in today’s prices</b><span class="meta hidden sm:block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num">{$(TH.left0Today)}</td><td class="r num">{$(TH.left1)}</td><td class:list={['r num font-bold', TH.diff >= 0 ? 'text-good' : 'text-bad']}>{(TH.diff >= 0 ? '+' : '') + $(TH.diff)}</td></tr>
-            </tbody>
-          </table>
-          <p class="meta mt-4 max-w-[90ch]"><b>Where the numbers come from.</b> Pay: ABS median weekly earnings, all employees, <a href={SRC.earnings2022}>August 2022</a> (${TH.weekly0.toLocaleString('en-AU')} a week each), grown by the Wage Price Index to the latest quarter (about ${Math.round(TH.weekly1).toLocaleString('en-AU')} a week each). The ABS has published no median household income since 2019-20 (<a href={SRC.sih}>the later surveys were cancelled or withheld</a>), so the household is 2 median earners. Mortgage: ABS <a href={SRC.lending}>average new owner-occupier loan</a>, June quarter 2022; RBA average variable rate on existing loans, May 2022 and {new Date(TH.rateMonth + 'T00:00:00Z').toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' })}{TH.lift ? `, plus ${TH.lift.toFixed(2)} points of cash rate rises announced since, assumed passed on in full` : ''}. Spending: ABS <a href={SRC.hes}>Household Expenditure Survey</a> 2015-16 averages (groceries $162, petrol $38, car registration and insurance $36.80 a week), brought to 2022 and to now with the matching <a href={SRC.cpi}>CPI</a> price indexes. Fuel is the June quarter; pump prices jumped again in August 2026. Home, health and life insurance are left in “everything else”. Interest rates are set by the independent Reserve Bank and fuel prices by world markets, so this shows what has changed for the household, not who caused each part. A guide, not financial advice.</p>
-        </div>
+        {([['owner', TH.owner, 'This household owns with a mortgage'], ['renter', TH.renter, 'This household rents']] as const).map(([k, V, note]) => (
+          <div data-panel={k} hidden={k !== 'owner'}>
+            <div class:list={['grid gap-2 px-5 py-5 md:grid-cols-[1fr_auto] md:items-center md:px-7', V.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}>
+              <p class="text-[15px] font-semibold">{k === 'owner' ? `With the average new mortgage of $${Math.round(TH.loan / 1000)}k` : `Paying the median rent ($${Math.round(TH.rentWeek1)} a week now)`}</p>
+              <p class="md:text-right"><span class:list={['num font-display text-[clamp(34px,5vw,46px)] font-semibold leading-none tracking-tight', V.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(V.diff))}</span> <span class:list={['font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>a year {V.diff >= 0 ? 'better off' : 'worse off'} ({$(Math.abs(V.diff) / 52)} a week)</span></p>
+            </div>
+            <div class="table-scroll px-5 pb-2 pt-4 md:px-7">
+              <table class="dt w-full">
+                <thead><tr><th>A year</th><th class="r">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
+                <tbody>
+                  {V.rows.map((r) => <tr><td class="min-w-[150px]"><b>{r.l}</b><span class="meta hidden sm:block">{r.n}</span></td><td class="r num">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
+                  <tr><td class="min-w-[150px]"><b>Left for everything else</b><span class="meta hidden sm:block">{note}</span></td><td class="r num font-bold">{$(V.left0)}</td><td class="r num font-bold">{$(V.left1)}</td><td class="r num"></td></tr>
+                  <tr><td class="min-w-[150px]"><b>2022 amount in today’s prices</b><span class="meta hidden sm:block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num">{$(V.left0Today)}</td><td class="r num">{$(V.left1)}</td><td class:list={['r num font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>{(V.diff >= 0 ? '+' : '') + $(V.diff)}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+        <p class="meta max-w-[90ch] px-5 pb-6 md:px-7"><b>Where the numbers come from.</b> Pay: ABS median weekly earnings, all employees, <a href={SRC.earnings2022}>August 2022</a> (${TH.weekly0.toLocaleString('en-AU')} a week each), grown by the Wage Price Index to the latest quarter (about ${Math.round(TH.weekly1).toLocaleString('en-AU')} a week each). The ABS has published no median household income since 2019-20 (<a href={SRC.sih}>the later surveys were cancelled or withheld</a>), so the household is 2 median earners. Mortgage: ABS <a href={SRC.lending}>average new owner-occupier loan</a>, June quarter 2022; RBA average variable rate on existing loans, May 2022 and {new Date(TH.rateMonth + 'T00:00:00Z').toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' })}{TH.lift ? `, plus ${TH.lift.toFixed(2)} points of cash rate rises announced since, assumed passed on in full` : ''}. Rent: <a href={SRC.census}>2021 Census median weekly rent</a> ($375), moved to June 2022 and to now with CPI rents (+{TH.rents.toFixed(1)}% since June 2022). CPI rents covers all existing leases, including public housing; rents on new leases have risen faster, so this is likely to understate what a renter moving now pays. Spending: ABS <a href={SRC.hes}>Household Expenditure Survey</a> 2015-16 averages (groceries $162, petrol $38, car registration and insurance $36.80 a week), brought to 2022 and to now with the matching <a href={SRC.cpi}>CPI</a> price indexes. Fuel is the June quarter; pump prices jumped again in August 2026. Home, health and life insurance are left in “everything else”. Interest rates are set by the independent Reserve Bank and fuel prices by world markets, so this shows what has changed for the household, not who caused each part. A guide, not financial advice.</p>
       </div>
     )}
-    {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:visible then={RULES_2223} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} /></div>}
+    <script is:inline>
+      (function () { var box = document.getElementById('typical'); if (!box) return; var tabs = box.querySelectorAll('[data-tenure]');
+        function show(k) { tabs.forEach(function (t) { var on = t.dataset.tenure === k; t.setAttribute('aria-selected', String(on)); t.style.background = on ? 'var(--ink)' : ''; t.style.color = on ? 'var(--paper)' : ''; });
+          box.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== k; }); }
+        tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.dataset.tenure); }); }); show('owner'); })();
+    </script>
+    {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:visible then={RULES_2223} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} rentGrowth={TH?.rents} /></div>}
     <p class="lede mt-10">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
     <div class="mt-7 grid gap-5 md:grid-cols-2">
       {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (

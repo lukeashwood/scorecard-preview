@@ -3,12 +3,15 @@ import { incomeTax, type TaxRules } from '../lib/personalTax';
 
 /* "Are you better or worse off?" A household calculator. It compares what your household takes home now with what the
    same jobs paid after tax in the base year (2022-23, the first year of this government), with the old figure lifted to today's
-   prices. Optional: a mortgage, because interest costs are left out of the CPI. Everything runs in the browser. */
+   prices. Optional: a mortgage (interest is left out of the CPI) or rent (renters spend far more of their income on it
+   than the CPI's average household). Both are compared in today's prices, like everything else. Runs in the browser. */
 
 interface Props {
   then: TaxRules; now: TaxRules;
   cpi: number; wpi: number; periodLabel: string;
   mortgage: { then: number; now: number; thenLabel: string; nowLabel: string } | null;
+  /** CPI rents, % change over the same period. */
+  rentGrowth?: number;
 }
 
 const repay = (loan: number, rate: number) => { const i = rate / 1200, n = 360; return i ? loan * i / (1 - Math.pow(1 + i, -n)) : loan / n; };
@@ -28,12 +31,14 @@ function Money({ id, label, value, onChange, hint }: { id: string; label: string
   );
 }
 
-export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortgage }: Props) {
+export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortgage, rentGrowth }: Props) {
   const [a, setA] = useState('90,000');
   const [b, setB] = useState('');
   const [aThen, setAThen] = useState('');
   const [bThen, setBThen] = useState('');
   const [loan, setLoan] = useState('');
+  const [tenure, setTenure] = useState<'none' | 'mortgage' | 'rent'>('none');
+  const [rent, setRent] = useState('');
   const [more, setMore] = useState(false);
   const [dropLmito, setDropLmito] = useState(false);
   const cpiR = 1 + cpi / 100, wpiR = 1 + wpi / 100;
@@ -45,10 +50,13 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
       return { nowInc, inc0, tax0, tax1, pay: nowInc - inc0 * cpiR, tax: -(tax1 - tax0 * cpiR), estimated: !(thenInc > 0) };
     });
     const pay = people.reduce((s, p) => s + p.pay, 0), tax = people.reduce((s, p) => s + p.tax, 0);
-    const L = num(loan); const mort = mortgage && L > 0 ? -12 * (repay(L, mortgage.now) - repay(L, mortgage.then)) : 0;
+    // Same loan both times; the 2022 repayment is lifted to today's prices, like the 2022 pay it came out of.
+    const L = tenure === 'mortgage' ? num(loan) : 0; const mort = mortgage && L > 0 ? -12 * (repay(L, mortgage.now) - repay(L, mortgage.then) * cpiR) : 0;
+    // Rent: today's rent against the same home's rent in 2022 (CPI rents), with the 2022 rent lifted to today's prices.
+    const R = tenure === 'rent' && rentGrowth != null ? num(rent) : 0; const rentCost = R > 0 ? -52 * (R - (R / (1 + rentGrowth! / 100)) * cpiR) : 0;
     const takeNow = people.reduce((s, p) => s + p.nowInc - p.tax1, 0), takeThen = people.reduce((s, p) => s + (p.inc0 - p.tax0) * cpiR, 0);
-    return { people, pay, tax, mort, total: pay + tax + mort, takeNow, takeThen };
-  }, [a, b, aThen, bThen, loan, dropLmito, then, now, cpiR, wpiR, mortgage]);
+    return { people, pay, tax, mort, rentCost, total: pay + tax + mort + rentCost, takeNow, takeThen };
+  }, [a, b, aThen, bThen, loan, rent, tenure, dropLmito, then, now, cpiR, wpiR, mortgage, rentGrowth]);
 
   const has = r.people.length > 0;
   const better = r.total >= 0;
@@ -65,7 +73,12 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
             <Money id="hc-a" label="Your income now (a year)" value={a} onChange={setA} />
             <Money id="hc-b" label="Partner’s income now" value={b} onChange={setB} hint="Leave blank if single" />
           </div>
-          {mortgage && <Money id="hc-l" label="Mortgage owing (optional)" value={loan} onChange={setLoan} hint={`Variable rate ${mortgage.thenLabel} ${mortgage.then.toFixed(2)}%, now ${mortgage.now.toFixed(2)}% (${mortgage.nowLabel})`} />}
+          <fieldset className="grid gap-2"><legend className="text-[14px] font-semibold">Your home</legend>
+            <div className="flex flex-wrap gap-1.5" role="group">{([['none', 'Leave out'], ['mortgage', 'Mortgage'], ['rent', 'Renting']] as const).filter(([k]) => k !== 'mortgage' || mortgage).filter(([k]) => k !== 'rent' || rentGrowth != null).map(([k, l]) => (
+              <button key={k} type="button" className="btn btn-sm btn-ghost" aria-pressed={tenure === k} onClick={() => setTenure(k)} style={tenure === k ? { background: 'var(--ink)', color: 'var(--paper)' } : undefined}>{l}</button>))}</div>
+          </fieldset>
+          {tenure === 'mortgage' && mortgage && <Money id="hc-l" label="Mortgage owing" value={loan} onChange={setLoan} hint={`Variable rate ${mortgage.thenLabel} ${mortgage.then.toFixed(2)}%, now ${mortgage.now.toFixed(2)}% (${mortgage.nowLabel})`} />}
+          {tenure === 'rent' && rentGrowth != null && <Money id="hc-r" label="Rent now, a week" value={rent} onChange={setRent} hint={`Rents are up ${rentGrowth.toFixed(1)}% since ${periodLabel.split(' → ')[0]} (CPI rents). New leases have risen faster than that.`} />}
           <button type="button" className="justify-self-start text-[14px] font-semibold text-brand underline" aria-expanded={more} onClick={() => setMore(!more)}>{more ? 'Hide' : 'More options'}</button>
           {more && <div className="grid gap-4 rounded-lg bg-panel p-4">
             <p className="text-[14px] text-ink-2">If you know what you earned in {then.label}, enter it. Otherwise we assume your pay rose in line with average wages ({wpi.toFixed(1)}%).</p>
@@ -87,7 +100,8 @@ export default function HouseholdCalc({ then, now, cpi, wpi, periodLabel, mortga
               {[
                 { l: 'Pay compared with prices', v: r.pay, n: `Prices are up ${cpi.toFixed(1)}% since ${periodLabel.split(' → ')[0]}.` },
                 { l: 'Income tax and Medicare levy', v: r.tax, n: `${now.label} rates compared with ${then.label}.` },
-                ...(r.mort ? [{ l: 'Mortgage repayments', v: r.mort, n: 'Extra interest on the same loan, 30 year term. Not counted in the CPI.' }] : []),
+                ...(r.mort ? [{ l: 'Mortgage repayments', v: r.mort, n: 'Same loan, 30 year term, compared in today’s prices. Interest is not counted in the CPI.' }] : []),
+                ...(r.rentCost ? [{ l: 'Rent', v: r.rentCost, n: `Rent up ${rentGrowth!.toFixed(1)}% against prices up ${cpi.toFixed(1)}%, on the rent you pay now.` }] : []),
               ].map((x) => (
                 <div key={x.l} className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 border-t border-rule py-2.5">
                   <dt className="font-semibold">{x.l}</dt><dd className={`num font-bold ${x.v >= 0 ? 'text-good' : 'text-bad'}`}>{signed$(x.v)}</dd>
