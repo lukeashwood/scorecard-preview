@@ -1,6 +1,6 @@
-# The Scorecard (next)
+# Gov Score (next)
 
-A rebuilt, separate version of The Scorecard: official Australian figures, sourced line by line, with verdicts only on
+A rebuilt, separate version of Gov Score: official Australian figures, sourced line by line, with verdicts only on
 commitments the government itself made. Astro + React islands + Tailwind, static output.
 
 ## Commands

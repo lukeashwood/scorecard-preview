@@ -1,6 +1,6 @@
 /* One place for everything that changes between editions (Australia now; NZ, UK, Canada, US later). */
 export const SITE = {
-  name: 'The Scorecard',
+  name: 'Gov Score',
   edition: 'Australia',
   tagline: 'Holding the federal government to account, in its own numbers.',
   description:

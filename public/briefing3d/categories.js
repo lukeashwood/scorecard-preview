@@ -37,7 +37,7 @@
     return { ...sec, type: "category", metrics, rated: rated.length, off, watch, on, color: rampColor(off, watch, rated.length) };
   }).filter((s) => s.metrics.length);
   const S = D.summary;
-  const overall = { id: "overall", type: "overall", name: "The whole Scorecard", metrics: D.metrics,
+  const overall = { id: "overall", type: "overall", name: "The whole of Gov Score", metrics: D.metrics,
     rated: S.metrics_rated, off: S.metrics_off_track, watch: S.metrics_watch, on: S.metrics_on_track,
     color: rampColor(S.metrics_off_track, S.metrics_watch, S.metrics_rated) };
   overall.pos = { x: 0, y: 0, z: 0 };
@@ -525,11 +525,11 @@
     panel.hidden = false;
     const close = h("button", "panel-close", "✕"); close.type = "button"; close.setAttribute("aria-label", "Close"); close.addEventListener("click", () => select(null, true));
     panel.appendChild(close);
-    panel.appendChild(h("div", "p-kicker", n.type === "overall" ? "Every measure on the Scorecard" : `Category · ${n.metrics.length} measure${n.metrics.length === 1 ? "" : "s"}`));
+    panel.appendChild(h("div", "p-kicker", n.type === "overall" ? "Every measure on Gov Score" : `Category · ${n.metrics.length} measure${n.metrics.length === 1 ? "" : "s"}`));
     panel.appendChild(h("h2", "p-title", n.type === "overall" ? "Overall" : n.title));
     const plain = h("p", "p-plain"); panel.appendChild(plain);
     typewrite(plain, n.type === "overall"
-      ? "Every measure the Scorecard tracks, rolled into one figure. Click a sphere on the ring to open a category."
+      ? "Every measure Gov Score tracks, rolled into one figure. Click a sphere on the ring to open a category."
       : n.blurb);
     const row = h("div", "p-stat-row");
     row.append(statChip(n.off, "Worse", "fail"), statChip(n.watch, "Mixed", "warn"), statChip(n.on, "Better", "pass"));
@@ -551,7 +551,7 @@
       panel.appendChild(box);
     }
     const cta = h("div", "p-cta");
-    const a1 = h("a", "btn-hud", "Open on the Scorecard ↗");
+    const a1 = h("a", "btn-hud", "Open on Gov Score ↗");
     a1.href = n.type === "overall" ? BASE + "#record" : BASE + "measures/";
     cta.appendChild(a1);
     if (n.type !== "overall") { const back = h("button", "btn-hud", "◂ Overall"); back.type = "button"; back.addEventListener("click", () => select("overall", true)); cta.appendChild(back); }
@@ -560,7 +560,7 @@
   }
 
   /* ---------------------------------------------------------------- guided tour */
-  const tourSteps = [{ id: "overall", say: `The Scorecard tracks ${S.metrics_total} measures of government performance. Since the government took office in May 2022, ${S.metrics_off_track} of ${S.metrics_rated} rated measures are worse or off track, and ${S.metrics_on_track} are better or on track.` }]
+  const tourSteps = [{ id: "overall", say: `Gov Score tracks ${S.metrics_total} measures of government performance. Since the government took office in May 2022, ${S.metrics_off_track} of ${S.metrics_rated} rated measures are worse or off track, and ${S.metrics_on_track} are better or on track.` }]
     .concat(sections.map((s) => ({ id: s.id, say: `${s.title}: ${s.off} of ${s.rated} rated measures are worse or off track since May 2022. ${s.blurb}` })))
     .concat([{ id: "overall", say: "That's every category. Click any sphere to explore it, or open a measure to see its source." }]);
   const tour = { active: false, i: 0, timer: null, stepping: false,
