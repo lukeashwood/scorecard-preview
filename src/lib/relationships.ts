@@ -57,6 +57,11 @@ export const PAIRS: PairSpec[] = [
     x: { measure: 'government_size', label: 'Public demand, % of the economy', unit: '%', decimals: 1 },
     y: { measure: 'productivity', label: 'Labour productivity, annual change', unit: '%', decimals: 1, transform: 'yoy' },
     read: 'Economists argue about this. Much of what governments produce, such as health care and education, is hard to measure, and measured productivity in those sectors grows slowly. That can drag on the national figure without anyone working less hard. Productivity also swings with the business cycle.' },
+  { id: 'migration-transfers', title: 'Migration and money sent overseas', freq: 'fy', lags: [0, 1],
+    question: 'Does more money go overseas in years when more people arrive?',
+    x: { measure: 'migration', label: 'Net overseas migration, financial year', unit: 'people', decimals: 0, transform: 'fyJune' },
+    y: { measure: 'personal_transfers', label: 'Personal transfers sent overseas, $ billion', unit: '$bn', decimals: 1 },
+    read: 'Both have grown over 20 years along with the population and incomes, so they will tend to rise together whatever the link between them. In 2020-21, when borders were closed and net migration was below zero, personal transfers barely changed. The ABS does not publish who sends the money or where it goes.' },
 ];
 
 /* ------------------------------------------------------------------ series handling */

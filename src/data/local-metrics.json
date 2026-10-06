@@ -1,0 +1,421 @@
+{
+ "verified_on": "2026-10-07",
+ "metrics": [
+  {
+   "id": "income_tax_shares",
+   "section": "budget",
+   "title": "Who pays the income tax",
+   "question": "What share of all personal income tax does each income group pay?",
+   "headline": {
+    "value": 16.8,
+    "unit": "%",
+    "decimals": 1,
+    "period": "2023-24",
+    "caption": "of all personal income tax was paid by the top 1% of taxpayers"
+   },
+   "benchmark": {
+    "label": "Top 10% of taxpayers",
+    "text": "43.7% of all personal income tax in 2023-24"
+   },
+   "status": "info",
+   "status_rule": "Shown for context, with no verdict. How the tax load should be shared is a political judgement.",
+   "context": [
+    "In 2023-24 the top 1% of taxpayers was 132,399 people with taxable incomes of $429,531 or more. Together they paid about $55.3 billion of the $329.5 billion in personal income tax.",
+    "The top 10% paid 43.7% of all personal income tax. The middle 40% paid 43.0%, and the bottom half of taxpayers paid 13.3%.",
+    "The shares have changed little over the decade. The top 1% paid 17.0% in 2013-14 and 16.8% in 2023-24, with a high of 19.6% in 2021-22.",
+    "The ATO does not publish how many high earners leave Australia each year, or how much tax they paid before leaving.",
+    "These figures cover personal income tax only. Company tax, GST and other taxes are not included."
+   ],
+   "chart": {
+    "kind": "line",
+    "unit": "%",
+    "decimals": 1,
+    "freq": "fy",
+    "series": [
+     {
+      "name": "Top 1%",
+      "role": "primary",
+      "points": [
+       [
+        "2014-06-30",
+        17.02
+       ],
+       [
+        "2015-06-30",
+        16.78
+       ],
+       [
+        "2016-06-30",
+        16.92
+       ],
+       [
+        "2017-06-30",
+        16.67
+       ],
+       [
+        "2018-06-30",
+        16.85
+       ],
+       [
+        "2019-06-30",
+        16.66
+       ],
+       [
+        "2020-06-30",
+        16.34
+       ],
+       [
+        "2021-06-30",
+        18.35
+       ],
+       [
+        "2022-06-30",
+        19.61
+       ],
+       [
+        "2023-06-30",
+        16.89
+       ],
+       [
+        "2024-06-30",
+        16.79
+       ]
+      ]
+     },
+     {
+      "name": "Next 9% (top 2% to 10%)",
+      "role": "accent",
+      "points": [
+       [
+        "2014-06-30",
+        28.43
+       ],
+       [
+        "2015-06-30",
+        28.29
+       ],
+       [
+        "2016-06-30",
+        27.98
+       ],
+       [
+        "2017-06-30",
+        27.79
+       ],
+       [
+        "2018-06-30",
+        27.49
+       ],
+       [
+        "2019-06-30",
+        27.95
+       ],
+       [
+        "2020-06-30",
+        27.89
+       ],
+       [
+        "2021-06-30",
+        27.9
+       ],
+       [
+        "2022-06-30",
+        28.04
+       ],
+       [
+        "2023-06-30",
+        26.97
+       ],
+       [
+        "2024-06-30",
+        26.92
+       ]
+      ]
+     },
+     {
+      "name": "Middle 40%",
+      "points": [
+       [
+        "2014-06-30",
+        42.49
+       ],
+       [
+        "2015-06-30",
+        42.51
+       ],
+       [
+        "2016-06-30",
+        42.6
+       ],
+       [
+        "2017-06-30",
+        42.83
+       ],
+       [
+        "2018-06-30",
+        42.84
+       ],
+       [
+        "2019-06-30",
+        42.82
+       ],
+       [
+        "2020-06-30",
+        43.22
+       ],
+       [
+        "2021-06-30",
+        42.15
+       ],
+       [
+        "2022-06-30",
+        41.17
+       ],
+       [
+        "2023-06-30",
+        42.86
+       ],
+       [
+        "2024-06-30",
+        42.95
+       ]
+      ]
+     },
+     {
+      "name": "Bottom 50%",
+      "role": "muted",
+      "points": [
+       [
+        "2014-06-30",
+        12.06
+       ],
+       [
+        "2015-06-30",
+        12.42
+       ],
+       [
+        "2016-06-30",
+        12.51
+       ],
+       [
+        "2017-06-30",
+        12.71
+       ],
+       [
+        "2018-06-30",
+        12.82
+       ],
+       [
+        "2019-06-30",
+        12.58
+       ],
+       [
+        "2020-06-30",
+        12.55
+       ],
+       [
+        "2021-06-30",
+        11.61
+       ],
+       [
+        "2022-06-30",
+        11.18
+       ],
+       [
+        "2023-06-30",
+        13.28
+       ],
+       [
+        "2024-06-30",
+        13.33
+       ]
+      ]
+     }
+    ],
+    "note": "Share of all net personal income tax paid by each group of taxpayers, ranked by taxable income. The 4 groups add up to 100%."
+   },
+   "sources": [
+    {
+     "publisher": "Australian Taxation Office",
+     "title": "Taxation statistics 2023-24, Individuals Table 16: Percentile distribution of taxable individuals",
+     "url": "https://www.ato.gov.au/about-ato/research-and-statistics/in-detail/taxation-statistics",
+     "data_url": "https://data.gov.au/data/dataset/faea4485-f407-457d-97f8-3f0822ccd654/resource/abb69db8-b053-4cd2-84d1-64ac75d02cb1/download/ts24individual16percentiledistributionontaxableincomebysexstate.xlsx",
+     "series": [
+      "Net tax by taxable income percentile, Individuals Table 16A, editions 2013-14 to 2023-24"
+     ],
+     "retrieved_at": "2026-10-07T03:20:00+10:00",
+     "automated": false
+    }
+   ],
+   "method": "Net tax by taxable income percentile from ATO Taxation Statistics, Individuals Table 16A, for each income year from 2013-14 to 2023-24, added up across sexes and states. Percentiles rank taxable individuals by taxable income. Each group's share is its net tax divided by the net tax of all taxable individuals.",
+   "automated": false,
+   "updated_at": "2026-10-07T03:20:00+10:00",
+   "verified_on": "2026-10-07",
+   "recheck_by": "2027-06-30",
+   "explainer": {
+    "what": "Everyone who paid income tax in a year, lined up from the lowest taxable income to the highest and split into groups. The chart shows what share of the total tax bill each group paid.",
+    "why": "Income tax is the government's biggest source of revenue. Because the system is progressive, a small group of high earners pays a large share. Changes in who earns what, or who lives here, affect how much tax is collected and who pays it."
+   }
+  },
+  {
+   "id": "personal_transfers",
+   "section": "population",
+   "title": "Money sent overseas by individuals",
+   "question": "How much do people living in Australia send to family and friends overseas?",
+   "headline": {
+    "value": 2.7,
+    "unit": "$",
+    "decimals": 1,
+    "period": "2025-26",
+    "caption": "sent overseas as personal transfers in a year",
+    "suffix": "bn"
+   },
+   "benchmark": {
+    "label": "2021-22",
+    "text": "$1.9 billion"
+   },
+   "baseline": {
+    "label": "2021-22",
+    "value": 1.9,
+    "unit": "$bn"
+   },
+   "status": "info",
+   "status_rule": "Shown for context, with no verdict. Sending money to family overseas is a private choice.",
+   "context": [
+    "$2.7 billion was sent overseas as personal transfers in 2025-26, up from $1.9 billion in 2021-22 and $1.1 billion in 2013-14.",
+    "That is about 0.1% of GDP.",
+    "The ABS does not publish this series for money sent to people in Australia from overseas, so a net figure is not available.",
+    "The figures are not broken down by the country the money goes to or by the background of the person sending it."
+   ],
+   "chart": {
+    "kind": "bar",
+    "unit": "$bn",
+    "decimals": 1,
+    "freq": "fy",
+    "series": [
+     {
+      "name": "Personal transfers sent overseas",
+      "role": "primary",
+      "points": [
+       [
+        "2004-06-30",
+        0.544
+       ],
+       [
+        "2005-06-30",
+        0.569
+       ],
+       [
+        "2006-06-30",
+        0.628
+       ],
+       [
+        "2007-06-30",
+        0.697
+       ],
+       [
+        "2008-06-30",
+        0.757
+       ],
+       [
+        "2009-06-30",
+        0.807
+       ],
+       [
+        "2010-06-30",
+        0.867
+       ],
+       [
+        "2011-06-30",
+        0.944
+       ],
+       [
+        "2012-06-30",
+        1.022
+       ],
+       [
+        "2013-06-30",
+        1.101
+       ],
+       [
+        "2014-06-30",
+        1.148
+       ],
+       [
+        "2015-06-30",
+        1.142
+       ],
+       [
+        "2016-06-30",
+        1.172
+       ],
+       [
+        "2017-06-30",
+        1.272
+       ],
+       [
+        "2018-06-30",
+        1.437
+       ],
+       [
+        "2019-06-30",
+        1.595
+       ],
+       [
+        "2020-06-30",
+        1.746
+       ],
+       [
+        "2021-06-30",
+        1.726
+       ],
+       [
+        "2022-06-30",
+        1.923
+       ],
+       [
+        "2023-06-30",
+        2.138
+       ],
+       [
+        "2024-06-30",
+        2.455
+       ],
+       [
+        "2025-06-30",
+        2.709
+       ],
+       [
+        "2026-06-30",
+        2.744
+       ]
+      ]
+     }
+    ],
+    "note": "Money and goods sent by people living in Australia to people overseas, each financial year. ABS estimate."
+   },
+   "sources": [
+    {
+     "publisher": "Australian Bureau of Statistics",
+     "title": "Balance of Payments and International Investment Position, Australia",
+     "url": "https://www.abs.gov.au/statistics/economy/international-trade/balance-payments-and-international-investment-position-australia/latest-release",
+     "data_url": "https://data.api.abs.gov.au/rest/data/ABS,BOP/1.8240.10.Q",
+     "series": [
+      "Secondary income debits, Other sectors, Personal transfers, original, current prices"
+     ],
+     "retrieved_at": "2026-10-07T03:20:00+10:00",
+     "automated": false
+    }
+   ],
+   "method": "ABS Balance of Payments, secondary income debits, other sectors, personal transfers, original series at current prices. The 4 quarters of each financial year are added together and shown in billions of dollars.",
+   "automated": false,
+   "updated_at": "2026-10-07T03:20:00+10:00",
+   "verified_on": "2026-10-07",
+   "recheck_by": "2026-12-15",
+   "explainer": {
+    "what": "Personal transfers are money or goods sent by people living in Australia to people overseas without anything in return, mostly to family. The ABS estimates them as part of the balance of payments.",
+    "why": "They are one of the ways money leaves the country, alongside imports, overseas travel and payments to foreign investors. They tend to grow as the population and incomes grow."
+   }
+  }
+ ]
+}

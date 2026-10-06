@@ -1,5 +1,6 @@
 import raw from '../data/metrics.json';
 import commitmentsRaw from '../data/commitments.json';
+import localRaw from '../data/local-metrics.json';
 import { SITE } from '../config/site';
 import { EDITORIAL } from './editorial';
 import { daysBetween, fmtPeriod, inferFreq, signed, withUnit } from './format';
@@ -11,6 +12,9 @@ const data = raw as unknown as {
   metrics: RawMetric[];
   budget: unknown;
 };
+
+// Measures entered by hand from official releases. Kept apart from the daily data feed so the sync never overwrites them.
+for (const m of (localRaw as unknown as { metrics: RawMetric[] }).metrics) if (!data.metrics.some((x) => x.id === m.id)) data.metrics.push(m);
 
 // Use the full history wherever the pipeline supplies it.
 for (const m of data.metrics) if (m.chart?.long?.length) m.chart = { ...m.chart, series: m.chart.long, long: undefined };
