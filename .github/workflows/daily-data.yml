@@ -1,0 +1,41 @@
+name: Daily data refresh
+
+# Pulls the day's official figures into the site and commits them.
+# Vercel rebuilds the live site automatically whenever this repo gets a new commit.
+on:
+  schedule:
+    # 03:15 UTC (1:15 pm Brisbane), after the data run in the-scorecard repo (02:45 UTC)
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run sync
+      # Only commit if the new figures pass the site's tests and build cleanly
+      - run: npm run check
+      - name: Commit new figures
+        run: |
+          if git diff --quiet -- src/data; then
+            echo "No new figures today."
+            exit 0
+          fi
+          git config user.name "Luke Ashwood"
+          git config user.email "luke.ashwood@icloud.com"
+          git add src/data
+          git commit -m "Daily data refresh $(date -u +%Y-%m-%d)"
+          git push
