@@ -39,6 +39,20 @@ export function factualHeadline(m: Measure): string {
   return `${m.title}.`;
 }
 
+/** Whether the latest figure is above (or below) every earlier figure in the data held for this measure.
+    `from` is the first year of that data, so the claim is always stated with the period it covers. */
+export function recordStatus(m: Measure): { kind: 'high' | 'low'; from: string } | null {
+  const rs = ratedSeries(m);
+  if (!rs || m.ed.group === 'context' || m.chart.kind === 'hbar') return null;
+  const pts = actualPoints(m); if (pts.length < 8) return null;
+  const years = +pts[pts.length - 1][0].slice(0, 4) - +pts[0][0].slice(0, 4);
+  if (years < 8) return null;
+  const lv = pts[pts.length - 1][1]; const earlier = pts.slice(0, -1);
+  if (earlier.every((p) => p[1] < lv)) return { kind: 'high', from: pts[0][0].slice(0, 4) };
+  if (earlier.every((p) => p[1] > lv)) return { kind: 'low', from: pts[0][0].slice(0, 4) };
+  return null;
+}
+
 /** "The highest since 1996-97" style context from the full history, or null when nothing notable. */
 export function recordLine(m: Measure): string | null {
   const rs = ratedSeries(m);
