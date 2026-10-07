@@ -138,7 +138,9 @@ export const GOV_TARGETS = TARGETS.filter((m) => m.ed.target!.owner === 'governm
 export const CONDITIONS = MEASURES.filter((m) => m.ed.group === 'condition');
 export const CONTEXT = MEASURES.filter((m) => m.ed.group === 'context');
 
-export interface Delivery { id: string; topic: string; title: string; owner: string; deadline?: string; commitment: string; verdict: Verdict; reason: string; sources: { label: string; url: string }[] }
+export interface Delivery { id: string; topic: string; title: string; owner: string; deadline?: string; commitment: string; verdict: Verdict; reason: string; sources: { label: string; url: string }[];
+  /** If the government later changed or dropped this commitment. The original is still the one judged. */
+  revised?: { date: string; text: string; sourceLabel: string; sourceUrl: string } }
 /** Commitments judged on delivery (a law passed, a scheme opened) rather than on a running data series. */
 export const DELIVERIES = commitmentsRaw.items as Delivery[];
 export const DELIVERIES_VERIFIED = commitmentsRaw.verified_on;

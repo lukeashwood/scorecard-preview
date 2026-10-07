@@ -23,8 +23,8 @@ export const SITE = {
      publisher is a party, candidate or associated entity, `authorisation` carries the "Authorised by …" line that
      electoral law generally requires on material intended to influence votes. */
   publisher: null as null | { name: string; statement: string; funding: string; contact: string; authorisation: string },
-  rulesVersion: '2.1',
-  rulesDate: '2026-09-18',
+  rulesVersion: '2.2',
+  rulesDate: '2026-10-07',
   repo: 'https://github.com/lukeashwood',
   // Formspree form that receives sign-ups and error reports (emailed to the publisher).
   formEndpoint: 'https://formspree.io/f/xnpnqgvj',

@@ -29,6 +29,9 @@ const coloured = CONDITIONS.filter((m) => m.ed.better !== 'none'), neutral = CON
       <p>A verdict is given only when three things are true: the government itself made the commitment, the commitment contains a number or a date, and official statistics can test it. This is deliberate. It is easy to make any government look good or bad by choosing the yardstick after the fact. Measuring a government against its own words is the one yardstick nobody can call unfair.</p>
       <div class="table-scroll"><table><thead><tr><th>Verdict</th><th>Meaning</th></tr></thead><tbody>{order.map((v) => <tr><td><VerdictPill verdict={v} /></td><td>{VERDICT_MEANING[v]}</td></tr>)}</tbody></table></div>
 
+      <h3 id="moved-targets">When a target is changed</h3>
+      <p>If the government changes, delays, softens or drops a commitment after making it, the original commitment stays on this site and is judged on its original terms: the same number and the same deadline. The new target is shown beside it, with the date it changed and a link to the announcement, so readers can see both. A changed target is not a met target. The only exception is a commitment recorded here by mistake (one the government never actually made), which is removed and logged as a correction.</p>
+
       <h3>The rule for each commitment</h3>
       <div class="table-scroll"><table><thead><tr><th>Commitment</th><th>Rule</th></tr></thead><tbody>
         {TARGETS.map((m) => <tr><td><a href={url(`measures/${m.id}/`)}>{m.ed.target!.commitment}</a><br /><span class="meta">{m.ed.target!.ownerLabel}</span></td><td>{m.ed.target!.rule}</td></tr>)}

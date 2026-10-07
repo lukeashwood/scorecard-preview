@@ -63,6 +63,8 @@ export interface TargetSpec {
   /** Optional wording for verdicts where the generic label misleads (the RBA is 'within target', not 'on track'). */
   verdictLabels?: Partial<Record<Verdict, string>>;
   rate: (m: RawMetric) => { verdict: Verdict; reason: string };
+  /** If the government later changed or dropped this target. The original commitment is still the one judged. */
+  revised?: { date: string; text: string; sourceLabel: string; sourceUrl: string };
 }
 
 export interface Editorial {

@@ -13,6 +13,7 @@ const { d, i = 0 } = Astro.props;
     <p class="eyebrow">{d.owner}{d.deadline ? ` · due ${fmtMonth(d.deadline)}` : ''}</p>
     <h3 class="mt-1.5 font-display text-[21px] font-semibold leading-snug">{d.commitment}</h3>
     <p class="mt-2 text-[14.5px] text-ink-2">{d.reason}</p>
+    {d.revised && <p class="mt-2 rounded-lg bg-warn-tint px-3 py-2 text-[14px] text-ink-2"><b class="text-warn">Commitment changed {fmtMonth(d.revised.date)}:</b> {d.revised.text} Gov Score still judges the original commitment. <a href={d.revised.sourceUrl} rel="noopener">{d.revised.sourceLabel}</a></p>}
     <details class="group mt-3 rounded-lg border border-rule bg-panel/60">
       <summary class="flex cursor-pointer list-none items-center gap-2 px-3.5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden"><span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> Show the evidence</summary>
       <dl class="grid gap-x-5 gap-y-2.5 border-t border-rule px-3.5 py-3.5 text-[14px] sm:grid-cols-[170px_1fr]">
