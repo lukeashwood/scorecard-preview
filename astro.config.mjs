@@ -30,7 +30,7 @@ const plainDashes = {
 };
 
 // SITE_URL / SITE_BASE let the same build serve a custom domain ("/") or a GitHub Pages preview ("/repo-name/").
-const site = process.env.SITE_URL || 'https://lukeashwood.github.io';
+const site = process.env.SITE_URL || 'https://govscore.com.au';
 const base = process.env.SITE_BASE || '/';
 
 export default defineConfig({
