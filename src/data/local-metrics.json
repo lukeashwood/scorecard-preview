@@ -416,6 +416,138 @@
     "what": "Personal transfers are money or goods sent by people living in Australia to people overseas without anything in return, mostly to family. The ABS estimates them as part of the balance of payments.",
     "why": "They are one of the ways money leaves the country, alongside imports, overseas travel and payments to foreign investors. They tend to grow as the population and incomes grow."
    }
+  },
+  {
+   "id": "consultancy_contracts",
+   "section": "budget",
+   "title": "Spending on consultants",
+   "question": "How much do federal agencies commit to consultancy contracts each year?",
+   "headline": {
+    "value": 759.8,
+    "unit": "$",
+    "decimals": 1,
+    "suffix": "m",
+    "period": "2025-26",
+    "caption": "in consultancy contracts starting in the year"
+   },
+   "benchmark": {
+    "label": "2021-22, the year before the change of government",
+    "text": "$705.0 million"
+   },
+   "baseline": {
+    "label": "2021-22",
+    "value": 705.0,
+    "unit": "$m"
+   },
+   "status": "info",
+   "status_rule": "Shown for context, with no verdict. There is no official target for consultancy spending.",
+   "context": [
+    "Federal agencies committed $759.8 million to 2,297 consultancy contracts starting in 2025-26, against $705.0 million on 2,923 contracts in 2021-22.",
+    "The value fell to $614.8 million in 2022-23, then rose for 2 years to a high of $785.8 million in 2024-25.",
+    "In 2012-13 the figure was $371.0 million, so it has roughly doubled over 13 years.",
+    "Number of consultancy contracts by start year: 2012-13 3,307, 2013-14 2,993, 2014-15 3,051, 2015-16 3,063, 2016-17 2,973, 2017-18 3,059, 2018-19 2,917, 2019-20 2,807, 2020-21 2,810, 2021-22 2,923, 2022-23 2,427, 2023-24 2,349, 2024-25 2,507, 2025-26 2,297.",
+    "These are the full values of the contracts, which are often paid over several years, not the amount paid out in each year.",
+    "Consultancies are only part of what agencies spend on outside help. Contractors and labour hire are counted separately and cost several times more.",
+    "The Auditor-General counted $887.7 million for 2021-22 using a different method that also counts each later change to a contract as its own entry."
+   ],
+   "chart": {
+    "kind": "bar",
+    "unit": "$m",
+    "decimals": 0,
+    "freq": "fy",
+    "series": [
+     {
+      "name": "Consultancy contracts starting in the year",
+      "role": "primary",
+      "points": [
+       [
+        "2013-06-30",
+        371.0
+       ],
+       [
+        "2014-06-30",
+        387.4
+       ],
+       [
+        "2015-06-30",
+        477.1
+       ],
+       [
+        "2016-06-30",
+        565.7
+       ],
+       [
+        "2017-06-30",
+        593.2
+       ],
+       [
+        "2018-06-30",
+        578.8
+       ],
+       [
+        "2019-06-30",
+        549.7
+       ],
+       [
+        "2020-06-30",
+        673.3
+       ],
+       [
+        "2021-06-30",
+        659.1
+       ],
+       [
+        "2022-06-30",
+        705.0
+       ],
+       [
+        "2023-06-30",
+        614.8
+       ],
+       [
+        "2024-06-30",
+        746.6
+       ],
+       [
+        "2025-06-30",
+        785.8
+       ],
+       [
+        "2026-06-30",
+        759.8
+       ]
+      ]
+     }
+    ],
+    "note": "Total value of contracts flagged as consultancies on AusTender, by the financial year the contract starts. Current value, including any later changes. Includes GST."
+   },
+   "sources": [
+    {
+     "publisher": "Department of Finance (AusTender)",
+     "title": "AusTender contract notices, consultancy contracts by start date",
+     "url": "https://www.tenders.gov.au/cn/search",
+     "series": [
+      "Contract notices with Consultancy = Yes, by contract start date, financial years 2012-13 to 2025-26"
+     ],
+     "retrieved_at": "2026-10-07T11:30:00+10:00",
+     "automated": false
+    },
+    {
+     "publisher": "Australian National Audit Office",
+     "title": "Australian Government procurement contract reporting: 2022 update",
+     "url": "https://www.anao.gov.au/work/information/australian-government-procurement-contract-reporting-2022-update",
+     "automated": false
+    }
+   ],
+   "method": "Downloaded from AusTender's contract notice search with Consultancy set to Yes and the contract start date in each financial year. Each contract is counted once, at its latest value including any amendments. Values are the full contract value including GST, not annual payments. Contracts under $10,000 are not reported on AusTender. Agencies have 42 days to publish a contract, so the latest year may still rise a little.",
+   "automated": false,
+   "updated_at": "2026-10-07T11:30:00+10:00",
+   "verified_on": "2026-10-07",
+   "recheck_by": "2027-01-31",
+   "explainer": {
+    "what": "A consultancy is a contract for independent expert advice, such as a review, an evaluation or a strategy, where the work reflects the consultant's own judgement. Agencies flag these contracts when they publish them on AusTender, the government's contract register. This chart adds up the value of every flagged contract by the year it starts.",
+    "why": "Consultancy spending is a common test of whether the public service has the skills to do its own work. Both major parties have promised to cut it. The figures show how much is being committed, not whether the advice was good value."
+   }
   }
  ]
 }
