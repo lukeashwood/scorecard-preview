@@ -34,12 +34,12 @@ const pub = (m: (typeof tiles)[number]) => [...new Set(m.sources.map((s) => s.pu
         <p class="mt-2 font-display text-[30px] font-semibold leading-tight">{t.total} commitments</p>
         <p class="mt-1 text-[15px] text-ink-2">with a measurable test: {t.good} met or on track, {t.progress} in progress, {t.risk} at risk, {t.bad} off track or not met.</p>
       </a>
-      {TH && <a href={url('#typical')} class="card card-link card-pad">
+      {TH && <a href={url('calculator/#typical')} class="card card-link card-pad">
         <p class="eyebrow">Typical household, with a mortgage</p>
         <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.owner.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.owner.diff)} a year</p>
         <p class="mt-1 text-[15px] text-ink-2">{TH.owner.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for a couple on the median wage, after tax, prices and mortgage.</p>
       </a>}
-      {TH && <a href={url('#typical')} class="card card-link card-pad">
+      {TH && <a href={url('calculator/#typical')} class="card card-link card-pad">
         <p class="eyebrow">Typical household, renting</p>
         <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.renter.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.renter.diff)} a year</p>
         <p class="mt-1 text-[15px] text-ink-2">{TH.renter.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for the same couple paying the median rent.</p>

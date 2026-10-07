@@ -30,6 +30,7 @@ function Num({ value, onCommit, step = 1, min = 0, max, label, id, width = 96, d
 
 export default function BudgetBuilder({ year, migration }: { year: BudgetYear; migration?: Migration | null }) {
   const M = useMemo(() => createModel(year), [year]);
+  const Y = year;
   const [state, setState] = useState<State>(() => M.initial());
   const [mode, setMode] = useState<Mode>('deficit');
   const [note, setNote] = useState('');
@@ -87,12 +88,13 @@ export default function BudgetBuilder({ year, migration }: { year: BudgetYear; m
           {[
             { l: 'Revenue', v: bn(S.rev), s: `${pctOf(S.rev, M.GDP)} of GDP`, c: '' },
             { l: 'Spending', v: bn(S.exp), s: `${pctOf(S.exp, M.GDP)} of GDP`, c: '' },
-            { l: S.balanced ? 'Balanced' : S.bal > 0 ? 'Surplus' : 'Deficit', v: S.balanced ? '$0bn' : bn(Math.abs(S.bal)), s: `${pctOf(Math.abs(S.bal), M.GDP)} of GDP`, c: S.balanced || S.bal > 0 ? 'text-good' : 'text-bad' },
+            { l: S.balanced ? 'Balanced' : S.bal > 0 ? 'Surplus' : 'Deficit', v: S.balanced ? '$0bn' : bn(Math.abs(S.bal)), s: `${pctOf(Math.abs(S.bal), M.GDP)} of GDP, accrual`, c: S.balanced || S.bal > 0 ? 'text-good' : 'text-bad' },
             { l: 'Against the Budget', v: S.changed ? (S.dBal > 0 ? '+' : '−') + bn(Math.abs(S.dBal)) : 'No change', s: S.changed ? (S.dBal > 0 ? 'better bottom line' : 'worse bottom line') : 'same bottom line', c: S.changed ? (S.dBal > 0 ? 'text-good' : 'text-bad') : '' },
           ].map((x) => <div key={x.l} className="bg-surface px-4 py-3"><dt className="eyebrow">{x.l}</dt><dd className={`num font-display text-[clamp(22px,2.6vw,30px)] font-semibold leading-tight ${x.c}`}>{x.v}</dd><dd className="meta">{x.s}</dd></div>)}
         </dl>
         <p ref={live} role="status" className="min-h-[22px] pt-1.5 text-[14px] text-ink-2">{note}</p>
       </div>
+      {Y.ucb_m != null && Y.revenue_total_m != null && Y.expenses_total_m != null && <p className="meta -mt-1 mb-3 max-w-[90ch]">This tool works on the Budget’s accrual figures: revenue minus expenses, {bn(Math.abs(Y.revenue_total_m - Y.expenses_total_m))} {Y.revenue_total_m >= Y.expenses_total_m ? 'surplus' : 'deficit'} before you change anything. The deficit usually quoted, and shown on the <a href="../../measures/budget_balance/">budget deficit</a> page, is the underlying cash balance: {bn(Math.abs(Y.ucb_m))} for {Y.year}. It also counts cash spent on assets and the timing of payments.</p>}
 
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
         <div role="tablist" aria-label="What to change" className="flex gap-1 rounded-xl bg-panel p-1">
@@ -131,6 +133,7 @@ export default function BudgetBuilder({ year, migration }: { year: BudgetYear; m
                       {Math.abs(d) >= 50 && <button type="button" className="ml-auto font-bold text-brand underline-offset-2 hover:underline" onClick={() => resetLine(k, i)}>Reset</button>}
                     </div>
                     {locked && <p className="meta mt-2 rounded-lg bg-panel p-2.5">Interest is set by the debt already owed and by interest rates, not by a decision. You can move it to see its weight, but “pay for it” never touches it.</p>}
+                    {k === 'expenses' && i === M.I.defence && Y.defence_funding_m > 0 && <p className="meta mt-2 rounded-lg bg-panel p-2.5">This is the Budget’s “Defence” expenses line. Total defence funding, which also counts equipment and bases bought, is {bn(Y.defence_funding_m)} ({pctOf(Y.defence_funding_m, M.GDP)} of GDP). That is the figure on the <a href="../../measures/defence_spending/">defence spending</a> page.</p>}
                     {k === 'revenue' && i === M.I.gst && <p className="meta mt-2 rounded-lg bg-panel p-2.5">GST is collected by Canberra and handed to the states, so it also sits inside “Payments to states”. Changing it here doesn’t change that line.</p>}
                   </div>); })}
               </section>))}

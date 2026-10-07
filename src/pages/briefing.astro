@@ -31,8 +31,26 @@ const base = url();
     body.catpage header.site { background: rgba(4, 9, 24, 0.85); border-bottom-color: var(--hud-line); }
     body.catpage footer.site { margin-top: 0; }
     .cat-stage { height: calc(100svh - 64px); }
+    .phone-intro { display: none; background: #060e26; color: var(--hud-white); border-bottom: 1px solid var(--hud-line); }
+    .phone-intro .wrap { padding-block: 28px; }
+    .phone-intro h1 { font-family: var(--hud-font); text-transform: uppercase; letter-spacing: .05em; font-size: 28px; margin: 0 0 8px; }
+    .phone-intro p { color: var(--hud-grey); margin: 0 0 16px; font-size: 15px; }
+    @media (max-width: 760px) {
+      body.catpage:not(.show3d) .phone-intro { display: block; }
+      body.catpage:not(.show3d) .cat-stage { display: none; }
+    }
   </style>
 
+  <section class="phone-intro" aria-label="About this page">
+    <div class="wrap">
+      <h1>Every measure, mapped</h1>
+      <p>On a phone, the topics and measures are listed below. The 3D model works best on a larger screen, but you can open it here too.</p>
+      <button type="button" class="btn-hud accent" id="btn-open-3d">Open the 3D model</button>
+    </div>
+  </section>
+  <script is:inline>
+    document.getElementById('btn-open-3d').addEventListener('click', function () { document.body.classList.add('show3d'); window.dispatchEvent(new Event('resize')); window.scrollTo(0, 0); });
+  </script>
   <section class="cat-stage" aria-label="Interactive 3D map of the government's record by topic">
     <div id="stage"></div>
     <div class="scanlines" aria-hidden="true"></div>
@@ -78,7 +96,7 @@ const base = url();
         <div class="boot-line"><span>Grouping individual measures</span><span>OK</span></div>
         <div class="boot-line"><span>Comparing with May 2022</span><span>OK</span></div>
         <div class="boot-line"><span>Rendering model</span><span>READY</span></div>
-        <div class="boot-skip">Click to skip</div>
+        <div class="boot-skip">Tap or click to skip</div>
       </div>
     </div>
   </section>
@@ -129,6 +147,7 @@ const base = url();
           li.appendChild(document.createTextNode(window.Charts.fmtNum(m.headline.value, m.headline.unit === '$' ? '$' : '', m.headline.decimals, { signed: m.headline.signed }) + (m.headline.unit === '%' ? '%' : m.headline.suffix || '') + ' ' + m.headline.caption)); ul.appendChild(li); });
         box.appendChild(ul); grid.appendChild(box); }); root.appendChild(grid); })();
   </script>
+  <script is:inline>if (window.matchMedia('(max-width: 760px)').matches) document.getElementById('text-version').hidden = false;</script>
   <script is:inline src={url('briefing3d/three.min.js')}></script>
   <script is:inline src={url('briefing3d/categories.js')}></script>
 </Base>

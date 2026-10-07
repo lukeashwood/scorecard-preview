@@ -1,41 +1,27 @@
 ---
 import Base from '../layouts/Base.astro';
-import TargetRow from '../components/TargetRow.astro';
 import MeasureCard from '../components/MeasureCard.astro';
 import VerdictPill from '../components/VerdictPill.astro';
 import Icon from '../components/Icon.astro';
 import { SITE, url } from '../config/site';
-import { CONDITIONS, GOV_TARGETS, TARGETS, DELIVERIES, SECTIONS, CHECKS, GENERATED_AT, tally, record } from '../lib/measures';
+import { MEASURES, GOV_TARGETS, DELIVERIES, CHECKS, GENERATED_AT, tally, record } from '../lib/measures';
 import { headlineText } from '../lib/format';
 import { VERDICT_TONE } from '../lib/editorial';
 import { fmtStamp } from '../lib/format';
-import HouseholdCalc from '../islands/HouseholdCalc.tsx';
 import { byId, BUDGET } from '../lib/measures';
-import { incomeTax, RULES_2122, RULES_2223, RULES_2526, type TaxRules } from '../lib/personalTax';
-import { typicalHousehold, SRC } from '../lib/typicalHousehold';
+import type { TaxRules } from '../lib/personalTax';
+import { typicalHousehold } from '../lib/typicalHousehold';
 
 const t = tally();
 const rec = record();
-const official = TARGETS.filter((m) => m.ed.target!.owner === 'official');
-const groups = SECTIONS.map((s) => ({ ...s, items: CONDITIONS.filter((m) => m.section === s.id) })).filter((g) => g.items.length);
+// Key figures: the same balanced set every time, chosen because they are the ones most often asked about, not for which way they point.
+const KEY = ['inflation', 'unemployment', 'employment', 'real_wages', 'mortgage', 'gross_debt'].map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
 const segs = [
   { n: t.good, label: 'met or on track', color: 'var(--good)' },
   { n: t.progress, label: 'in progress', color: 'var(--ink-3)' },
   { n: t.risk, label: 'at risk', color: 'var(--warn)' },
   { n: t.bad, label: 'off track or not met', color: 'var(--bad)' },
 ].filter((s) => s.n > 0);
-// ---- household calculator and median earner: price and wage growth since the June quarter 2022, from the site's data
-const pvw = byId('prices_vs_wages')!;
-const bar = (re: RegExp) => pvw.chart.bars?.find((x) => re.test(x.name))?.value ?? NaN;
-const CPI = bar(/^All prices/), WPI = bar(/^Wages/);
-const periodLabel = pvw.headline.period ?? '';
-const mp = byId('mortgage')?.chart.series?.[0]?.points ?? [];
-const mThen = mp.find((p) => p[0] === '2022-05-31'), mNow = mp[mp.length - 1];
-const steps = byId('interest_rates')?.chart.series?.[0]?.points ?? [];
-const cashAt = (d: string) => { const x = steps.filter((p) => p[0] <= d); return x.length ? x[x.length - 1][1] : null; };
-// The RBA's mortgage rate table lags by a month or two: add any cash rate change announced since, assumed passed on in full.
-const lift = mNow && cashAt(mNow[0]) != null && steps.length ? steps[steps.length - 1][1] - cashAt(mNow[0])! : 0;
-const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1] + lift, thenLabel: 'May 2022', nowLabel: lift ? 'estimate after the latest rate decision' : new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
 const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
 const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[–—]/g, '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
 const TH = typicalHousehold(NOW_RULES);
@@ -54,10 +40,9 @@ const jsonld = [
         <p class="eyebrow">{SITE.edition} · {SITE.government.name}</p>
         <h1 class="display mt-3 text-[clamp(38px,5.6vw,64px)]">The facts, laid out. <span class="text-brand">You decide the score.</span></h1>
         <p class="lede mt-5">Australia’s premier source of non-partisan data on federal government performance. The current government’s record on cost of living, housing, jobs, the Budget and more, set against decades of history and, where possible, the rest of the G20. All in one place. Every number links to its official source. No editorial, no spin, no party line.</p>
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a class="btn btn-primary" href="#record">See the record <Icon name="arrow" /></a>
-          <a class="btn btn-ghost" href="#commitments">Promises kept and broken</a>
-          <a class="btn btn-ghost" href={url('in-60-seconds/')}>Australia in 60 seconds</a>
+        <div class="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a class="btn btn-primary" href="#record">Explore the evidence <Icon name="arrow" /></a>
+          <a class="inline-flex items-center gap-1.5 font-bold no-underline hover:underline" href={url('in-60-seconds/')}>Australia in 60 seconds <Icon name="arrow" size={15} /></a>
         </div>
       </div>
 
@@ -104,50 +89,9 @@ const jsonld = [
   </section>
 
   <section class="wrap pt-16" id="record">
-    <p class="eyebrow">The record · May 2022 to now</p>
+    <p class="eyebrow">The record · since May 2022</p>
     <h2 class="h2 mt-2">What has changed since the government took office</h2>
-    {TH && (
-      <div class="card mt-6 overflow-hidden shadow-card" id="typical">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-rule px-5 pt-5 pb-4 md:px-7">
-          <div>
-            <p class="eyebrow">A typical household, June 2022 and now</p>
-            <h3 class="mt-1 font-display text-[24px] font-semibold leading-tight">A couple on the median wage, with a car and a weekly shop</h3>
-            <p class="mt-1.5 max-w-[70ch] text-[14.5px] text-ink-2">This shows what has changed for the household, not who caused it. Interest rates are set by the independent Reserve Bank, fuel prices by world markets, and rents by the housing market.</p>
-          </div>
-          <div class="flex gap-1" role="tablist" aria-label="Home">
-            <button type="button" role="tab" class="btn btn-sm btn-quiet" data-tenure="owner" aria-selected="true">Paying a mortgage</button>
-            <button type="button" role="tab" class="btn btn-sm btn-quiet" data-tenure="renter" aria-selected="false">Renting</button>
-          </div>
-        </div>
-        {([['owner', TH.owner, 'This household owns with a mortgage'], ['renter', TH.renter, 'This household rents']] as const).map(([k, V, note]) => (
-          <div data-panel={k} hidden={k !== 'owner'}>
-            <div class:list={['grid gap-2 px-5 py-5 md:grid-cols-[1fr_auto] md:items-center md:px-7', V.diff >= 0 ? 'bg-good-tint' : 'bg-bad-tint']}>
-              <p class="text-[15px] font-semibold">{k === 'owner' ? `With the average new mortgage of $${Math.round(TH.loan / 1000)}k` : `Paying the median rent ($${Math.round(TH.rentWeek1)} a week now)`}</p>
-              <p class="md:text-right"><span class:list={['num font-display text-[clamp(34px,5vw,46px)] font-semibold leading-none tracking-tight', V.diff >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(V.diff))}</span> <span class:list={['font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>a year {V.diff >= 0 ? 'better off' : 'worse off'} ({$(Math.abs(V.diff) / 52)} a week)</span></p>
-            </div>
-            <div class="table-scroll px-5 pb-2 pt-4 md:px-7">
-              <table class="dt w-full">
-                <thead><tr><th>A year</th><th class="r hidden sm:table-cell">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
-                <tbody>
-                  {V.rows.map((r) => <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>{r.l}</b><span class="meta hidden sm:block">{r.n}</span></td><td class="r num hidden sm:table-cell">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
-                  <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>Left for everything else</b><span class="meta hidden sm:block">{note}</span></td><td class="r num font-bold hidden sm:table-cell">{$(V.left0)}</td><td class="r num font-bold">{$(V.left1)}</td><td class="r num"></td></tr>
-                  <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>2022 amount in today’s prices</b><span class="meta hidden sm:block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num hidden sm:table-cell">{$(V.left0Today)}</td><td class="r num">{$(V.left1)}</td><td class:list={['r num font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>{(V.diff >= 0 ? '+' : '') + $(V.diff)}</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ))}
-        <p class="meta max-w-[90ch] px-5 pb-6 md:px-7"><b>Where the numbers come from.</b> Pay: ABS median weekly earnings, all employees, <a href={SRC.earnings2022}>August 2022</a> (${TH.weekly0.toLocaleString('en-AU')} a week each), grown by the Wage Price Index to the latest quarter (about ${Math.round(TH.weekly1).toLocaleString('en-AU')} a week each). The ABS has published no median household income since 2019-20 (<a href={SRC.sih}>the later surveys were cancelled or withheld</a>), so the household is 2 median earners. Mortgage: ABS <a href={SRC.lending}>average new owner-occupier loan</a>, June quarter 2022; RBA average variable rate on existing loans, May 2022 and {new Date(TH.rateMonth + 'T00:00:00Z').toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' })}{TH.lift ? `, plus ${TH.lift.toFixed(2)} points of cash rate rises announced since, assumed passed on in full` : ''}. Rent: Cotality national median rent, all dwellings, <a href={SRC.rentNow}>$705 a week in the June quarter 2026</a>, against about ${Math.round(TH.rentWeek0)} in the June quarter 2022 (<a href={SRC.rent2022}>$544 in the September quarter 2022</a>, less that quarter’s 2.3% rise). That is what a new lease costs. The ABS rent index, which averages all existing leases including public housing, rose less ({TH.rents.toFixed(1)}%), so a renter who has stayed put may be doing a little better than this. Spending: ABS <a href={SRC.hes}>Household Expenditure Survey</a> 2015-16 averages (groceries $162, petrol $38, car registration and insurance $36.80 a week), brought to 2022 and to now with the matching <a href={SRC.cpi}>CPI</a> price indexes. Fuel is the June quarter; pump prices jumped again in August 2026. Home, health and life insurance are left in “everything else”. Interest rates are set by the independent Reserve Bank and fuel prices by world markets, so this shows what has changed for the household, not who caused each part. A guide, not financial advice.</p>
-      </div>
-    )}
-    <script is:inline>
-      (function () { var box = document.getElementById('typical'); if (!box) return; var tabs = box.querySelectorAll('[data-tenure]');
-        function show(k) { tabs.forEach(function (t) { var on = t.dataset.tenure === k; t.setAttribute('aria-selected', String(on)); t.style.background = on ? 'var(--ink)' : ''; t.style.color = on ? 'var(--paper)' : ''; });
-          box.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== k; }); }
-        tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.dataset.tenure); }); }); show('owner'); })();
-    </script>
-    {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:visible then={RULES_2223} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} rentGrowth={TH?.rentGrowth} sittingRentGrowth={TH?.rents} /></div>}
-    <p class="lede mt-10">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
+    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
     <div class="mt-7 grid gap-5 md:grid-cols-2">
       {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
         <div class="card overflow-hidden">
@@ -159,46 +103,56 @@ const jsonld = [
             {g.list.length === 0 && <li class="rule-t px-5 py-4 text-ink-2">None on the latest figures.</li>}</ul>
         </div>))}
     </div>
-    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown below without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
-  </section>
-
-  <section id="commitments" class="wrap pt-16">
-    <p class="eyebrow">Commitments</p>
-    <h2 class="h2 mt-2">What the government said it would do</h2>
-    <p class="lede mt-3">Each of these is a measurable commitment the government made itself: an election promise, a law it passed, or a target it signed. The verdict follows a published rule, applied to official figures.</p>
-    <div class="mt-8 grid gap-4">
-      {GOV_TARGETS.map((m, i) => <TargetRow m={m} i={i} />)}
-    </div>
-    <p class="mt-5 text-[16px]"><a href={url('targets/')} class="font-bold">Plus {DELIVERIES.length} commitments judged on delivery</a>, from the student debt cut to the urgent care clinics, {DELIVERIES.filter((d) => d.verdict === 'met').length} of which have been met.</p>
-    {official.length > 0 && (
-      <div class="mt-10">
-        <h3 class="h3">An official target that isn’t the government’s to hit</h3>
-        <p class="mt-1 max-w-[70ch] text-[15px] text-ink-2">The Reserve Bank is independent and sets interest rates to keep inflation in its target band. It’s shown here because it matters to every household, but it doesn’t count in the government’s tally.</p>
-        <div class="mt-4 grid gap-4">{official.map((m, i) => <TargetRow m={m} i={i} />)}</div>
+    {rec.steady.length > 0 && (
+      <div class="card mt-5 overflow-hidden">
+        <div class="flex items-center justify-between gap-3 bg-panel px-5 py-3"><h3 class="h3">Little changed</h3><span class="num font-display text-[26px] font-semibold">{rec.steady.length}</span></div>
+        <ul class="grid md:grid-cols-2">{rec.steady.map((m) => (
+          <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
+            <span class="font-semibold">{m.title}</span><span class="num font-bold text-ink-2">{m.sinceElection!.label}</span>
+            <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul>
       </div>
     )}
+    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
   </section>
 
-  <section class="wrap pt-20">
-    <p class="eyebrow">Every measure</p>
-    <h2 class="h2 mt-2">The figures, topic by topic</h2>
-    <p class="lede mt-3">The latest official figure for each measure, how it has moved since the government took office, and how it moved over the past year. <a href={url('charts/')} class="font-bold">See every chart in full on one page</a>.</p>
-    <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13.5px] text-ink-2">
-      <span class="inline-flex items-center gap-2"><span class="pill pill-good"><Icon name="up" size={13} />Better</span><span class="pill pill-bad"><Icon name="down" size={13} />Worse</span> used only where nearly everyone agrees which way is good</span>
-      <span class="inline-flex items-center gap-2"><span class="pill pill-neutral"><Icon name="up" size={13} />Rising</span> used where that’s a matter of political opinion</span>
-    </div>
-    {groups.map((g) => (
-      <div class="mt-12">
-        <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-rule-strong pb-2">
-          <h3 class="font-display text-[23px] font-semibold">{g.title}</h3>
-          <p class="meta">{g.blurb}</p>
-        </div>
-        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {g.items.map((m, i) => <MeasureCard m={m} i={i} />)}
-        </div>
+  <section class="wrap pt-20" id="figures">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <p class="eyebrow">Key figures</p>
+        <h2 class="h2 mt-2">6 key figures</h2>
       </div>
-    ))}
+      <a href={url('measures/')} class="inline-flex items-center gap-1.5 text-[15px] font-bold no-underline hover:underline">All {MEASURES.length} measures, topic by topic <Icon name="arrow" size={15} /></a>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {KEY.map((m, i) => <MeasureCard m={m} i={i} />)}
+    </div>
+    <p class="mt-5 text-[15px]"><a href={url('charts/')} class="font-bold">See every chart on one page</a>, with 10 and 20 year views and G20 comparisons where they exist.</p>
   </section>
+
+  {TH && (
+  <section class="wrap pt-20" id="household">
+    <p class="eyebrow">Households</p>
+    <h2 class="h2 mt-2">What it means for a household</h2>
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <a href={url('calculator/#typical')} class="card card-link card-pad flex flex-col">
+        <p class="eyebrow">Worked example: a typical household</p>
+        <p class="mt-2 text-[15px] text-ink-2">A couple on the median wage, with a car and a weekly shop, after tax, prices and housing costs, against June 2022.</p>
+        <dl class="mt-4 grid grid-cols-2 gap-4">
+          {([['With a mortgage', TH.owner.diff], ['Renting', TH.renter.diff]] as const).map(([l, d]) => (
+            <div><dt class="meta">{l}</dt><dd class:list={['num font-display text-[28px] font-semibold leading-tight', d >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(d))}</dd><dd class="meta">a year {d >= 0 ? 'better off' : 'worse off'}</dd></div>
+          ))}
+        </dl>
+        <p class="mt-auto pt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-brand">See the working <Icon name="arrow" size={15} /></p>
+      </a>
+      <a href={url('calculator/')} class="card card-link card-pad flex flex-col">
+        <p class="eyebrow">Your own pay</p>
+        <p class="mt-2 font-display text-[24px] font-semibold leading-tight">Are you better or worse off than in 2022?</p>
+        <p class="mt-2 text-[15px] text-ink-2">Enter what you earn. The calculator compares your take-home pay today with the same job in 2022-23, after tax and inflation, and can add your mortgage or rent.</p>
+        <p class="mt-auto pt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-brand">Try the calculator <Icon name="arrow" size={15} /></p>
+      </a>
+    </div>
+  </section>
+  )}
 
   <section class="wrap pt-20">
     <div class="grid gap-4 md:grid-cols-3">

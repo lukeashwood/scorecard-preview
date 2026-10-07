@@ -12,6 +12,7 @@ export interface TaxRatesData {
 export interface BudgetYear {
   year: string; gdp_m: number; population: number; defence_funding_m: number; gross_debt_bn: number; gross_debt_prior_bn?: number;
   revenue: Line[]; expenses: Line[]; tax_rates?: TaxRatesData; url?: string; document?: string;
+  ucb_m?: number; revenue_total_m?: number; expenses_total_m?: number;
 }
 export type Kind = 'revenue' | 'expenses';
 export type Mode = 'deficit' | 'spending' | 'taxes';

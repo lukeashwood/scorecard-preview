@@ -31,7 +31,7 @@ const seoTitle = MEASURE_SEO[m.id] ?? `${m.title}, Australia`;
 const seoDesc = clip(`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}${m.headline.period ? ` (${m.headline.period})` : ''}. Official figures, sourced and checked daily.`);
 const crumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
   { '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href },
-  { '@type': 'ListItem', position: 2, name: 'Results', item: new URL(url('measures/'), Astro.site).href },
+  { '@type': 'ListItem', position: 2, name: 'Measures', item: new URL(url('measures/'), Astro.site).href },
   { '@type': 'ListItem', position: 3, name: m.title, item: pageUrl }] };
 const jsonld = {
   '@context': 'https://schema.org', '@type': 'Dataset', name: `${m.title} (Australia)`, description: `${m.question} ${m.explainer?.what ?? ''}`.trim(), url: pageUrl,
@@ -45,7 +45,7 @@ const jsonld = {
 <Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]} ogImage={url(`share/wide/${m.id}.png`)}>
   <article class="wrap pt-8 md:pt-12">
     <nav class="meta flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
-      <a href={url('measures/')} class="text-ink-3">Results</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>
+      <a href={url('measures/')} class="text-ink-3">Measures</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>
     </nav>
     <header class="mt-4 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
       <div>
@@ -53,9 +53,18 @@ const jsonld = {
         <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{m.title}</h1>
         <p class="lede mt-3">{m.question}</p>
         <p class="mt-3 max-w-[70ch] text-[17px] font-semibold leading-snug text-ink">{fh}{rec && <span class="text-brand"> {rec}</span>}</p>
-        <div class="no-print mt-4 flex flex-wrap gap-2"><ShareButton text={shareText(m)} href={pageUrl} label="Share this figure" />
-          <a class="btn btn-ghost btn-sm" href={url(`share/wide/${m.id}.png`)} download={`govscore-${m.id}.png`}>Download image</a>
-          <a class="btn btn-ghost btn-sm" href={url(`share/tall/${m.id}.png`)} download={`govscore-${m.id}-portrait.png`}>Portrait for Instagram</a></div>
+        <details class="share-menu no-print relative mt-4 inline-block">
+          <summary class="btn btn-ghost btn-sm list-none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" /></svg>Share <span aria-hidden="true">▾</span></summary>
+          <div class="card absolute left-0 z-30 mt-2 grid w-[250px] gap-1 p-2 shadow-card">
+            <ShareButton text={shareText(m)} href={pageUrl} label="Share a link" class="!justify-start !border-0" />
+            <a class="btn btn-ghost btn-sm !justify-start !border-0" href={url(`share/wide/${m.id}.png`)} download={`govscore-${m.id}.png`}>Download image</a>
+            <a class="btn btn-ghost btn-sm !justify-start !border-0" href={url(`share/tall/${m.id}.png`)} download={`govscore-${m.id}-portrait.png`}>Portrait image for Instagram</a>
+          </div>
+        </details>
+        <script is:inline>
+          document.addEventListener('click', function (e) { document.querySelectorAll('details.share-menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; }); });
+        </script>
+        <style>.share-menu > summary::-webkit-details-marker { display: none; }</style>
       </div>
       {m.verdict && <div class="lg:text-right"><VerdictPill verdict={m.verdict.verdict} label={m.ed.target?.verdictLabels?.[m.verdict.verdict]} large /><p class="meta mt-2 max-w-[38ch] lg:ml-auto">{t?.owner === 'official' ? m.verdict.reason : VERDICT_MEANING[m.verdict.verdict]}</p></div>}
     </header>
@@ -71,7 +80,7 @@ const jsonld = {
       </div>
       <div class="bg-surface p-5">
         <dt class="eyebrow">Over the past year</dt>
-        <dd class="mt-3">{m.direction ? <><DirectionBadge change={{ trend: m.direction.trend, tone: m.direction.tone, label: m.direction.changeLabel }} /><span class="meta mt-2 block">{withUnit(m.direction.prior[1], rs!.unit, rs!.decimals)} → {withUnit(m.direction.latest[1], rs!.unit, rs!.decimals)} ({m.direction.periodLabel})</span></> : <span class="meta">Not a time series, so no yearly change is shown.</span>}</dd>
+        <dd class="mt-3">{m.direction ? <><DirectionBadge change={{ trend: m.direction.trend, tone: m.direction.tone, label: m.direction.changeLabel }} /><span class="meta mt-2 block">{withUnit(m.direction.prior[1], rs!.unit, rs!.decimals)} → {withUnit(m.direction.latest[1], rs!.unit, rs!.decimals)} ({m.direction.periodLabel})</span></> : <span class="meta">{m.ed.noPastYear ? 'The headline figure is the change over the past year.' : 'Not a time series, so no yearly change is shown.'}</span>}</dd>
       </div>
     </dl>
 

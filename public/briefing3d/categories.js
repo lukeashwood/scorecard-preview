@@ -366,11 +366,16 @@
     gross_debt: "Gross debt", budget_balance: "Budget deficit", interest_costs: "Debt interest",
     spending_gdp: "Govt spending", aps_headcount: "Public service", ndis: "NDIS growth",
     migration: "Migration", defence_spending: "Defence", legislation: "Laws passed",
+    income_tax_shares: "Who pays tax", personal_transfers: "Money sent overseas", consultancy_contracts: "Consultants",
+    household_payments: "Mortgage & tax share", people_per_home: "People per home", rents_vs_wages: "Rents vs wages",
+    fuel_prices: "Fuel prices", price_to_earnings: "Price to earnings", tax_take: "Tax take",
+    living_standards_decades: "Living standards", employment: "People in work", womens_participation: "Women at work",
+    gender_pay_gap: "Gender pay gap",
   };
   function shortLabel(m) {
     if (SHORT_NAME[m.id]) return SHORT_NAME[m.id];
     const base = m.title.split(":")[0].trim();
-    return base.length > 18 ? base.slice(0, 17) + "…" : base;
+    return base.length > 24 ? base.slice(0, 23) + "…" : base;
   }
   function addMoonLabel(m) {
     const el = h("button", "lbl lbl-moon");
@@ -595,7 +600,10 @@
   /* ---------------------------------------------------------------- boot overlay */
   (function () {
     const boot = $("#boot"), lines = [...boot.querySelectorAll(".boot-line")];
-    const done = () => { boot.classList.add("out"); setTimeout(() => (boot.hidden = true), 700); };
+    const done = () => { boot.classList.add("out"); setTimeout(() => (boot.hidden = true), 700); try { sessionStorage.setItem("gs-boot", "1"); } catch (e) {} };
+    // Show the loading sequence once per visit; after that, go straight to the model.
+    let seen = false; try { seen = sessionStorage.getItem("gs-boot") === "1"; } catch (e) {}
+    if (seen) { boot.hidden = true; return; }
     if (reduced) { lines.forEach((l) => l.classList.add("on")); setTimeout(done, 300); return; }
     lines.forEach((l, i) => setTimeout(() => l.classList.add("on"), 250 + i * 300));
     setTimeout(done, 250 + lines.length * 300 + 450);
@@ -674,6 +682,7 @@
     // labels — categories/overall sit at a fixed offset above a static position; each measure's label
     // follows its moon, which is orbiting, so its position is read fresh from the mesh every frame.
     const W = stage.clientWidth, H = stage.clientHeight;
+    const placed = [];
     Object.keys(labelEls).forEach((id) => {
       const el = labelEls[id];
       const mo = moonById[id];
@@ -688,6 +697,19 @@
       el.style.transform = `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
       el.style.visibility = vis ? "visible" : "hidden";
       el.style.opacity = Math.max(mo ? 0.3 : 0.4, Math.min(1, 1.3 - depth / 26)).toFixed(2);
+      if (vis) {
+        if (!el._w || (tick % 2 < dt)) { el._w = el.offsetWidth; el._h = el.offsetHeight; }
+        placed.push({ el, moon: !!mo, sel: !!(selected && selected.id === id), depth, x, y, w: el._w * scale, h: el._h * scale });
+      }
+    });
+    // Keep labels from piling on top of each other: topic labels and the selected label always show; a measure label
+    // that would overlap one already placed (nearer the camera first) is hidden until the model turns.
+    placed.sort((a, b) => (b.sel - a.sel) || (a.moon - b.moon) || (a.depth - b.depth));
+    const kept = [];
+    placed.forEach((p) => {
+      const hit = kept.some((k) => Math.abs(k.x - p.x) * 2 < k.w + p.w + 4 && Math.abs(k.y - p.y) * 2 < k.h + p.h + 2);
+      if (hit && p.moon && !p.sel) { p.el.style.visibility = "hidden"; return; }
+      kept.push(p);
     });
     if (selected) { reticle.hidden = false; v3.set(selected.pos.x, selected.pos.y, selected.pos.z).project(camera);
       reticle.style.transform = `translate(-50%, -50%) translate(${((v3.x + 1) / 2 * W).toFixed(1)}px, ${((1 - v3.y) / 2 * H).toFixed(1)}px)`; }

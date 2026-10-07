@@ -85,7 +85,13 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
   return (
     <figure className="m-0">
       <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1" role="group" aria-label="What to show">
+        {/* Phones: one compact selector instead of a row of buttons, so the chart is reached sooner. */}
+        {(isTime || g20.length > 0) && <select className="input !min-h-[38px] w-auto !py-1 text-[14px] sm:hidden" aria-label="What to show"
+          value={mode === 'g20' ? 'g20' : range} onChange={(e) => { const v = e.target.value; if (v === 'g20') setMode('g20'); else { setMode('time'); if (isTime) setRange(v as typeof range); } }}>
+          {isTime ? RANGES.filter((r) => r.years !== 0 || spanYears > 22).map((r) => <option key={r.id} value={r.id}>{r.label}</option>) : <option value={range}>This chart</option>}
+          {g20.length > 0 && <option value="g20">G20 comparison</option>}
+        </select>}
+        <div className="hidden flex-wrap gap-1 sm:flex" role="group" aria-label="What to show">
           {isTime && RANGES.filter((r) => r.years !== 0 || spanYears > 22).map((r) => (
             <button key={r.id} type="button" className="btn btn-sm btn-quiet" aria-pressed={mode === 'time' && range === r.id} onClick={() => { setMode('time'); setRange(r.id); }}
               style={mode === 'time' && range === r.id ? on : undefined}>{r.label}</button>
@@ -95,7 +101,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
         </div>
         {mode === 'time' && <div className="flex gap-1">
           <button type="button" className="btn btn-sm btn-ghost" aria-pressed={view === 'table'} onClick={() => setView(view === 'chart' ? 'table' : 'chart')}>{view === 'chart' ? 'Show as table' : 'Show as chart'}</button>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={downloadCsv}>Download CSV</button>
+          <button type="button" className="btn btn-sm btn-ghost hidden sm:inline-flex" onClick={downloadCsv}>Download CSV</button>
         </div>}
       </div>
       {mode === 'g20' ? <G20Panel indicators={g20} csvName={csvName} /> : <>

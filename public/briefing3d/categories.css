@@ -42,10 +42,10 @@ body.catpage .search-btn kbd { color: var(--hud-grey); border-color: var(--hud-l
 .lbl-swatch { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .lbl-overall { font-size: 15px; padding: 7px 14px; border: 1.5px solid var(--hud-red); background: rgba(200, 32, 40, .22); box-shadow: 0 0 22px rgba(255, 77, 85, .35); }
 .lbl-count { font-size: 10px; opacity: .75; }
-.lbl-moon { font-size: 9.5px; font-weight: 700; padding: 2px 6px; gap: 4px; border-color: rgba(95, 212, 255, .18); background: rgba(4, 9, 24, .58); }
+.lbl-moon { font-size: 11px; font-weight: 700; padding: 2px 7px; gap: 4px; border-color: rgba(95, 212, 255, .18); background: rgba(4, 9, 24, .58); }
 .lbl-moon .lbl-swatch { width: 6px; height: 6px; }
 .lbl-moon:hover { background: rgba(95, 212, 255, .16); }
-@media (max-width: 760px) { .lbl { font-size: 10px; padding: 2px 6px; } .lbl-overall { font-size: 12px; } }
+@media (max-width: 760px) { .lbl { font-size: 10.5px; padding: 2px 6px; } .lbl-moon { font-size: 10px; } .lbl-overall { font-size: 12px; } }
 #reticle { position: absolute; left: 0; top: 0; width: 96px; height: 96px; pointer-events: none; border-radius: 50%; border: 1.5px dashed rgba(255, 77, 85, .85); z-index: 1100; }
 #reticle::before, #reticle::after { content: ""; position: absolute; inset: 10px; border-radius: 50%; border: 1px solid rgba(95, 212, 255, .45); }
 #reticle::after { inset: -10px; border-style: dotted; }

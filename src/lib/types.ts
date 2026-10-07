@@ -97,6 +97,14 @@ export interface Editorial {
   shareHeadline?: string;
   /** Share images: start the chart here instead of 12 years back (for long histories). */
   shareFrom?: string;
+  /** Show the change since May 2022 and over the past year as "from → to" rather than a percentage (for ratios). */
+  changeAs?: 'fromTo';
+  /** Hide the "past year" comparison when the headline already is a past-year change on a different basis. */
+  noPastYear?: boolean;
+  /** A shorter display title than the one in the data feed. */
+  title?: string;
+  /** Decimal places for the headline figure, when the data feed's are more precise than readers need. */
+  headlineDecimals?: number;
 }
 
 export interface Direction {

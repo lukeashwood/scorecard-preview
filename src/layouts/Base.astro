@@ -101,18 +101,19 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <main id="main" tabindex="-1" class="outline-none"><slot /></main>
 
   <footer class="site mt-24 border-t border-rule bg-panel">
-    <div class="wrap grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
-      <div class="max-w-md">
+    <div class="wrap grid gap-10 py-12 sm:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+      <div class="max-w-md sm:col-span-3 lg:col-span-1">
         <p class="font-display text-[22px] font-semibold">{SITE.name}</p>
         <p class="mt-2 text-[14.5px] text-ink-2">Official Australian figures, sourced line by line. Automatic figures are tested every day; figures entered by hand show the date they were checked. Verdicts are given only where someone in authority made a measurable commitment. Everything else is shown as it is.</p>
         <p class="meta mt-4">Data last checked <span class="mono">{fmtStamp(GENERATED_AT)}</span> · Rating rules v{SITE.rulesVersion}</p>
       </div>
+      {[{ h: 'The record', items: [...NAV_GROUPS[0].items, ...NAV_GROUPS[1].items] }, { h: 'Explore', items: [...NAV_GROUPS[2].items, ...NAV_GROUPS[3].items] }].map((g) => (
       <div>
-        <p class="eyebrow mb-3">Explore</p>
-        <ul class="grid gap-2 text-[14.5px]">{NAV.map((n) => <li><a class="text-ink-2 no-underline hover:text-ink hover:underline" href={url(n.href)}>{n.label}</a></li>)}</ul>
-      </div>
+        <p class="eyebrow mb-3">{g.h}</p>
+        <ul class="grid gap-2 text-[14.5px]">{g.items.map((n) => <li><a class="text-ink-2 no-underline hover:text-ink hover:underline" href={url(n.href)}>{n.label}</a></li>)}</ul>
+      </div>))}
       <div>
-        <p class="eyebrow mb-3">Trust</p>
+        <p class="eyebrow mb-3">About the site</p>
         <ul class="grid gap-2 text-[14.5px]">{FOOTER_NAV.map((n) => <li><a class="text-ink-2 no-underline hover:text-ink hover:underline" href={url(n.href)}>{n.label}</a></li>)}</ul>
       </div>
     </div>

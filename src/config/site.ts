@@ -33,8 +33,8 @@ export const SITE = {
 /* The site is organised around 3 questions. The top bar shows the main pages; the rest sit under "More". */
 export const NAV_GROUPS = [
   { q: 'What did they promise?', items: [{ href: 'targets/', label: 'Promises', top: true }] },
-  { q: 'What happened?', items: [{ href: 'measures/', label: 'Results', top: true }, { href: 'charts/', label: 'Charts', top: true }, { href: 'in-60-seconds/', label: 'In 60 seconds', top: false }, { href: 'calculator/', label: 'Are you better off?', top: false }] },
-  { q: 'Why did it happen?', items: [{ href: 'relationships/', label: 'Connections', top: true }, { href: 'budget/', label: 'Budget', top: true }, { href: 'budget/build/', label: 'Build your own Budget', top: false }, { href: 'laws/', label: 'Laws', top: false }] },
+  { q: 'What happened?', items: [{ href: 'measures/', label: 'Measures', top: true }, { href: 'charts/', label: 'Charts', top: true }, { href: 'in-60-seconds/', label: 'In 60 seconds', top: false }, { href: 'calculator/', label: 'Are you better off?', top: false }] },
+  { q: 'Why did it happen?', items: [{ href: 'relationships/', label: 'Compare', top: true }, { href: 'budget/', label: 'Budget', top: true }, { href: 'budget/build/', label: 'Build your own Budget', top: false }, { href: 'laws/', label: 'Laws', top: false }] },
   { q: 'More', items: [{ href: 'controversies/', label: 'Controversies', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'briefing/', label: 'Briefing (3D)', top: false }] },
 ] as const;
 export const NAV = NAV_GROUPS.flatMap((g) => g.items);

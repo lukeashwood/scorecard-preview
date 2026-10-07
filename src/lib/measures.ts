@@ -68,7 +68,7 @@ function direction(m: RawMetric): Direction | null {
   const d = isRate ? (Math.abs(change) < 1 ? 2 : 1) : 1;
   return {
     trend, tone, latest, prior, change,
-    changeLabel: isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : d)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`,
+    changeLabel: ed.changeAs === 'fromTo' ? `${withUnit(prior[1], rs.unit, rs.decimals)} → ${withUnit(latest[1], rs.unit, rs.decimals)}` : isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : d)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`,
     periodLabel: `${fmtPeriod(prior[0], freq)} → ${fmtPeriod(latest[0], freq)}`,
   };
 }
@@ -77,20 +77,28 @@ function sinceElection(m: RawMetric) {
   const ed = EDITORIAL[m.id]; const rs = ratedSeries(m);
   if (!ed || ed.group === 'context' || ed.noSince || !rs) return null;
   let pts = actuals(m, rs.points);
-  // A newer series (the monthly CPI began in 2025) can't reach back to 2022: fall back to the long-running first series.
-  if ((!pts.length || pts[0][0] > '2022-09-30') && ed.useExtra == null && m.chart.series?.[0]) pts = actuals(m, m.chart.series[0].points);
+  // A newer series (the monthly CPI began in 2025) can't reach back to 2022: take the starting point from the
+  // long-running first series, but keep the newer series' latest figure, so the box ends on the same number the page leads with.
+  let latestNewer: Point | null = null; let newerFreq: ReturnType<typeof inferFreq> | null = null;
+  if ((!pts.length || pts[0][0] > '2022-09-30') && ed.useExtra == null && m.chart.series?.[0]) {
+    if (pts.length) { latestNewer = pts[pts.length - 1]; newerFreq = inferFreq(pts, m.chart.freq); }
+    pts = actuals(m, m.chart.series[0].points);
+  }
   if (pts.length < 2) return null;
   const freq = inferFreq(pts, m.chart.freq);
   const anchor = freq === 'fy' || freq === 'q' ? '2022-06-30' : '2022-05-31';
-  const from = nearest(pts, anchor, freq === 'fy' ? 10 : 50); const to = pts[pts.length - 1];
+  const from = nearest(pts, anchor, freq === 'fy' ? 10 : 50);
+  const useNewer = !!latestNewer && latestNewer[0] > pts[pts.length - 1][0];
+  const to = useNewer ? latestNewer! : pts[pts.length - 1];
+  const toFreq = useNewer ? newerFreq! : freq;
   if (!from || from[0] === to[0]) return null;
   const isRate = rs.unit === '%', isMoney = rs.unit === '$bn';
   const change = isRate || isMoney ? to[1] - from[1] : from[1] !== 0 ? ((to[1] - from[1]) / Math.abs(from[1])) * 100 : 0;
   const band = isRate ? 0.2 : isMoney ? Math.max(0.5, Math.abs(from[1]) * 0.01) : 1;
   const trend: Trend = Math.abs(change) < band ? 'steady' : change > 0 ? 'up' : 'down';
   const tone = trend === 'steady' || ed.better === 'none' ? 'neutral' : (trend === 'up') === (ed.better === 'higher') ? 'good' : 'bad';
-  const label = isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : 1)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`;
-  return { from, to, change, trend, tone, periodLabel: `${fmtPeriod(from[0], freq)} → ${fmtPeriod(to[0], freq)}`, label };
+  const label = ed.changeAs === 'fromTo' ? `${withUnit(from[1], rs.unit, rs.decimals)} → ${withUnit(to[1], rs.unit, rs.decimals)}` : isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : 1)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`;
+  return { from, to, change, trend, tone, periodLabel: `${fmtPeriod(from[0], freq)} → ${fmtPeriod(to[0], toFreq)}`, label };
 }
 
 function lastDataDate(m: RawMetric): string | null {
@@ -111,10 +119,12 @@ export const MEASURES: Measure[] = data.metrics
       if (last) m = { ...m, headline: { value: last[1], unit: e.unit, decimals: e.decimals, caption: `${m.title.toLowerCase()} as a share of GDP (latest actual)`, period: fmtPeriod(last[0], 'fy') }, chart: { ...m.chart, estimateFrom: m.chart.estimateFrom } };
     }
     const usesActual = ed.useExtra != null;
+    if (ed.title) m = { ...m, title: ed.title };
+    if (ed.headlineDecimals != null) m = { ...m, headline: { ...m.headline, decimals: ed.headlineDecimals } };
     return {
       ...m, ed,
       sectionTitle: secTitle[m.section] ?? m.section,
-      direction: direction(m),
+      direction: ed.noPastYear ? null : direction(m),
       sinceElection: sinceElection(m),
       verdict: ed.target ? ed.target.rate(m) : null,
       lastDataDate: lastDataDate(m),
