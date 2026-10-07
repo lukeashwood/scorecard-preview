@@ -45,6 +45,14 @@ function brandFooter(xRight: number, y: number, size: number): string {
 
 interface Box { x: number; y: number; w: number; h: number }
 
+/** Short label for a line. Brackets are dropped, unless 2 lines share the same name, when the bracket tells them apart. */
+function seriesLabel(name: string, others: string[]): string {
+  const strip = (n: string) => n.replace(/\s*\(.*?\)/g, '').split(',')[0].trim();
+  const inner = name.match(/\(([^)]+)\)/)?.[1];
+  const clash = others.some((o) => strip(o) === strip(name));
+  return clash && inner ? inner.charAt(0).toUpperCase() + inner.slice(1) : strip(name);
+}
+
 /** Line, step or bar chart of the measure, last ~12 years, with the government's term shaded and labels on the lines. */
 function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
   const rs = ratedSeries(m); const ed = m.ed; const fs = opts.labelSize;
@@ -63,7 +71,8 @@ function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
   if (!rs || rs.points.length < 2) return '';
   const unit = rs.unit, dec = rs.decimals;
   const last = rs.points[rs.points.length - 1][0];
-  const startCut = `${+last.slice(0, 4) - 12}${last.slice(4)}`;
+  // Long-history measures can ask for a longer view on the image; otherwise the last 12 years.
+  const startCut = ed.shareFrom ?? `${+last.slice(0, 4) - 12}${last.slice(4)}`;
   const main = rs.points.filter((p) => p[0] >= startCut);
   // Other series on the same chart (e.g. public vs private wages), muted, only when they share the unit.
   const others = ed.useExtra != null ? [] : (m.chart.series ?? []).filter((s, i) => i !== (ed.seriesIndex ?? 0) && s.points.length > 1).slice(0, 2)
@@ -91,6 +100,14 @@ function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
     const xs = Math.max(px, X(TERM_START));
     s += `<rect x="${xs}" y="${py}" width="${px + pw - xs}" height="${ph}" fill="${C.brandTint}"/>`;
     s += `<text x="${xs + 6}" y="${py + fs * 1.05}" font-family="${SANS}" font-weight="600" font-size="${fs * 0.78}" fill="${C.brand}" letter-spacing="0.6">ALBANESE GOVERNMENT</text>`;
+  }
+  // Reference lines (e.g. average household size), dashed, labelled at the right
+  let refLab = ''; // drawn after the series so the line never runs through the words
+  for (const r of m.chart.ref ?? []) {
+    if (r.value < tlo || r.value > thi) continue;
+    const y = Y(r.value);
+    s += `<line x1="${px}" x2="${px + pw}" y1="${y}" y2="${y}" stroke="${C.ink3}" stroke-width="1.3" stroke-dasharray="6 5"/>`;
+    if (r.label) { const t = wrap(r.label, 40, 1)[0]; refLab += `<rect x="${px + 2}" y="${y - 6 - fs * 0.85}" width="${t.length * fs * 0.78 * 0.56 + 10}" height="${fs * 1.05}" rx="3" fill="#ffffff" fill-opacity="0.92"/><text x="${px + 6}" y="${y - 6}" font-family="${SANS}" font-weight="600" font-size="${fs * 0.78}" fill="${C.ink2}">${esc(t)}</text>`; }
   }
   // Grid
   for (const v of ticks) {
@@ -121,7 +138,7 @@ function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
     const lp = o.points[o.points.length - 1];
     let ly = Y(lp[1]) + fs * 0.35;
     if (Math.abs(ly - mainLabelY) < fs * 2.6) ly = ly >= mainLabelY ? mainLabelY + fs * 2.7 : mainLabelY - fs * 1.6;
-    s += `<text x="${X(lp[0]) + 8}" y="${ly}" font-family="${SANS}" font-size="${fs * 0.85}" fill="${C.ink3}">${esc(wrap(o.name, 22, 1)[0])}</text>`;
+    s += `<text x="${X(lp[0]) + 8}" y="${ly}" font-family="${SANS}" font-size="${fs * 0.85}" fill="${C.ink3}">${esc(wrap(seriesLabel(o.name, [rs.name]), 22, 1)[0])}</text>`;
   }
   if (est && isBar) s += `<text x="${px + pw}" y="${py - fs * 0.6}" text-anchor="end" font-family="${SANS}" font-size="${fs * 0.8}" fill="${C.ink3}">Paler bars: Budget estimates</text>`;
   if (isBar) {
@@ -136,11 +153,18 @@ function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
     s += `<path d="${path(actual, m.chart.kind === 'step')}" fill="none" stroke="${C.brand}" stroke-width="${fs * 0.24}" stroke-linejoin="round" stroke-linecap="round"/>`;
     if (fut.length && actual.length) s += `<path d="${path([actual[actual.length - 1], ...fut], m.chart.kind === 'step')}" fill="none" stroke="${C.est}" stroke-width="${fs * 0.2}" stroke-dasharray="${fs * 0.5} ${fs * 0.4}"/>`;
   }
+  s += refLab;
   // Direct label on the latest actual value
   const act = est ? main.filter((p) => p[0] < est) : main; const lp = act[act.length - 1] ?? main[main.length - 1];
+  if (isBar) {
+    // Bars: the value sits on top of the latest actual bar, clear of any later estimate bars
+    const yTop = Y(Math.max(0, lp[1])) - fs * 0.5;
+    s += `<text x="${X(lp[0])}" y="${yTop}" text-anchor="middle" font-family="${SANS}" font-weight="700" font-size="${fs * 1.05}" fill="${C.brand}">${esc(withUnit(lp[1], unit, dec, { compact: true }))}</text>`;
+    return s;
+  }
   s += `<circle cx="${X(lp[0])}" cy="${Y(lp[1])}" r="${fs * 0.36}" fill="${C.brand}" stroke="#fff" stroke-width="2"/>`;
   s += `<text x="${X(lp[0]) + fs * 0.7}" y="${Y(lp[1]) - fs * 0.15}" font-family="${SANS}" font-weight="700" font-size="${fs * 1.05}" fill="${C.brand}">${esc(withUnit(lp[1], unit, dec, { compact: true }))}</text>`;
-  const who = others.length ? `${wrap(rs.name.replace(/\s*\(.*?\)/g, ''), 16, 1)[0]} · ` : '';
+  const who = others.length ? `${wrap(seriesLabel(rs.name, others.map((o) => o.name)), 22, 1)[0]} · ` : '';
   s += `<text x="${X(lp[0]) + fs * 0.7}" y="${Y(lp[1]) + fs * 1.05}" font-family="${SANS}" font-size="${fs * 0.8}" fill="${C.ink3}">${esc(who + fmtPeriod(lp[0], inferFreq(act, m.chart.freq)))}</text>`;
   return s;
 }
@@ -171,7 +195,7 @@ export function wideSvg(m: Measure): string {
   const top = P + 52 + head.length * 50;
   // Left: key figure
   s += `<text x="${P}" y="${top + 62}" font-family="${SANS}" font-weight="700" font-size="64" fill="${C.ink}" letter-spacing="-1">${esc(headlineText(m.headline))}</text>`;
-  s += textLines(wrap(`${m.headline.caption}${m.headline.period ? `, ${m.headline.period}` : ''}`, 30, 3), P, top + 96, 26, `font-family="${SANS}" font-size="20" fill="${C.ink2}"`);
+  s += textLines(wrap(`${m.headline.caption}${m.headline.period ? `, ${m.headline.period}` : ''}`, 30, rec ? 3 : 4), P, top + 96, 26, `font-family="${SANS}" font-size="20" fill="${C.ink2}"`);
   if (rec) s += textLines(wrap(rec, 32, 2), P, top + 190, 24, `font-family="${SANS}" font-weight="600" font-size="18" fill="${C.brand}"`);
   // Right: chart
   s += chartSvg(m, { x: 430, y: top + 10, w: W - 430 - P, h: H - top - 10 - 100 }, { labelSize: 16 });

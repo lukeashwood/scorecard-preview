@@ -91,6 +91,12 @@ export interface Editorial {
   target?: TargetSpec;
   /** Dated policy events marked on the chart, e.g. a tax change. Facts only: what happened and when. */
   events?: { date: string; label: string }[];
+  /** Share images: who the headline is about, when the title alone is ambiguous. */
+  subject?: string;
+  /** Share images: a fixed headline, with {value} and {period} filled from the latest figure. */
+  shareHeadline?: string;
+  /** Share images: start the chart here instead of 12 years back (for long histories). */
+  shareFrom?: string;
 }
 
 export interface Direction {
