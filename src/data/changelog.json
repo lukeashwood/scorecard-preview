@@ -3,6 +3,11 @@
  "rules": [
   {
    "date": "2026-10-07",
+   "version": "2.3",
+   "summary": "Institutions supply data, not judgements. Results are set only by the commitment and the official figures; no institution's view of what the figures mean, and no commentary, can change a result. On the Controversies page, a statement by an official or institution is quoted as that person's view and never makes a claim established on its own; a new 'Stated position' label marks what one side says."
+  },
+  {
+   "date": "2026-10-07",
    "version": "2.2",
    "summary": "If the government changes, delays or drops a commitment after making it, the original commitment is still the one judged, on its original number and deadline. The new target is shown beside it with the date it changed."
   },

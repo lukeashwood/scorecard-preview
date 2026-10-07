@@ -6,7 +6,7 @@ import { fmtDate } from '../../lib/format';
 import { CONTROVERSIES, STATUS_LABEL, TYPE_LABEL, STANDING_LABEL } from '../../lib/controversies';
 const ministers = [...new Set(CONTROVERSIES.map((c) => c.minister))].sort();
 const nPolicy = CONTROVERSIES.filter((c) => c.type === 'policy').length, nConduct = CONTROVERSIES.length - nPolicy;
-const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 'pill-bad' } as const;
+const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 'pill-bad', position: 'pill-brand' } as const;
 ---
 <Base title="Albanese Government controversies: claims and the record" description="Disputed policies and questions about ministers' conduct: what happened, what the government says, what critics say and what the record shows, all sourced." section="controversies/">
   <div class="wrap pt-10 md:pt-14">
@@ -16,9 +16,10 @@ const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 
 
     <div class="mt-5 flex max-w-[900px] flex-wrap gap-x-5 gap-y-2 rounded-xl bg-panel p-4 text-[14px] text-ink-2">
       <span class="font-bold text-ink">In-depth entries test each claim:</span>
-      <span class="inline-flex items-center gap-1.5"><span class="pill pill-neutral">{STANDING_LABEL.established}</span> the official record shows it</span>
+      <span class="inline-flex items-center gap-1.5"><span class="pill pill-neutral">{STANDING_LABEL.established}</span> official figures or records show it</span>
       <span class="inline-flex items-center gap-1.5"><span class="pill pill-warn">{STANDING_LABEL.contested}</span> credible sources disagree</span>
       <span class="inline-flex items-center gap-1.5"><span class="pill pill-bad">{STANDING_LABEL.unverified}</span> the claim goes further than the evidence</span>
+      <span class="inline-flex items-center gap-1.5"><span class="pill pill-brand">{STANDING_LABEL.position}</span> what one side says, quoted, not tested</span>
     </div>
     <div class="no-print mt-7 flex flex-wrap gap-2" id="con-type" role="group" aria-label="Filter by kind">
       <button type="button" class="btn btn-sm btn-ghost" data-t="all" aria-pressed="true">All <span class="num text-ink-3">{CONTROVERSIES.length}</span></button>
@@ -66,7 +67,7 @@ const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 
     </ul>
 
     <div class="prose mt-14"><h2>How entries are chosen</h2>
-      <p>An entry is included when a policy, decision or a minister’s own conduct under the {SITE.government.name} was publicly challenged, and the episode is documented by official records (Hansard, Senate estimates, the expenses authority, the National Anti-Corruption Commission, audit reports) or established news organisations. Each entry gives the facts as reported, the government’s response and the outcome. For disputed policies, each strand of the dispute is marked <strong>established</strong> (supported by official figures), <strong>contested</strong> (credible people disagree) or <strong>not verified</strong> (a claim in circulation that the record doesn’t support).</p>
+      <p>An entry is included when a policy, decision or a minister’s own conduct under the {SITE.government.name} was publicly challenged, and the episode is documented by official records (Hansard, Senate estimates, the expenses authority, the National Anti-Corruption Commission, audit reports) or established news organisations. Each entry gives the facts as reported, the government’s response and the outcome. For disputed policies, each strand of the dispute is marked <strong>established</strong> (official figures or records show it), <strong>contested</strong> (credible people disagree), <strong>not supported by the record</strong> (a claim in circulation that the record doesn’t support) or <strong>stated position</strong> (what one side says, quoted as their view). A statement by a minister, an official or an institution such as the Reserve Bank is quoted as that person’s view; on its own it never makes a claim established.</p>
       <p>Claims are attributed to whoever made them. Rumour, satire and unverified social-media claims are left out. “No inquiry or finding” means no official body has examined the matter; it doesn’t mean anyone was cleared or found at fault. Think an entry is missing or unfair? <a href={url('corrections/#report')}>Tell us</a>, and ministers’ offices have the same right of reply.</p></div>
   </div>
   <script is:inline>

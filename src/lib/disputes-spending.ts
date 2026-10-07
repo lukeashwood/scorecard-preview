@@ -10,6 +10,7 @@ const cash = lastOf('interest_rates');
 const infl = byId('inflation')?.headline;
 const spend = byId('spending_gdp')?.headline;
 const pubDemand = byId('government_size')?.headline;
+const pubDemand0 = (byId('government_size')?.chart?.series?.[0]?.points as [string, number][] | undefined)?.find((x) => x[0] === '2022-06-30')?.[1];
 const pct = (v?: number, d = 1) => (v == null ? 'n/a' : `${v.toFixed(d)}%`);
 
 export const SPENDING_INFLATION: Controversy = {
@@ -25,16 +26,17 @@ export const SPENDING_INFLATION: Controversy = {
     { label: 'Public demand, all governments', value: pct(pubDemand?.value), note: `Share of the economy, ${pubDemand?.period ?? 'latest quarter'}` },
   ],
   points: [
-    { heading: 'Inflation was already too high before the Middle East war', standing: 'established',
-      body: 'This is the Reserve Bank’s own account. In March, Governor Michele Bullock said “inflation was already too high”. After the September rise she said the bank “did start from a position of excess demand anyway”, which is why it began raising rates “even before the conflict started”. The first rise of 2026, on 3 February, came before the war began.',
+    { heading: 'Inflation was already above the target band before the Middle East war', standing: 'established',
+      body: 'The official figures show it. Annual inflation in the ABS monthly CPI was 3.2% in August 2025, above the Reserve Bank’s 2 to 3% band, and 3.8% in December 2025 and January 2026. The Reserve Bank’s first rate rise of 2026, on 3 February, came before the war began. The Governor’s own description, in March, was that “inflation was already too high”; that is her view, quoted, and the figures stand on their own.',
       sources: [
-        { title: 'RBA media conference, 29 September 2026', url: 'https://www.rba.gov.au/speeches/2026/mc-gov-2026-09-29.html' },
+        { title: 'ABS Monthly Consumer Price Index Indicator', url: 'https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/monthly-consumer-price-index-indicator/latest-release' },
+        { title: 'RBA cash rate target: decisions', url: 'https://www.rba.gov.au/statistics/cash-rate/' },
         { title: 'RBA media conference, 17 March 2026', url: 'https://www.rba.gov.au/speeches/2026/mc-gov-2026-03-17.html' },
       ] },
-    { heading: 'Government spending adds to demand, and so to inflation pressure', standing: 'established',
-      body: 'On the mechanics there is no dispute. Asked about it in March, Bullock said “if G goes up, then that adds to aggregate demand”, G being government spending. In September she said public and private demand “are both adding to aggregate demand”. What is disputed is how big the government’s share of the problem is, and whether spending is too high.',
+    { heading: 'Government spending adds to demand', standing: 'established',
+      get body() { return `This is how demand is defined. In the national accounts, government spending on goods, services and investment is part of total demand. Public demand from all levels of government was ${pct(pubDemand?.value)} of the economy in the ${pubDemand?.period ?? 'latest quarter'}, against ${pct(pubDemand0)} in the June quarter 2022 (see Size of government). What is disputed is how much this adds to inflation compared with private demand, and whether spending is too high. The Reserve Bank Governor’s view, as she put it in September, is that public and private demand “are both adding to aggregate demand”.`; },
       sources: [
-        { title: 'RBA media conference, 17 March 2026', url: 'https://www.rba.gov.au/speeches/2026/mc-gov-2026-03-17.html' },
+        { title: 'ABS Australian National Accounts: National Income, Expenditure and Product', url: 'https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release' },
         { title: 'RBA media conference, 29 September 2026', url: 'https://www.rba.gov.au/speeches/2026/mc-gov-2026-09-29.html' },
       ] },
     { heading: 'The Reserve Bank says government spending is too high', standing: 'unverified',
@@ -57,7 +59,7 @@ export const SPENDING_INFLATION: Controversy = {
         { title: 'Final Budget Outcome 2025-26', url: 'https://archive.budget.gov.au/2025-26/fbo/download/00_fbo_2025-26.pdf' },
         { title: 'Budget Paper No. 1 2026-27, Statement 11, Table 11.1', url: 'https://budget.gov.au/content/bp1/download/bp1_bs-11.pdf' },
       ] },
-    { heading: 'What the government says', standing: 'established',
+    { heading: 'What the government says', standing: 'position',
       body: 'Jim Chalmers said on 28 September that “a big driver of the inflation we’re seeing” comes from the Middle East, while accepting there was “an inflation challenge in our economy, made much worse by the war”. He says four out of every five dollars of demand added over the past year came from the private sector, and that he has taken responsibility for his part in the fight against inflation. Katy Gallagher told the Senate on 16 September that cost of living support “was done in a targeted way that didn’t add to the inflation challenge”. Neither has said spending plays no part; both reject the claim that it is the main cause.',
       sources: [
         { title: 'Treasurer Jim Chalmers defends inflation record as 15-year interest rate high looms (ABC, 28 September 2026)', url: 'https://www.abc.net.au/news/2026-09-28/chalmers-interest-rates-cost-of-living-households-mortgage/107203392' },
