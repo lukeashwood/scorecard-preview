@@ -3,10 +3,13 @@ import '../styles/global.css';
 import { SITE, NAV, NAV_GROUPS, FOOTER_NAV, url } from '../config/site';
 import { GENERATED_AT } from '../lib/measures';
 import { fmtStamp } from '../lib/format';
+import { clip } from '../lib/seo';
 
-interface Props { title?: string; description?: string; section?: string; jsonld?: Record<string, unknown>; bodyClass?: string; forceDark?: boolean }
-const { title, description = SITE.description, section = '', jsonld, bodyClass, forceDark = false } = Astro.props;
-const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} | ${SITE.tagline}`;
+interface Props { title?: string; fullTitle?: string; description?: string; section?: string; jsonld?: Record<string, unknown> | Record<string, unknown>[]; bodyClass?: string; forceDark?: boolean; ogType?: string }
+const { title, fullTitle: fullTitleProp, description: descRaw = SITE.description, section = '', jsonld, bodyClass, forceDark = false, ogType = 'website' } = Astro.props;
+const fullTitle = fullTitleProp ?? (title ? (title.length > 49 ? title : `${title} | ${SITE.name}`) : `${SITE.name} | ${SITE.tagline}`);
+const description = clip(descRaw, 160);
+const ldList = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 ---
@@ -23,18 +26,23 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <link rel="canonical" href={canonical} />
   <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
   <meta name="theme-color" content="#4a2d9c" />
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={ogType} />
+  <meta property="og:locale" content="en_AU" />
   <meta property="og:site_name" content={SITE.name} />
-  <meta property="og:title" content={title ?? SITE.name} />
+  <meta property="og:title" content={fullTitle} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta property="og:image" content={new URL(url('og.png'), Astro.site).href} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={`${SITE.name}: the federal government in its own numbers`} />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={new URL(url('og.png'), Astro.site).href} />
   {preview && <meta name="robots" content="noindex, nofollow" />}
   <link rel="sitemap" href={url('sitemap-index.xml')} />
-  {jsonld && <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />}
+  {ldList.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
 </head>
 <body class={bodyClass}>
   <a class="skip" href="#main">Skip to content</a>

@@ -24,7 +24,7 @@ const rated = metrics.filter((m) => m.status !== 'info');
 const data = { sections: SECTIONS, metrics, summary: { metrics_total: metrics.length, metrics_rated: rated.length, metrics_off_track: rated.filter((m) => m.status === 'fail').length, metrics_watch: rated.filter((m) => m.status === 'warn').length, metrics_on_track: rated.filter((m) => m.status === 'pass').length } };
 const base = url();
 ---
-<Base title="The briefing" description="Every measure mapped in 3D: each sphere is a topic, each moon a measure, coloured by whether it is better or worse than when the government took office." section="briefing/" bodyClass="catpage" forceDark>
+<Base title="The Australian economy in 3D: every measure mapped" description="Every measure mapped in 3D: each sphere is a topic, each moon a measure, coloured by whether it is better or worse than when the government took office." section="briefing/" bodyClass="catpage" forceDark>
   <link rel="stylesheet" href={url('briefing3d/categories.css')} />
   <style is:global>
     body.catpage { --font: var(--font-sans); --hud-font: "Rajdhani", var(--font-sans); }

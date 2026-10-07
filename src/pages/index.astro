@@ -41,9 +41,13 @@ const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[
 const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
 
-const jsonld = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, description: SITE.description, url: new URL(url(), Astro.site).href };
+const home = new URL(url(), Astro.site).href;
+const jsonld = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, alternateName: 'Gov Score Australia', description: SITE.description, url: home, inLanguage: 'en-AU' },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, url: home, logo: new URL(url('favicon.svg'), Astro.site).href, description: 'An independent site that tracks the Australian Government against official figures.' },
+];
 ---
-<Base jsonld={jsonld}>
+<Base fullTitle="Gov Score: Albanese Government report card in official figures" description="Is Australia better off since May 2022? Promises kept and broken, cost of living, inflation, debt and more, from official figures checked daily. Free and independent." jsonld={jsonld}>
   <section class="border-b border-rule">
     <div class="wrap grid gap-10 py-12 md:py-16 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
       <div>

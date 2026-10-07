@@ -8,7 +8,7 @@ const ministers = [...new Set(CONTROVERSIES.map((c) => c.minister))].sort();
 const nPolicy = CONTROVERSIES.filter((c) => c.type === 'policy').length, nConduct = CONTROVERSIES.length - nPolicy;
 const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 'pill-bad' } as const;
 ---
-<Base title="Controversies" description="Policies in dispute and questions about ministers' conduct under the current Australian Government: what happened, what the government says, what critics say and what the record shows, each linked to its sources." section="controversies/">
+<Base title="Albanese Government controversies: claims and the record" description="Disputed policies and questions about ministers' conduct: what happened, what the government says, what critics say and what the record shows, all sourced." section="controversies/">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Controversies · since May 2022</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Contested decisions and conduct: the claims, the evidence, and where each stands</h1>

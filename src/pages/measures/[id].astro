@@ -13,6 +13,7 @@ import { g20For } from '../../lib/g20';
 import { INFLUENCE_MEANING, VERDICT_MEANING } from '../../lib/editorial';
 import { fmtDate, fmtMonth, fmtPeriod, fmtStamp, headlineText, withUnit } from '../../lib/format';
 import type { Measure } from '../../lib/types';
+import { MEASURE_SEO, clip } from '../../lib/seo';
 
 export function getStaticPaths() { return MEASURES.map((m) => ({ params: { id: m.id }, props: { m } })); }
 const { m } = Astro.props as { m: Measure };
@@ -24,13 +25,22 @@ const context = m.context.filter((c) => !(m.ed.dropContext ?? []).some((re) => r
 const kind = m.ed.group === 'target' ? 'Commitment' : m.ed.group === 'condition' ? 'Condition' : 'Context';
 const pageUrl = new URL(url(`measures/${m.id}/`), Astro.site).href;
 const cite = `${SITE.name} (${GENERATED_AT.slice(0, 4)}). ${m.title}: ${headlineText(m.headline)} (${m.headline.period ?? ''}). Source: ${m.sources.map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i).join('; ')}. Retrieved ${fmtDate(GENERATED_AT)}, from ${pageUrl}`;
+const seoTitle = MEASURE_SEO[m.id] ?? `${m.title}, Australia`;
+const seoDesc = clip(`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}${m.headline.period ? ` (${m.headline.period})` : ''}. Official figures, sourced and checked daily.`);
+const crumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href },
+  { '@type': 'ListItem', position: 2, name: 'Results', item: new URL(url('measures/'), Astro.site).href },
+  { '@type': 'ListItem', position: 3, name: m.title, item: pageUrl }] };
 const jsonld = {
-  '@context': 'https://schema.org', '@type': 'Dataset', name: `${m.title} (Australia)`, description: m.question, url: pageUrl,
+  '@context': 'https://schema.org', '@type': 'Dataset', name: `${m.title} (Australia)`, description: `${m.question} ${m.explainer?.what ?? ''}`.trim(), url: pageUrl,
+  spatialCoverage: { '@type': 'Place', name: 'Australia' }, keywords: [m.title, 'Australia', m.sectionTitle, 'official statistics'], measurementTechnique: m.method,
+  includedInDataCatalog: { '@type': 'DataCatalog', name: SITE.name, url: new URL(url('data/'), Astro.site).href },
+  distribution: [{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: new URL(url(`data/${m.id}.csv`), Astro.site).href }],
   dateModified: m.updated_at ?? GENERATED_AT, isBasedOn: m.sources.map((s) => s.url), license: 'https://creativecommons.org/licenses/by/4.0/',
   creator: { '@type': 'Organization', name: SITE.name }, temporalCoverage: rs?.points.length ? `${rs.points[0][0]}/${rs.points[rs.points.length - 1][0]}` : undefined,
 };
 ---
-<Base title={m.title} description={`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}.`} section="measures/" jsonld={jsonld}>
+<Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]}>
   <article class="wrap pt-8 md:pt-12">
     <nav class="meta flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
       <a href={url('measures/')} class="text-ink-3">Results</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>

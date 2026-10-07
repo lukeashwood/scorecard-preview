@@ -9,7 +9,7 @@ const { l } = Astro.props as { l: Lesson };
 const Y = BUDGET.years[0];
 const i = LESSONS.findIndex((x) => x.slug === l.slug), next = LESSONS[(i + 1) % LESSONS.length];
 ---
-<Base title={l.title} description={l.question} section="learn/">
+<Base title={/\?$/.test(l.title) ? `${l.title} Explained simply` : `${l.title}, explained simply`} description={`${l.question} A short interactive explainer in plain English, using official Australian figures.`} section="learn/">
   <article class="wrap pt-10 md:pt-14">
     <p class="eyebrow"><a href={url('learn/')} class="text-ink-3 no-underline hover:underline">← Learn</a> · {l.minutes} minute read</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{l.title}</h1>

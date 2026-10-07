@@ -9,7 +9,7 @@ import type { Verdict } from '../lib/types';
 const order: Verdict[] = ['met', 'on_track', 'in_progress', 'at_risk', 'off_track', 'not_met'];
 const coloured = CONDITIONS.filter((m) => m.ed.better !== 'none'), neutral = CONDITIONS.filter((m) => m.ed.better === 'none');
 ---
-<Base title="Methodology" description="How figures are collected and checked, how verdicts are reached, and the full text of every rating rule.">
+<Base title="Methodology: how figures and verdicts are checked" description="How figures are collected and checked, how verdicts are reached, and the full text of every rating rule.">
   <div class="wrap-narrow pt-10 md:pt-14">
     <p class="eyebrow">Methodology · rules v{SITE.rulesVersion} · {fmtDate(SITE.rulesDate)}</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">How this site works</h1>

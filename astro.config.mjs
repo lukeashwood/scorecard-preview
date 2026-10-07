@@ -37,7 +37,16 @@ export default defineConfig({
   site,
   base,
   trailingSlash: 'always',
-  integrations: [react(), sitemap(), plainDashes],
+  integrations: [react(), sitemap({
+    filter: (page) => !/\/(subscribe|corrections)\/$/.test(page),
+    serialize(item) {
+      item.lastmod = new Date().toISOString();
+      const p = new URL(item.url).pathname;
+      item.changefreq = p === '/' || p.startsWith('/measures/') ? 'daily' : 'weekly';
+      item.priority = p === '/' ? 1.0 : /^\/(calculator|budget\/build|targets|in-60-seconds)\/$/.test(p) ? 0.9 : p.startsWith('/measures/') ? 0.8 : 0.6;
+      return item;
+    },
+  }), plainDashes],
   // Pre-bundle the heavier libraries up front so the local dev server never serves a half-optimised copy.
   vite: { plugins: [tailwindcss()], optimizeDeps: { include: ['react', 'react-dom', 'react-dom/client', 'd3-scale', 'd3-shape'] } },
 });

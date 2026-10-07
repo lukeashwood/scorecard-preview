@@ -32,7 +32,7 @@ const groups = [
   { id: 'other', title: 'Other figures', blurb: '', items: items.filter((i) => !known.has(i.section)) },
 ].filter((g) => g.items.length);
 ---
-<Base title="All charts" description={`Every chart ${SITE.name} tracks on one page: ${items.length} official series with their full history, sources and download options.`} section="charts/">
+<Base title="Australian economy charts: every official series" description={`Every chart ${SITE.name} tracks on one page: ${items.length} official series with their full history, sources and download options.`} section="charts/">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Charts</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every chart, one page</h1>

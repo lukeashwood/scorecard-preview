@@ -12,7 +12,7 @@ const STATUS: Record<string, { label: string; tone: string }> = { scheduled: { l
 const counts = Object.keys(STATUS).map((k) => ({ k, n: laws.filter((l) => l.status === k && l.sponsor === 'government').length }));
 const nPrivate = laws.filter((l) => l.sponsor === 'private').length;
 ---
-<Base title="Laws" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands, and who raised what objections, all linked to the official record." section="laws/">
+<Base title="Bills and laws passed by the Albanese Government" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands, and who raised what objections, all linked to the official record." section="laws/">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Laws · since May 2022</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What Parliament has passed, and what’s before it</h1>

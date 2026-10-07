@@ -4,8 +4,19 @@ import BudgetBuilder from '../../islands/BudgetBuilder.tsx';
 import { url } from '../../config/site';
 import { BUDGET } from '../../lib/measures';
 const Y = BUDGET.years[0];
+const pageUrl = new URL(url('budget/build/'), Astro.site).href;
+const jsonld = [
+  { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Build your own Federal Budget: Australian Budget simulator', url: pageUrl,
+    applicationCategory: 'EducationalApplication', operatingSystem: 'Any', isAccessibleForFree: true, inLanguage: 'en-AU',
+    description: `Start from the real ${Y.year} Australian Federal Budget, change any tax or spending line, and see the effect on the deficit, debt and interest bill.`,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'AUD' }, publisher: { '@type': 'Organization', name: 'Gov Score', url: new URL(url(), Astro.site).href } },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Gov Score', item: new URL(url(), Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'The Budget', item: new URL(url('budget/'), Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: 'Build your own Federal Budget', item: pageUrl }] },
+];
 ---
-<Base title="Build your own Federal Budget" description="Start from the government's real Budget. Change any tax, spending line, tax rate or migration setting and see what it does to the deficit, debt and interest bill." section="budget/">
+<Base title="Federal Budget simulator: build your own Budget" description={`Can you balance Australia's Federal Budget? Start from the real ${Y.year} Budget, change taxes, spending and migration, and see the deficit and debt change.`} section="budget/" jsonld={jsonld}>
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow"><a href={url('budget/')} class="text-ink-3 no-underline hover:underline">← The Budget</a> · Educational tool</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Build your own Federal Budget</h1>
@@ -23,6 +34,17 @@ const Y = BUDGET.years[0];
           <li><strong>Time.</strong> Real changes take years to legislate and phase in. Here they happen at once, in one Budget year.</li>
           <li><strong>The states.</strong> Cutting payments to the states doesn’t make the costs disappear; it moves them.</li></ul>
         <p>Use it to understand the size of things and the trade-offs between them, not to predict the future.</p></div>
+    </section>
+    <section class="mt-16 prose max-w-[72ch]">
+      <h2 class="!mt-0">Questions people ask about the Budget</h2>
+      <h3>Can the Federal Budget be balanced?</h3>
+      <p>Yes, but it takes large changes. Try the “Balance it with spending cuts” and “Balance it with tax rises” buttons above to see how big. The <a href={url('measures/budget_balance/')}>budget deficit</a> page tracks the real result each year.</p>
+      <h3>How much does the government pay in interest?</h3>
+      <p>Interest is one of the fastest-growing lines in the Budget. See <a href={url('measures/interest_costs/')}>interest on government debt</a> and <a href={url('measures/gross_debt/')}>gross government debt</a> for the official figures.</p>
+      <h3>Where does the money go now?</h3>
+      <p>The <a href={url('budget/')}>Budget page</a> lists every line as published, and <a href={url('learn/your-tax-receipt/')}>your tax receipt</a> shows where your own tax goes.</p>
+      <h3>Is this the same as the Parliamentary Budget Office tool?</h3>
+      <p>No. The Parliamentary Budget Office publishes its own long-term projections tool. This one starts from the current Budget year, works line by line, and lets you share your Budget with a link.</p>
     </section>
   </div>
 </Base>

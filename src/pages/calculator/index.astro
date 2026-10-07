@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import HouseholdCalc from '../../islands/HouseholdCalc.tsx';
+import { SITE, url } from '../../config/site';
+import { byId, BUDGET } from '../../lib/measures';
+import { RULES_2223, type TaxRules } from '../../lib/personalTax';
+import { typicalHousehold } from '../../lib/typicalHousehold';
+
+// Same inputs as the calculator on the home page: price and wage growth since the June quarter 2022, from the site's data.
+const pvw = byId('prices_vs_wages')!;
+const bar = (re: RegExp) => pvw.chart.bars?.find((x) => re.test(x.name))?.value ?? NaN;
+const CPI = bar(/^All prices/), WPI = bar(/^Wages/);
+const periodLabel = pvw.headline.period ?? '';
+const mp = byId('mortgage')?.chart.series?.[0]?.points ?? [];
+const mThen = mp.find((p) => p[0] === '2022-05-31'), mNow = mp[mp.length - 1];
+const steps = byId('interest_rates')?.chart.series?.[0]?.points ?? [];
+const cashAt = (d: string) => { const x = steps.filter((p) => p[0] <= d); return x.length ? x[x.length - 1][1] : null; };
+const lift = mNow && cashAt(mNow[0]) != null && steps.length ? steps[steps.length - 1][1] - cashAt(mNow[0])! : 0;
+const mortgage = mThen && mNow ? { then: mThen[1], now: mNow[1] + lift, thenLabel: 'May 2022', nowLabel: lift ? 'estimate after the latest rate decision' : new Date(mNow[0]).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' }) } : null;
+const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
+const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[–—]/g, '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
+const TH = typicalHousehold(NOW_RULES);
+const pageUrl = new URL(url('calculator/'), Astro.site).href;
+const jsonld = [
+  { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'Are you better off than in 2022? Cost of living calculator', url: pageUrl,
+    applicationCategory: 'FinanceApplication', operatingSystem: 'Any', isAccessibleForFree: true, inLanguage: 'en-AU',
+    description: 'Enter your income to compare your take-home pay today with the same job in 2022-23, after tax and inflation, using official ABS and ATO figures.',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'AUD' }, publisher: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href } },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Are you better off?', item: pageUrl }] },
+];
+---
+<Base title="Are you better off than in 2022? Cost of living calculator" description="Free calculator: enter your income and see if you are better or worse off than in 2022-23, after tax and inflation. Uses official ABS and ATO figures." section="calculator/" jsonld={jsonld}>
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">Calculator</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Are you better off than in 2022?</h1>
+    <p class="lede mt-3 max-w-[62ch]">Enter what you earn now, before tax. The calculator works out what the same job paid in 2022-23, takes out tax under each year’s rates, and compares the two in today’s dollars. Add your mortgage or rent to see the full picture.</p>
+    {NOW_RULES && Number.isFinite(CPI) && Number.isFinite(WPI) && <div class="mt-6"><HouseholdCalc client:load then={RULES_2223} now={NOW_RULES} cpi={CPI} wpi={WPI} periodLabel={periodLabel} mortgage={mortgage} rentGrowth={TH?.rentGrowth} sittingRentGrowth={TH?.rents} /></div>}
+    <noscript><p class="card card-pad mt-6">This calculator needs JavaScript. The worked example for a typical household is on the <a href={url()}>home page</a>.</p></noscript>
+    <section class="mt-16 grid gap-10 lg:grid-cols-2">
+      <div class="prose"><h2 class="!mt-0">How the calculator works</h2>
+        <p>Your pay in 2022-23 is estimated from what you earn now, using the ABS Wage Price Index, which tracks how much pay for the same job has grown. Income tax and the Medicare levy are worked out under the ATO’s resident rates for each year, including the low income tax offset. The result is then adjusted for inflation using the Consumer Price Index{periodLabel ? ` (${periodLabel})` : ''}, so both years are in today’s dollars.</p>
+        <p>If you add a mortgage, the change in repayments uses the Reserve Bank’s average variable rate. If you rent, the change uses market rents for new leases.</p></div>
+      <div class="prose"><h2 class="!mt-0">What it leaves out</h2>
+        <ul><li>HELP repayments, super, government payments and most rebates and offsets.</li>
+          <li>Any pay rise from a promotion or new job. It compares the same job in both years.</li>
+          <li>Your own spending pattern. Inflation is the average for all households.</li></ul>
+        <p>It is a guide, not financial advice. For the figures behind it, see <a href={url('measures/prices_vs_wages/')}>prices vs wages</a>, <a href={url('measures/inflation/')}>inflation</a>, <a href={url('measures/real_wages/')}>real wages</a> and <a href={url('measures/mortgage/')}>mortgage costs</a>. To try your own answer to the Budget, use the <a href={url('budget/build/')}>Federal Budget simulator</a>.</p></div>
+    </section>
+  </div>
+</Base>
