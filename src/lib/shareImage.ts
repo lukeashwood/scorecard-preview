@@ -99,7 +99,7 @@ function chartSvg(m: Measure, box: Box, opts: { labelSize: number }): string {
   if (t(TERM_START) < x1) {
     const xs = Math.max(px, X(TERM_START));
     s += `<rect x="${xs}" y="${py}" width="${px + pw - xs}" height="${ph}" fill="${C.brandTint}"/>`;
-    s += `<text x="${xs + 6}" y="${py + fs * 1.05}" font-family="${SANS}" font-weight="600" font-size="${fs * 0.78}" fill="${C.brand}" letter-spacing="0.6">ALBANESE GOVERNMENT</text>`;
+    s += `<text x="${xs + 6}" y="${py + fs * 1.05}" font-family="${SANS}" font-weight="600" font-size="${fs * 0.78}" fill="${C.brand}" letter-spacing="0.6">CURRENT GOVERNMENT</text>`;
   }
   // Reference lines (e.g. average household size), dashed, labelled at the right
   let refLab = ''; // drawn after the series so the line never runs through the words

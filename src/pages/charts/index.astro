@@ -81,7 +81,7 @@ const groups = [
               </div>
               {i.since && <div class="mt-3"><DirectionBadge change={{ trend: i.since.trend, tone: i.since.tone, label: i.since.label }} prefix="Since May 2022" /></div>}
               <div class="mt-4">
-                <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} g20={g20For(i.id)} />
+                <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} g20={g20For(i.id)} />
               </div>
               {i.hasPage && <div class="no-print mt-4 flex flex-wrap items-center justify-between gap-2"><a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a><ShareButton text={shareText(measure[i.id])} href={new URL(url(`measures/${i.id}/`), Astro.site).href} /></div>}
             </article>

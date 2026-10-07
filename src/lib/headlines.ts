@@ -54,7 +54,7 @@ export function recordLine(m: Measure): string | null {
   const name = rs.unit === '%' || rs.unit === '$bn' || rs.unit === '$' || rs.unit === "$'000" ? 'level' : 'figure';
   for (const [kind, cmp] of [['highest', (v: number) => v > lv], ['lowest', (v: number) => v < lv]] as const) {
     const prev = [...earlier].reverse().find((p) => cmp(p[1]));
-    if (!prev) { if (span >= 8) return `The ${kind} ${name} since the series began in ${pts[0][0].slice(0, 4)}.`; continue; }
+    if (!prev) { if (span >= 8) return `The ${kind} ${name} in figures back to ${pts[0][0].slice(0, 4)}.`; continue; }
     if (yrs(prev[0], ld) >= 3) return `The ${kind} ${name} since ${fmtPeriod(prev[0], fq)}.`;
   }
   return null;

@@ -72,6 +72,8 @@ export function inferFreq(points: [string, number][], hint?: 'q' | 'fy' | 'y'): 
   const gaps: number[] = [];
   for (let i = Math.max(1, points.length - 6); i < points.length; i++) gaps.push(daysBetween(points[i - 1][0], points[i][0]));
   const g = gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)];
+  // Half-yearly surveys taken in a non-quarter month (e.g. May and November) are labelled by month, not quarter.
+  if (g > 150 && g <= 300 && +points[points.length - 1][0].slice(5, 7) % 3 !== 0) return 'm';
   return g > 300 ? 'fy' : g > 80 ? 'q' : g > 20 ? 'm' : 'd';
 }
 

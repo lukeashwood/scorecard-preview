@@ -16,7 +16,7 @@ export const MEASURE_SEO: Record<string, string> = {
   real_wages: 'Real wages Australia: public vs private sector',
   prices_vs_wages: 'Cost of living vs wages since the 2022 election',
   productivity: 'Productivity in Australia: latest figures',
-  insolvencies: 'Business collapses in Australia: insolvencies',
+  insolvencies: 'Company insolvencies in Australia',
   consumer_confidence: 'Consumer sentiment Australia: latest index',
   gdp_per_capita: 'GDP per capita Australia vs total GDP growth',
   household_income: 'Real household income per person, Australia',
@@ -43,6 +43,9 @@ export const MEASURE_SEO: Record<string, string> = {
   price_to_earnings: 'House price to income ratio, Australia',
   tax_take: 'Tax to GDP ratio: Commonwealth tax take, Australia',
   living_standards_decades: 'Australian living standards by decade',
+  employment: 'How many Australians are employed? Jobs since 2022',
+  womens_participation: "Women's workforce participation rate, Australia",
+  gender_pay_gap: 'Gender pay gap in Australia: latest and trend',
 };
 
 /** Keep a description inside the length Google shows (about 155 characters), cutting at a word. */

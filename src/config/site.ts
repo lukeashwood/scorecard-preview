@@ -2,13 +2,15 @@
 export const SITE = {
   name: 'Gov Score',
   edition: 'Australia',
-  tagline: 'Holding the federal government to account, in its own numbers.',
+  tagline: 'The government of the day. What do the numbers say?',
   description:
-    'Holding the Australian Government to account with official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, dated and tested daily, in plain English.',
+    'The Australian Government of the day in official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, dated and tested daily, in plain English.',
   locale: 'en-AU',
   currency: 'AUD',
   government: {
     name: 'Albanese Government',
+    // Shown on charts and share images, so a chart never names a party or leader.
+    chartLabel: 'Current Government',
     swornIn: '2022-05-23',
     // Elections shown as markers on every time-series chart.
     elections: [
