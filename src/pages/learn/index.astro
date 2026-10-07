@@ -20,6 +20,16 @@ const glossary = MEASURES.filter((m) => m.explainer).slice(0, 40);
           <p class="mt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-brand">Start <Icon name="arrow" size={15} /></p>
         </a>))}
     </div>
+    <section class="mt-12">
+      <h2 class="h2">More interactive tools</h2>
+      <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[{ href: 'budget/build/', h: 'Build your own Federal Budget', p: 'Change any tax or spending line and see the deficit and debt respond.' },
+          { href: 'calculator/', h: 'Are you better off?', p: 'Compare your take-home pay with 2022, after tax and inflation.' },
+          { href: 'relationships/', h: 'Compare', p: 'See whether 2 official series move together, at the same time or later.' },
+          { href: 'briefing/', h: 'Every measure in 3D', p: 'Every measure in one interactive 3D model.' }].map((t) => (
+          <a href={url(t.href)} class="card card-link card-pad flex flex-col"><p class="font-display text-[20px] font-semibold leading-tight">{t.h}</p><p class="mt-2 text-[14.5px] text-ink-2">{t.p}</p><p class="mt-auto pt-4 inline-flex items-center gap-1.5 text-[14px] font-bold text-brand">Open <Icon name="arrow" size={14} /></p></a>))}
+      </div>
+    </section>
     <section class="mt-16">
       <h2 class="h2">Plain-English glossary</h2>
       <p class="mt-2 max-w-[70ch] text-ink-2">Every measure on the site comes with a short explanation of what it is and why it matters.</p>
