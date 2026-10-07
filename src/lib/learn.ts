@@ -15,6 +15,6 @@ export const LESSONS: Lesson[] = [
     related: [{ label: 'Inflation', href: 'measures/inflation/' }, { label: 'Real wages', href: 'measures/real_wages/' }, { label: 'Prices vs wages', href: 'measures/prices_vs_wages/' }] },
   { slug: 'interest-rates-and-mortgages', tool: 'mortgage', minutes: 2, title: 'Interest rates and mortgages', question: 'Who decides your mortgage rate, and what does a rate rise really cost?',
     intro: ['When the news says “rates went up”, it means the Reserve Bank lifted its cash rate. Banks pass that on to people with variable mortgages, usually within weeks.', 'Enter a loan and a rate to see the repayment, and what each quarter-point move adds or saves.'],
-    takeaways: ['The Reserve Bank sets the cash rate independently of the government.', 'Its job is to keep inflation between 2 and 3%. Higher rates slow spending; lower rates encourage it.', 'On a typical loan, each quarter-point rise costs roughly $100 a month.'],
+    takeaways: ['The Reserve Bank sets the cash rate independently of the government.', 'Its job is to keep inflation between 2 and 3%. Higher rates slow spending; lower rates encourage it.', 'On a typical loan, each quarter-point rise costs roughly $100 a month.', 'Extra repayments early in a loan save the most interest, because every dollar paid off stops being charged interest from then on.'],
     related: [{ label: 'Interest rates', href: 'measures/interest_rates/' }, { label: 'Mortgage repayments', href: 'measures/mortgage/' }] },
 ];

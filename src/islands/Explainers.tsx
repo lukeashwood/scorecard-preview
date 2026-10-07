@@ -69,3 +69,51 @@ export function MortgageRates() {
       <p className="text-[15.5px] text-ink-2">The government doesn’t set this rate. The <b className="text-ink">Reserve Bank</b>, which is independent, sets the “cash rate”, and banks move mortgage rates with it. The Bank raises rates to slow spending when inflation is too high, and cuts them when the economy needs a push.</p>
     </div>);
 }
+
+/* ------------------------------------------------------------------ 4b. Paying a mortgage off sooner */
+type Run = { months: number; interest: number; path: [number, number][] };
+function amortise(loan: number, rate: number, payment: number, start: number): Run {
+  const m = rate / 1200; let b = Math.max(0, loan - start), interest = 0, months = 0; const path: [number, number][] = [[0, b]];
+  while (b > 0.005 && months < 1200) { const i = b * m; interest += i; b = b + i - payment; months++; if (months % 6 === 0 || b <= 0) path.push([months, Math.max(0, b)]); }
+  return { months, interest, path };
+}
+const yrsMonths = (n: number) => { const y = Math.floor(n / 12), mo = n % 12; return `${y} year${y === 1 ? '' : 's'}${mo ? ` ${mo} month${mo === 1 ? '' : 's'}` : ''}`; };
+
+export function PayOffSooner() {
+  const [loan, setLoan] = useState(600000), [rate, setRate] = useState(6.2), [extra, setExtra] = useState(200), [lump, setLump] = useState(0);
+  const term = 30, m = rate / 1200, n = term * 12;
+  const pay = m ? loan * m / (1 - Math.pow(1 + m, -n)) : loan / n;
+  const base = useMemo(() => amortise(loan, rate, pay, 0), [loan, rate, pay]);
+  const fast = useMemo(() => amortise(loan, rate, pay + extra, lump), [loan, rate, pay, extra, lump]);
+  const saved = base.interest - fast.interest, sooner = base.months - fast.months;
+  // Balance over time: the standard loan beside the one with extra payments.
+  const W = 600, H = 200, px = (yrs: number) => (yrs / term) * W, py = (v: number) => H - (v / loan) * H;
+  const line = (p: [number, number][]) => p.map(([mo, v], i) => `${i ? 'L' : 'M'}${px(Math.min(mo / 12, term)).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
+        <Slider label="Loan size" value={loan} min={100000} max={2000000} step={10000} onChange={setLoan} fmt={dollars} />
+        <Slider label="Your interest rate" value={rate} min={1} max={12} step={0.05} onChange={setRate} fmt={(v) => v.toFixed(2) + '%'} />
+        <Slider label="Extra each month" value={extra} min={0} max={3000} step={50} onChange={setExtra} fmt={dollars} />
+        <Slider label="One-off lump sum, paid now" value={lump} min={0} max={Math.min(300000, loan)} step={5000} onChange={setLump} fmt={dollars} />
+      </div>
+      <Stats>
+        <Stat l="Interest saved" v={dollars(Math.max(0, saved))} s={`${dollars(fast.interest)} instead of ${dollars(base.interest)}`} />
+        <Stat l="Paid off sooner by" v={sooner > 0 ? yrsMonths(sooner) : 'No change'} s={`loan cleared in ${yrsMonths(fast.months)}`} />
+        <Stat l="Monthly repayment" v={dollars(pay + extra)} s={extra ? `${dollars(pay)} required plus ${dollars(extra)} extra` : 'the required amount'} />
+      </Stats>
+      <figure className="m-0">
+        <svg viewBox={`0 0 ${W} ${H + 24}`} className="block w-full" role="img" aria-label={`Loan balance over ${term} years: the standard loan is cleared in ${term} years; with the extra payments it is cleared in ${yrsMonths(fast.months)}.`}>
+          {[0, 10, 20, 30].map((y) => <g key={y}><line x1={px(y)} x2={px(y)} y1={0} y2={H} stroke="var(--grid)" /><text x={px(y)} y={H + 18} textAnchor={y === 0 ? 'start' : y === term ? 'end' : 'middle'} fontSize="12" fill="var(--ink-3)">{y === 0 ? 'Now' : `${y} yrs`}</text></g>)}
+          <line x1={0} x2={W} y1={H} y2={H} stroke="var(--ink-3)" />
+          <path d={line(base.path)} fill="none" stroke="var(--c4)" strokeWidth={2.5} strokeDasharray="6 5" />
+          <path d={line(fast.path)} fill="none" stroke="var(--c1)" strokeWidth={3} />
+        </svg>
+        <figcaption className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[13.5px] text-ink-2">
+          <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-[3px] w-5 rounded" style={{ background: 'var(--c4)' }} />Standard loan: what you still owe</span>
+          <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-[3px] w-5 rounded" style={{ background: 'var(--c1)' }} />With your extra payments</span>
+        </figcaption>
+      </figure>
+      <p className="text-[15.5px] text-ink-2">Every extra dollar goes straight off what you owe, so less interest is charged on it every month from then on. That is why money paid early saves far more than the same amount paid late in the loan. Money in an offset account works the same way. Check your loan’s rules first: some fixed-rate loans limit or charge for extra repayments.</p>
+    </div>);
+}
