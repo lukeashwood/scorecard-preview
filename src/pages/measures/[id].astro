@@ -14,6 +14,7 @@ import { INFLUENCE_MEANING, VERDICT_MEANING } from '../../lib/editorial';
 import { fmtDate, fmtMonth, fmtPeriod, fmtStamp, headlineText, withUnit } from '../../lib/format';
 import type { Measure } from '../../lib/types';
 import { MEASURE_SEO, clip } from '../../lib/seo';
+import { factualHeadline, recordLine } from '../../lib/headlines';
 
 export function getStaticPaths() { return MEASURES.map((m) => ({ params: { id: m.id }, props: { m } })); }
 const { m } = Astro.props as { m: Measure };
@@ -25,6 +26,7 @@ const context = m.context.filter((c) => !(m.ed.dropContext ?? []).some((re) => r
 const kind = m.ed.group === 'target' ? 'Commitment' : m.ed.group === 'condition' ? 'Condition' : 'Context';
 const pageUrl = new URL(url(`measures/${m.id}/`), Astro.site).href;
 const cite = `${SITE.name} (${GENERATED_AT.slice(0, 4)}). ${m.title}: ${headlineText(m.headline)} (${m.headline.period ?? ''}). Source: ${m.sources.map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i).join('; ')}. Retrieved ${fmtDate(GENERATED_AT)}, from ${pageUrl}`;
+const fh = factualHeadline(m); const rec = recordLine(m);
 const seoTitle = MEASURE_SEO[m.id] ?? `${m.title}, Australia`;
 const seoDesc = clip(`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}${m.headline.period ? ` (${m.headline.period})` : ''}. Official figures, sourced and checked daily.`);
 const crumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
@@ -40,7 +42,7 @@ const jsonld = {
   creator: { '@type': 'Organization', name: SITE.name }, temporalCoverage: rs?.points.length ? `${rs.points[0][0]}/${rs.points[rs.points.length - 1][0]}` : undefined,
 };
 ---
-<Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]}>
+<Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]} ogImage={url(`share/wide/${m.id}.png`)}>
   <article class="wrap pt-8 md:pt-12">
     <nav class="meta flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
       <a href={url('measures/')} class="text-ink-3">Results</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>
@@ -50,7 +52,10 @@ const jsonld = {
         <p class="eyebrow">{kind}</p>
         <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{m.title}</h1>
         <p class="lede mt-3">{m.question}</p>
-        <div class="no-print mt-4"><ShareButton text={shareText(m)} href={pageUrl} label="Share this figure" /></div>
+        <p class="mt-3 max-w-[70ch] text-[17px] font-semibold leading-snug text-ink">{fh}{rec && <span class="text-brand"> {rec}</span>}</p>
+        <div class="no-print mt-4 flex flex-wrap gap-2"><ShareButton text={shareText(m)} href={pageUrl} label="Share this figure" />
+          <a class="btn btn-ghost btn-sm" href={url(`share/wide/${m.id}.png`)} download={`govscore-${m.id}.png`}>Download image</a>
+          <a class="btn btn-ghost btn-sm" href={url(`share/tall/${m.id}.png`)} download={`govscore-${m.id}-portrait.png`}>Portrait for Instagram</a></div>
       </div>
       {m.verdict && <div class="lg:text-right"><VerdictPill verdict={m.verdict.verdict} label={m.ed.target?.verdictLabels?.[m.verdict.verdict]} large /><p class="meta mt-2 max-w-[38ch] lg:ml-auto">{t?.owner === 'official' ? m.verdict.reason : VERDICT_MEANING[m.verdict.verdict]}</p></div>}
     </header>
@@ -75,7 +80,7 @@ const jsonld = {
         <h2 class="h3">{m.ed.chartTitle ?? ((m.chart.series?.length ?? 0) > 1 ? m.title : rs?.name ?? m.title)}</h2>
         <ul class="flex flex-wrap gap-1.5">{m.ed.labels.map((l) => <li class="pill pill-neutral !font-semibold">{l}</li>)}</ul>
       </div>
-      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} g20={g20For(m.id)} />
+      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.name }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} g20={g20For(m.id)} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
     </section>
 

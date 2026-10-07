@@ -62,6 +62,11 @@ export const PAIRS: PairSpec[] = [
     x: { measure: 'migration', label: 'Net overseas migration, financial year', unit: 'people', decimals: 0, transform: 'fyJune' },
     y: { measure: 'personal_transfers', label: 'Personal transfers sent overseas, $ billion', unit: '$bn', decimals: 1 },
     read: 'Both have grown over 20 years along with the population and incomes, so they will tend to rise together whatever the link between them. In 2020-21, when borders were closed and net migration was below zero, personal transfers barely changed. The ABS does not publish who sends the money or where it goes.' },
+  { id: 'migration-rents', title: 'Migration and rents', freq: 'q', lags: [0, 4],
+    question: 'Do rents rise faster when more people are arriving?',
+    x: { measure: 'migration', label: 'Net overseas migration, past 12 months', unit: 'people', decimals: 0 },
+    y: { measure: 'rents_vs_wages', series: 0, label: 'Rents (CPI), annual change', unit: '%', decimals: 1, transform: 'yoy' },
+    read: 'More people need more homes, so faster population growth adds to demand for rentals. Interest rates, how many homes are built and changes in household size matter too. The CPI rent measure covers existing leases as well as new ones, so it moves more slowly than advertised rents.' },
 ];
 
 /* ------------------------------------------------------------------ series handling */

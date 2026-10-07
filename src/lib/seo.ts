@@ -36,6 +36,13 @@ export const MEASURE_SEO: Record<string, string> = {
   income_tax_shares: 'Who pays income tax in Australia? Top 1% and 10%',
   personal_transfers: 'Money sent overseas from Australia each year',
   consultancy_contracts: 'Federal government spending on consultants',
+  household_payments: 'Mortgage interest and income tax: share of household income',
+  people_per_home: 'Population growth vs new homes built, Australia',
+  rents_vs_wages: 'Rents vs wages in Australia since 2022',
+  fuel_prices: 'Petrol prices in Australia: fuel price changes',
+  price_to_earnings: 'House price to income ratio, Australia',
+  tax_take: 'Tax to GDP ratio: Commonwealth tax take, Australia',
+  living_standards_decades: 'Australian living standards by decade',
 };
 
 /** Keep a description inside the length Google shows (about 155 characters), cutting at a word. */

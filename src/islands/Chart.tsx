@@ -193,8 +193,8 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
             ))}
             {yearTicks.map((yr) => { const d = `${yr}-${isBar && freq === 'fy' ? '06-30' : '01-01'}`; const xx = isBar ? (xb(series[0].points.find((p) => p[0].startsWith(String(yr)))?.[0] ?? '') ?? null) : x(parseDate(d)); if (xx == null || xx < 0 || xx > iw) return null;
               return <text key={yr} x={isBar ? xx + xb.bandwidth() / 2 : xx} y={ih + 20} textAnchor="middle" fontSize="12" fill="var(--ink-3)">{freq === 'fy' ? `${String(yr - 1).slice(2)}-${String(yr).slice(2)}` : yr}</text>; })}
-            {elections.map((el) => { const ex = isBar ? null : x(parseDate(el.date)); if (ex == null || ex < 0 || ex > iw) return null; return (
-              <g key={el.date}><line x1={ex} x2={ex} y1={-4} y2={ih} stroke="var(--rule-strong)" strokeDasharray="3 4" /><text x={ex + 4} y={ih - 6} fontSize="10.5" fill="var(--ink-3)" fontFamily="var(--font-mono)">{el.label.toUpperCase()}</text></g>); })}
+            {[...elections].sort((a, b) => a.date.localeCompare(b.date)).map((el, i) => { const ex = isBar ? null : x(parseDate(el.date)); if (ex == null || ex < 0 || ex > iw) return null; return (
+              <g key={el.date + el.label}><line x1={ex} x2={ex} y1={-4} y2={ih} stroke="var(--rule-strong)" strokeDasharray="3 4" /><text x={ex + 4} y={ih - 6 - (i % 3) * 13} fontSize="10.5" fill="var(--ink-3)" fontFamily="var(--font-mono)">{el.label.toUpperCase()}</text></g>); })}
             {refs.map((r) => <g key={r.label + r.value}><line x1={0} x2={iw} y1={y(r.value)} y2={y(r.value)} stroke="var(--ink-2)" strokeDasharray="5 4" strokeWidth={1.2} />{r.label && <text x={iw} y={y(r.value) - 5} textAnchor="end" fontSize="11.5" fill="var(--ink-2)" fontWeight={600}>{r.label}</text>}</g>)}
 
             {isBar ? series[0]?.points.map((p) => { const y0 = y(0), yv = y(p[1]); const bh = Math.max(1, Math.abs(yv - y0)); const fc = est && p[0] >= est; return (

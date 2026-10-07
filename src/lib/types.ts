@@ -89,6 +89,8 @@ export interface Editorial {
   /** Context lines from the data feed that are dropped because they argue rather than inform. */
   dropContext?: RegExp[];
   target?: TargetSpec;
+  /** Dated policy events marked on the chart, e.g. a tax change. Facts only: what happened and when. */
+  events?: { date: string; label: string }[];
 }
 
 export interface Direction {
