@@ -124,8 +124,8 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   const [ref, W] = useWidth<HTMLDivElement>();
   const [hover, setHover] = useState<number | null>(null);
   const isBar = spec.kind === 'bar';
-  const m = { t: 34, r: 18, b: 30, l: 52 };
-  const w = Math.max(280, W), h = height, iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const mt = 34, mr = 18, mb = 30;
+  const w = Math.max(280, W), h = height, ih = h - mt - mb;
 
   const dates = useMemo(() => [...new Set(series.flatMap((s) => s.points.map((p) => p[0])))].sort(), [series]);
   const refs = plottingExtra ? [] : spec.ref ?? [];
@@ -136,6 +136,12 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   if (isBar || lo > 0 && lo / (hi || 1) < 0.35) lo = Math.min(0, lo); // bars and near-zero series are anchored at zero
   const padY = (hi - lo || 1) * 0.08;
   const y = scaleLinear().domain([lo < 0 ? lo - padY : lo === 0 ? 0 : lo - padY, hi + padY]).nice(5).range([ih, 0]);
+  const yTicks = y.ticks(5);
+  // Axis labels drop needless decimals ("4%" not "4.0%") unless the ticks themselves are fractional.
+  const tickFmt = (v: number) => (yTicks.every((t) => Number.isInteger(t)) ? fmt(v).replace(/\.0+(?=\D*$)/, '') : fmt(v));
+  // The left margin grows with the longest axis label, so "250,000" or "-$150bn" is never cut off.
+  const m = { t: mt, r: mr, b: mb, l: Math.max(40, Math.ceil(Math.max(...yTicks.map((t) => tickFmt(t).length)) * 8.4) + 14) };
+  const iw = w - m.l - m.r;
   const t0 = dates.length ? parseDate(dates[0]) : new Date(), t1 = dates.length ? parseDate(dates[dates.length - 1]) : new Date();
   const x = scaleTime().domain([t0, t1]).range([0, iw]);
   const xb = scaleBand<string>().domain(series[0]?.points.map((p) => p[0]) ?? []).range([0, iw]).paddingInner(0.22).paddingOuter(0.1);
@@ -149,9 +155,6 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   const termX = !term || !firstIn ? null : isBar ? Math.max(0, (xb(firstIn) ?? 0) - xb.step() * 0.11) : Math.max(0, Math.min(iw, x(parseDate(term.start))));
   const uid = useMemo(() => 'c' + Math.random().toString(36).slice(2, 8), []);
 
-  const yTicks = y.ticks(5);
-  // Axis labels drop needless decimals ("4%" not "4.0%") unless the ticks themselves are fractional.
-  const tickFmt = (v: number) => (yTicks.every((t) => Number.isInteger(t)) ? fmt(v).replace(/\.0+(?=\D*$)/, '') : fmt(v));
   const yearTicks = useMemo(() => {
     const ys: number[] = []; const a = t0.getUTCFullYear(), b = t1.getUTCFullYear();
     const step = Math.max(1, Math.ceil((b - a + 1) / Math.max(2, Math.floor(iw / 70))));
@@ -175,6 +178,21 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   const tipLeft = Math.min(Math.max(hx + m.l + 12, 8), w - 196);
   const mk = d3line<Point>().x((p) => px(p[0])).y((p) => y(p[1])).curve(spec.kind === 'step' ? curveStepAfter : curveMonotoneX);
   const last = series[0]?.points[series[0].points.length - 1];
+  const monoW = (txt: string, size: number) => txt.length * size * 0.62; // IBM Plex Mono is 0.6em per character
+  const termText = term ? term.label.toUpperCase() : '';
+  const termFits = termX != null && termX + 6 + monoW(termText + ' →', 11) <= iw;
+  const markers = useMemo(() => {
+    const placed: { x0: number; x1: number; lvl: number }[] = [];
+    return [...elections].sort((a, b) => a.date.localeCompare(b.date)).flatMap((el) => {
+      if (isBar) return [];
+      const ex = x(parseDate(el.date)); if (ex < 0 || ex > iw) return [];
+      const label = el.label.toUpperCase(); const tw = monoW(label, 10.5);
+      const right = ex + 4 + tw <= iw; const x0 = right ? ex + 4 : Math.max(0, ex - 4 - tw), x1 = x0 + tw;
+      let lvl = 0; while (placed.some((p) => p.lvl === lvl && p.x0 < x1 + 6 && x0 < p.x1 + 6)) lvl++;
+      placed.push({ x0, x1, lvl });
+      return [{ key: el.date + el.label, ex, label, tx: right ? ex + 4 : Math.max(tw, ex - 4), anchor: (right ? 'start' : 'end') as 'start' | 'end', lvl }];
+    });
+  }, [elections, iw, isBar, t0.getTime(), t1.getTime()]);
 
   return (
     <div ref={ref} className="relative" style={{ height: h }}>
@@ -182,10 +200,10 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
         <svg width={w} height={h} role="img" aria-label={`${title}. ${series.map((s) => s.name).join(', ')}. Use the table view for exact figures.`}
           tabIndex={0} onKeyDown={onKey} onBlur={() => setHover(null)} className="block touch-pan-y select-none rounded-lg focus-visible:outline-offset-4">
           <g transform={`translate(${m.l},${m.t})`}>
-            {termX != null && termX < iw && <g><rect x={termX} y={-8} width={iw - termX} height={ih + 8} fill="var(--brand-tint)" opacity={0.6} /><line x1={termX} x2={termX} y1={-8} y2={ih} stroke="var(--brand)" strokeWidth={1.5} /><text x={termX + 6} y={-12} fontSize="11" fill="var(--brand)" fontWeight={700} fontFamily="var(--font-mono)">{term!.label.toUpperCase()} →</text>
+            {termX != null && termX < iw && <g><rect x={termX} y={-8} width={iw - termX} height={ih + 8} fill="var(--brand-tint)" opacity={0.6} /><line x1={termX} x2={termX} y1={-8} y2={ih} stroke="var(--brand)" strokeWidth={1.5} /><text x={termFits ? termX + 6 : iw} y={-12} textAnchor={termFits ? 'start' : 'end'} fontSize="11" fill="var(--brand)" fontWeight={700} fontFamily="var(--font-mono)">{termFits ? `${termText} →` : termText}</text>
               <clipPath id={`${uid}-pre`}><rect x={-4} y={-20} width={termX + 4} height={ih + 40} /></clipPath><clipPath id={`${uid}-in`}><rect x={termX} y={-20} width={iw - termX + 8} height={ih + 40} /></clipPath></g>}
             {est && dates.some((d) => d >= est) && (() => { const first = dates.find((d) => d >= est)!; const sx = isBar ? (xb(first) ?? 0) - xb.step() * 0.11 : x(parseDate(first)); return (
-              <g><rect x={sx} y={-8} width={Math.max(0, iw - sx)} height={ih + 8} fill="var(--panel)" /><text x={sx + 6} y={4} fontSize="11" fill="var(--ink-3)" fontFamily="var(--font-mono)">BUDGET FORECAST →</text></g>); })()}
+              <g><rect x={sx} y={-8} width={Math.max(0, iw - sx)} height={ih + 8} fill="var(--panel)" />{(() => { const fits = sx + 6 + monoW('BUDGET FORECAST →', 11) <= iw; return <text x={fits ? sx + 6 : iw - 2} y={4} textAnchor={fits ? 'start' : 'end'} fontSize="11" fill="var(--ink-3)" fontFamily="var(--font-mono)">{fits || iw - sx > monoW('FORECAST', 11) + 8 ? (fits ? 'BUDGET FORECAST →' : 'FORECAST') : ''}</text>; })()}</g>); })()}
             {band && <g><rect x={0} y={y(band.hi)} width={iw} height={Math.max(1, y(band.lo) - y(band.hi))} fill="var(--good-tint)" /><text x={6} y={y(band.hi) - 5} fontSize="11.5" fill="var(--good)" fontWeight={700}>{band.label}</text></g>}
             {yTicks.map((tv) => (
               <g key={tv}><line x1={0} x2={iw} y1={y(tv)} y2={y(tv)} stroke={tv === 0 ? 'var(--ink-3)' : 'var(--grid)'} strokeWidth={1} />
@@ -193,9 +211,9 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
             ))}
             {yearTicks.map((yr) => { const d = `${yr}-${isBar && freq === 'fy' ? '06-30' : '01-01'}`; const xx = isBar ? (xb(series[0].points.find((p) => p[0].startsWith(String(yr)))?.[0] ?? '') ?? null) : x(parseDate(d)); if (xx == null || xx < 0 || xx > iw) return null;
               return <text key={yr} x={isBar ? xx + xb.bandwidth() / 2 : xx} y={ih + 20} textAnchor="middle" fontSize="12" fill="var(--ink-3)">{freq === 'fy' ? `${String(yr - 1).slice(2)}-${String(yr).slice(2)}` : yr}</text>; })}
-            {[...elections].sort((a, b) => a.date.localeCompare(b.date)).map((el, i) => { const ex = isBar ? null : x(parseDate(el.date)); if (ex == null || ex < 0 || ex > iw) return null; return (
-              <g key={el.date + el.label}><line x1={ex} x2={ex} y1={-4} y2={ih} stroke="var(--rule-strong)" strokeDasharray="3 4" /><text x={ex + 4} y={ih - 6 - (i % 3) * 13} fontSize="10.5" fill="var(--ink-3)" fontFamily="var(--font-mono)">{el.label.toUpperCase()}</text></g>); })}
-            {refs.map((r) => <g key={r.label + r.value}><line x1={0} x2={iw} y1={y(r.value)} y2={y(r.value)} stroke="var(--ink-2)" strokeDasharray="5 4" strokeWidth={1.2} />{r.label && <text x={iw} y={y(r.value) - 5} textAnchor="end" fontSize="11.5" fill="var(--ink-2)" fontWeight={600}>{r.label}</text>}</g>)}
+            {markers.map((mk2) => (
+              <g key={mk2.key}><line x1={mk2.ex} x2={mk2.ex} y1={-4} y2={ih} stroke="var(--rule-strong)" strokeDasharray="3 4" /><text x={mk2.tx} y={ih - 6 - mk2.lvl * 13} textAnchor={mk2.anchor} fontSize="10.5" fill="var(--ink-3)" fontFamily="var(--font-mono)" stroke="var(--surface)" strokeWidth={3} paintOrder="stroke">{mk2.label}</text></g>))}
+            {refs.map((r) => <g key={r.label + r.value}><line x1={0} x2={iw} y1={y(r.value)} y2={y(r.value)} stroke="var(--ink-2)" strokeDasharray="5 4" strokeWidth={1.2} />{r.label && <text x={iw} y={y(r.value) - 5} textAnchor="end" fontSize="11.5" fill="var(--ink-2)" fontWeight={600} stroke="var(--surface)" strokeWidth={3.5} paintOrder="stroke">{r.label}</text>}</g>)}
 
             {isBar ? series[0]?.points.map((p) => { const y0 = y(0), yv = y(p[1]); const bh = Math.max(1, Math.abs(yv - y0)); const fc = est && p[0] >= est; return (
               <rect key={p[0]} x={xb(p[0])} y={Math.min(y0, yv)} width={xb.bandwidth()} height={bh} rx={Math.min(3, xb.bandwidth() / 3)} fill={term && !inTerm(p[0]) ? 'var(--c4)' : 'var(--c1)'} opacity={fc ? 0.42 : term && !inTerm(p[0]) ? 0.5 : hd && hd !== p[0] ? 0.6 : 1} />); })

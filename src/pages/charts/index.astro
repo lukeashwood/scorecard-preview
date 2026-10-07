@@ -42,7 +42,7 @@ const groups = [
     <div class="no-print sticky top-16 z-20 -mx-4 mt-6 border-b border-rule bg-paper px-4 py-3">
       <div class="flex items-center gap-2">
         <button type="button" id="pick-btn" class="btn btn-primary btn-sm shrink-0" aria-expanded="false" aria-controls="picker">Choose charts <span id="pick-count" class="num opacity-80">({items.length} of {items.length})</span></button>
-        <nav class="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Jump to topic">{groups.map((g) => <a class="btn btn-quiet btn-sm shrink-0 whitespace-nowrap" href={`#t-${g.id}`} data-jump={g.id}>{g.title}</a>)}</nav>
+        <nav class="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none] [mask-image:linear-gradient(to_right,black_82%,transparent)] md:flex-wrap md:overflow-visible md:[mask-image:none]" aria-label="Jump to topic">{groups.map((g) => <a class="btn btn-quiet btn-sm shrink-0 whitespace-nowrap" href={`#t-${g.id}`} data-jump={g.id}>{g.title}</a>)}</nav>
       </div>
       <div id="picker" class="card card-pad mt-3 max-h-[60vh] overflow-y-auto" hidden>
         <div class="flex flex-wrap items-center justify-between gap-2">

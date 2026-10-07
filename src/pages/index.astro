@@ -127,11 +127,11 @@ const jsonld = [
             </div>
             <div class="table-scroll px-5 pb-2 pt-4 md:px-7">
               <table class="dt w-full">
-                <thead><tr><th>A year</th><th class="r">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
+                <thead><tr><th>A year</th><th class="r hidden sm:table-cell">June 2022</th><th class="r">Now</th><th class="r">Change</th></tr></thead>
                 <tbody>
-                  {V.rows.map((r) => <tr><td class="min-w-[150px]"><b>{r.l}</b><span class="meta hidden sm:block">{r.n}</span></td><td class="r num">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
-                  <tr><td class="min-w-[150px]"><b>Left for everything else</b><span class="meta hidden sm:block">{note}</span></td><td class="r num font-bold">{$(V.left0)}</td><td class="r num font-bold">{$(V.left1)}</td><td class="r num"></td></tr>
-                  <tr><td class="min-w-[150px]"><b>2022 amount in today’s prices</b><span class="meta hidden sm:block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num">{$(V.left0Today)}</td><td class="r num">{$(V.left1)}</td><td class:list={['r num font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>{(V.diff >= 0 ? '+' : '') + $(V.diff)}</td></tr>
+                  {V.rows.map((r) => <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>{r.l}</b><span class="meta hidden sm:block">{r.n}</span></td><td class="r num hidden sm:table-cell">{$(r.a)}</td><td class="r num">{$(r.b)}</td><td class:list={['r num font-semibold', r.b - r.a >= 0 ? 'text-good' : 'text-bad']}>{(r.b - r.a >= 0 ? '+' : '') + $(r.b - r.a)}</td></tr>)}
+                  <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>Left for everything else</b><span class="meta hidden sm:block">{note}</span></td><td class="r num font-bold hidden sm:table-cell">{$(V.left0)}</td><td class="r num font-bold">{$(V.left1)}</td><td class="r num"></td></tr>
+                  <tr><td class="min-w-[120px] sm:min-w-[150px]"><b>2022 amount in today’s prices</b><span class="meta hidden sm:block">Everything else costs {TH.cpi.toFixed(1)}% more (CPI, {TH.period})</span></td><td class="r num hidden sm:table-cell">{$(V.left0Today)}</td><td class="r num">{$(V.left1)}</td><td class:list={['r num font-bold', V.diff >= 0 ? 'text-good' : 'text-bad']}>{(V.diff >= 0 ? '+' : '') + $(V.diff)}</td></tr>
                 </tbody>
               </table>
             </div>
