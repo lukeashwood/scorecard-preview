@@ -39,7 +39,7 @@ export const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 export const FOOTER_NAV = [
   { href: 'methodology/', label: 'Methodology' },
-  { href: 'about/', label: 'About & funding' },
+  { href: 'about/', label: 'About' },
   { href: 'corrections/', label: 'Corrections' },
   { href: 'data/', label: 'Data & downloads' },
   { href: 'subscribe/', label: 'Email updates' },
