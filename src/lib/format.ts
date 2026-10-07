@@ -21,7 +21,7 @@ export function withUnit(v: number, unit = '', d = 0, opts: { signed?: boolean; 
     case '%': return f(v) + '%';
     case '$': return money(v, d, opts.signed);
     case '$bn': return money(v, d, opts.signed) + 'bn';
-    case '$m': return money(v, d, opts.signed) + 'm';
+    case '$m': return Math.abs(v) >= 1000 ? money(v / 1000, 1, opts.signed) + 'bn' : money(v, d, opts.signed) + 'm';
     case "$'000": return money(v * 1000, 0, opts.signed, true);
     case 'index': return f(v);
     case '': return f(v);
