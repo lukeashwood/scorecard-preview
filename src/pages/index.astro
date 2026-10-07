@@ -159,7 +159,7 @@ const jsonld = [
       {[
         { href: 'budget/build/', eyebrow: 'Interactive', h: 'Build your own Federal Budget', p: 'Start from the real Budget. Change any tax or spending line and watch the deficit, debt and interest bill respond.' },
         { href: 'learn/', eyebrow: 'Plain English', h: 'Learn how it works', p: 'Deficit or debt? Who sets interest rates? Short, interactive explainers with no jargon.' },
-        { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'Each topic is a sphere and each measure a moon, coloured by whether it is better or worse than when the government took office.' },
+        { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'An interactive 3D model of the economy. Spin it, zoom in and open any topic to see how its measures have moved.' },
       ].map((c, i) => (
         <a href={url(c.href)} class="card card-link card-pad rise flex flex-col" style={`--i:${i}`}>
           <p class="eyebrow">{c.eyebrow}</p>
