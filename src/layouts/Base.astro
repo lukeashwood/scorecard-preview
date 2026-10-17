@@ -4,6 +4,8 @@ import { SITE, NAV, NAV_GROUPS, FOOTER_NAV, url } from '../config/site';
 import { GENERATED_AT } from '../lib/measures';
 import { fmtStamp } from '../lib/format';
 import { clip } from '../lib/seo';
+import Logo from '../components/Logo.astro';
+import DisplayMenu from '../components/DisplayMenu.astro';
 
 interface Props { title?: string; fullTitle?: string; description?: string; section?: string; jsonld?: Record<string, unknown> | Record<string, unknown>[]; bodyClass?: string; forceDark?: boolean; ogType?: string; ogImage?: string }
 const { title, fullTitle: fullTitleProp, description: descRaw = SITE.description, section = '', jsonld, bodyClass, forceDark = false, ogType = 'website', ogImage } = Astro.props;
@@ -20,13 +22,18 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script is:inline>
-    (function (d) { var t; try { t = localStorage.getItem('sc_theme'); } catch (e) {} if (d.hasAttribute('data-force-dark')) t = 'dark'; if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t); d.classList.add('js'); })(document.documentElement);
+    (function (d) { var g = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      var t = g('sc_theme'); if (d.hasAttribute('data-force-dark')) t = 'dark'; if (t === 'dark' || t === 'light') d.setAttribute('data-theme', t);
+      var a = g('sc_accent'); if (a && a !== 'indigo') d.setAttribute('data-accent', a);
+      if (g('sc_motion') === 'off') d.setAttribute('data-motion', 'off');
+      if (g('sc_text') === 'large') d.setAttribute('data-text', 'large');
+      d.classList.add('js'); })(document.documentElement);
   </script>
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
   <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
-  <meta name="theme-color" content="#4a2d9c" />
+  <meta name="theme-color" content="#080b1a" />
   <meta property="og:type" content={ogType} />
   <meta property="og:locale" content="en_AU" />
   <meta property="og:site_name" content={SITE.name} />
@@ -49,14 +56,10 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <a class="skip" href="#main">Skip to content</a>
   {preview && <p class="no-print bg-ink px-4 py-1.5 text-center text-[13px] font-semibold text-paper">Private preview. Not launched, not for sharing. Some sections are still being finalised.</p>}
   <header class="site sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
+    <div class="aurora-line" aria-hidden="true"></div>
     <div class="wrap flex h-16 items-center gap-4">
       <a href={url()} class="flex items-center gap-2.5 text-ink no-underline" aria-label={`${SITE.name} home`}>
-        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
-          <rect width="30" height="30" rx="8" fill="var(--brand)" />
-          <rect x="7" y="16" width="4" height="7" rx="1.2" fill="var(--on-brand)" />
-          <rect x="13" y="11.5" width="4" height="11.5" rx="1.2" fill="var(--on-brand)" />
-          <rect x="19" y="7" width="4" height="16" rx="1.2" fill="var(--on-brand)" />
-        </svg>
+        <Logo size={32} />
         <span class="leading-none">
           <span class="block font-display text-[19px] font-semibold tracking-tight">{SITE.name}</span>
           <span class="mono block pt-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-3">{SITE.edition}</span>
@@ -79,9 +82,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
       </nav>
       <div class="ml-auto flex items-center gap-2 lg:ml-2">
         <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden sm:inline-flex">Get updates</a>
-        <button type="button" id="theme-btn" class="btn btn-ghost btn-sm w-9 !px-0" aria-label="Switch between light and dark">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
-        </button>
+        <DisplayMenu />
         <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 lg:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
@@ -103,7 +104,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <footer class="site mt-24 border-t border-rule bg-panel">
     <div class="wrap grid gap-10 py-12 sm:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
       <div class="max-w-md sm:col-span-3 lg:col-span-1">
-        <p class="font-display text-[22px] font-semibold">{SITE.name}</p>
+        <p class="flex items-center gap-2.5 font-display text-[22px] font-semibold"><Logo size={26} />{SITE.name}</p>
         <p class="mt-2 text-[14.5px] text-ink-2">Official Australian figures, sourced line by line. Automatic figures are tested every day; figures entered by hand show the date they were checked. Verdicts are given only where someone in authority made a measurable commitment. Everything else is shown as it is.</p>
         <p class="meta mt-4">Data last checked <span class="mono">{fmtStamp(GENERATED_AT)}</span> · Rating rules v{SITE.rulesVersion}</p>
       </div>
@@ -127,13 +128,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 
   <script is:inline>
     (function () {
-      var root = document.documentElement, tb = document.getElementById('theme-btn'), mb = document.getElementById('menu-btn'), mn = document.getElementById('mobile-nav');
-      tb && tb.addEventListener('click', function () {
-        var cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        var next = cur === 'dark' ? 'light' : 'dark';
-        root.setAttribute('data-theme', next); try { localStorage.setItem('sc_theme', next); } catch (e) {}
-        document.dispatchEvent(new CustomEvent('themechange', { detail: next }));
-      });
+      var mb = document.getElementById('menu-btn'), mn = document.getElementById('mobile-nav');
       mb && mb.addEventListener('click', function () { var open = mn.hidden; mn.hidden = !open; mb.setAttribute('aria-expanded', String(open)); });
       document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-share]'); if (!b) return;
         var text = b.getAttribute('data-text'), link = b.getAttribute('data-url'), lab = b.querySelector('[data-share-label]'), old = lab ? lab.textContent : '';

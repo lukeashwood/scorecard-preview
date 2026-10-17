@@ -9,7 +9,7 @@ import { ratedSeries } from './measures';
 import { factualHeadline, recordLine } from './headlines';
 import type { Measure, Point } from './types';
 
-const C = { bg: '#ffffff', ink: '#1d1640', ink2: '#4a4466', ink3: '#7a7590', rule: '#e7e3f1', brand: '#4a2d9c', brandTint: '#f3f0fb', muted: '#c9c3da', est: '#9a8fc4' };
+const C = { bg: '#ffffff', ink: '#1d1640', ink2: '#4a4466', ink3: '#7a7590', rule: '#e7e3f1', brand: '#5438e6', brandTint: '#f3f0fb', muted: '#c9c3da', est: '#9a8fc4' };
 const FONT_DIR = join(process.cwd(), 'src/assets/fonts');
 const FONTS = ['Public-Sans-wght-400.ttf', 'Public-Sans-wght-600.ttf', 'Public-Sans-wght-700.ttf'].map((f) => join(FONT_DIR, f));
 const SANS = 'Public Sans', SERIF = 'Public Sans';

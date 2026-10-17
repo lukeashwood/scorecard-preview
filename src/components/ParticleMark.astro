@@ -1,0 +1,181 @@
+---
+/* The living mark on the home page: thousands of points of light drift as mist, then gather into the Gov Score mark,
+   hold it, and let go again. Canvas, no library. Reduced motion, or Motion off in the Display menu, draws the formed
+   mark once and stops. The static SVG inside is what screen readers, print and no-JS browsers get. */
+import Logo from './Logo.astro';
+interface Props { size?: number; class?: string }
+const { size = 420, class: cls = '' } = Astro.props;
+---
+<div class:list={['pmark', cls]} style={`--pm-size:${size}px`} data-particle-mark>
+  <canvas class="pmark-canvas" aria-hidden="true"></canvas>
+  <div class="pmark-fallback"><Logo size={size * 0.56} title="Gov Score" /></div>
+</div>
+
+<style>
+  .pmark { position: relative; width: min(var(--pm-size), 100%); aspect-ratio: 1; margin-inline: auto; }
+  .pmark-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .pmark-fallback { position: absolute; inset: 0; display: grid; place-items: center; }
+  .pmark-fallback :global(svg) { width: 56%; height: 56%; }
+  :global(html.js) .pmark.is-live .pmark-fallback { opacity: 0; }
+  .pmark::before { content: ''; position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--brand-glow) 28%, transparent) 0%, transparent 62%); filter: blur(18px); pointer-events: none; }
+</style>
+
+<script>
+  const SHAPE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-width="7"/><rect x="29" y="54" width="11" height="20" rx="3" fill="#fff"/><rect x="44.5" y="42" width="11" height="32" rx="3" fill="#fff"/><rect x="60" y="28" width="11" height="46" rx="3" fill="#fff"/></svg>`;
+
+  function hexToRgb(h: string): [number, number, number] {
+    const m = h.trim().replace('#', '');
+    const v = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
+    return [parseInt(v.slice(0, 2), 16), parseInt(v.slice(2, 4), 16), parseInt(v.slice(4, 6), 16)];
+  }
+
+  function start(host: HTMLElement) {
+    const canvas = host.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+    const root = document.documentElement;
+    const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || root.getAttribute('data-motion') === 'off';
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const glow = document.createElement('canvas'); const gctx = glow.getContext('2d')!;
+    const GS = 0.22; // glow layer resolution: drawn small, scaled up, so it blurs for free
+    let W = 0, H = 0, cx = 0, cy = 0, R = 0;
+    const mobile = matchMedia('(max-width: 640px)').matches;
+    const N = mobile ? 2600 : 6500;
+
+    // Particle state in flat arrays: position, velocity, target, mist anchor, colour index, size.
+    const px = new Float32Array(N), py = new Float32Array(N), vx = new Float32Array(N), vy = new Float32Array(N);
+    const tx = new Float32Array(N), ty = new Float32Array(N), ax = new Float32Array(N), ay = new Float32Array(N);
+    const ci = new Uint8Array(N), sz = new Float32Array(N), ph = new Float32Array(N);
+    let colours: [number, number, number][] = [[47, 214, 207], [111, 92, 255], [255, 107, 87]];
+
+    function readColours() {
+      const cs = getComputedStyle(root);
+      const pick = (n: string, fb: string) => hexToRgb(cs.getPropertyValue(n) || fb);
+      colours = [pick('--aurora-1', '#2fd6cf'), pick('--brand-glow', '#8b7bff'), pick('--aurora-3', '#ff6b57')];
+    }
+
+    function sampleTargets() {
+      const S = 220, off = document.createElement('canvas'); off.width = S; off.height = S;
+      const o = off.getContext('2d')!;
+      const img = new Image();
+      img.onload = () => {
+        o.clearRect(0, 0, S, S); o.drawImage(img, 0, 0, S, S);
+        const d = o.getImageData(0, 0, S, S).data, pts: number[] = [];
+        for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) if (d[(y * S + x) * 4 + 3] > 120) pts.push(x, y);
+        const M = pts.length / 2;
+        for (let i = 0; i < N; i++) {
+          const k = (Math.random() * M) | 0;
+          tx[i] = (pts[k * 2] + Math.random() - 0.5) / S; ty[i] = (pts[k * 2 + 1] + Math.random() - 0.5) / S;
+        }
+        ready = true;
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SHAPE);
+    }
+
+    function resize() {
+      const r = host.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      glow.width = Math.max(8, Math.round(W * GS)); glow.height = Math.max(8, Math.round(H * GS));
+      gctx.setTransform(GS, 0, 0, GS, 0, 0);
+      cx = W / 2; cy = H / 2; R = Math.min(W, H) * 0.5;
+    }
+
+    function seed() {
+      for (let i = 0; i < N; i++) {
+        const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * R * 1.05;
+        px[i] = cx + Math.cos(a) * rr; py[i] = cy + Math.sin(a) * rr;
+        ax[i] = Math.cos(a) * (0.55 + Math.random() * 0.5); ay[i] = Math.sin(a) * (0.55 + Math.random() * 0.5);
+        vx[i] = 0; vy[i] = 0;
+        const r = Math.random(); ci[i] = r < 0.58 ? 1 : r < 0.86 ? 0 : 2;
+        sz[i] = 0.7 + Math.random() * 1.3; ph[i] = Math.random() * Math.PI * 2;
+      }
+    }
+
+    // Timeline (seconds): gather -> hold -> release -> drift, then repeat.
+    const GATHER = 3.2, HOLD = 5.2, RELEASE = 1.2, DRIFT = 3.4, CYCLE = GATHER + HOLD + RELEASE + DRIFT;
+    let ready = false, raf = 0, last = 0, t = GATHER + 1, visible = true, running = false;
+    let mx = -1e4, my = -1e4;
+
+    function step(now: number) {
+      raf = 0;
+      if (!running) return;
+      const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now; t += dt;
+      const phase = t % CYCLE;
+      // How strongly the mark is pulling right now, 0 (mist) to 1 (formed).
+      let pull: number, hold = 0;
+      if (phase < GATHER) pull = 1 - Math.pow(1 - phase / GATHER, 3);
+      else if (phase < GATHER + HOLD) { pull = 1; hold = 1; }
+      else if (phase < GATHER + HOLD + RELEASE) pull = Math.max(0, 1 - (phase - GATHER - HOLD) / RELEASE * 1.6);
+      else pull = 0;
+      const releasing = phase >= GATHER + HOLD && phase < GATHER + HOLD + RELEASE;
+      const markScale = R * 1.36, markOff = R * 0.68;
+      const breathe = 1 + Math.sin(t * 1.4) * 0.012 * hold;
+      const dmp = 0.84, spring = 0.085 * pull + 0.012;
+      for (let i = 0; i < N; i++) {
+        let fx: number, fy: number;
+        if (pull > 0.02) {
+          const gx = cx + (tx[i] * markScale - markOff) * breathe, gy = cy + (ty[i] * markScale - markOff) * breathe;
+          fx = (gx - px[i]) * spring; fy = (gy - py[i]) * spring;
+          if (hold) { fx += Math.sin(t * 2.1 + ph[i]) * 0.05; fy += Math.cos(t * 1.7 + ph[i]) * 0.05; }
+        } else {
+          // Mist: a slow swirl around a loose anchor, with a weak pull home so nothing wanders off.
+          const gx = cx + ax[i] * R * 0.72, gy = cy + ay[i] * R * 0.72;
+          const n1 = Math.sin(px[i] * 0.012 + t * 0.9 + ph[i]), n2 = Math.cos(py[i] * 0.011 - t * 0.7 + ph[i] * 0.5);
+          fx = (gx - px[i]) * 0.006 + n2 * 0.08 + (cy - py[i]) * 0.0007; fy = (gy - py[i]) * 0.006 + n1 * 0.08 - (cx - px[i]) * 0.0007;
+        }
+        if (releasing) { const dx = px[i] - cx, dy = py[i] - cy, d = Math.hypot(dx, dy) + 1; fx += (dx / d) * 0.4 + Math.sin(ph[i] + t * 3) * 0.3; fy += (dy / d) * 0.4 + Math.cos(ph[i] + t * 3) * 0.3; }
+        const ddx = px[i] - mx, ddy = py[i] - my, dd = ddx * ddx + ddy * ddy;
+        if (dd < 5200) { const d = Math.sqrt(dd) + 0.5, k = (72 - d) * 0.045; fx += (ddx / d) * k; fy += (ddy / d) * k; }
+        vx[i] = (vx[i] + fx) * dmp; vy[i] = (vy[i] + fy) * dmp;
+        px[i] += vx[i]; py[i] += vy[i];
+      }
+      draw(pull);
+      ctx!.globalCompositeOperation = 'source-over';
+      raf = requestAnimationFrame(step);
+    }
+
+    function paint(target: CanvasRenderingContext2D, alpha: number, size: number, posx: Float32Array, posy: Float32Array) {
+      for (let c = 0; c < 3; c++) {
+        const col = colours[c];
+        target.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+        target.beginPath();
+        for (let i = 0; i < N; i++) if (ci[i] === c) { const s = sz[i] * size; target.rect(posx[i] - s / 2, posy[i] - s / 2, s, s); }
+        target.fill();
+      }
+    }
+    function draw(pull: number) {
+      // Glow pass: fat, faint points on a tiny canvas, scaled up under the sharp pass.
+      gctx.clearRect(0, 0, W, H); gctx.globalCompositeOperation = 'lighter';
+      paint(gctx, 0.14 + 0.1 * pull, 6 + 3 * pull, px, py);
+      ctx!.clearRect(0, 0, W, H);
+      ctx!.globalAlpha = 0.9; ctx!.imageSmoothingEnabled = true; ctx!.drawImage(glow, 0, 0, W, H); ctx!.globalAlpha = 1;
+      ctx!.globalCompositeOperation = 'lighter';
+      paint(ctx!, 0.38 + 0.3 * pull, 0.8 + 0.4 * pull, px, py);
+      ctx!.globalCompositeOperation = 'source-over';
+    }
+    const sx = new Float32Array(N), sy = new Float32Array(N);
+    function drawStatic() {
+      const markScale = R * 1.36, markOff = R * 0.68;
+      for (let i = 0; i < N; i++) { sx[i] = cx + tx[i] * markScale - markOff; sy[i] = cy + ty[i] * markScale - markOff; }
+      gctx.clearRect(0, 0, W, H); gctx.globalCompositeOperation = 'lighter'; paint(gctx, 0.35, 10, sx, sy);
+      ctx!.clearRect(0, 0, W, H); ctx!.globalAlpha = 0.9; ctx!.drawImage(glow, 0, 0, W, H); ctx!.globalAlpha = 1;
+      ctx!.globalCompositeOperation = 'lighter'; paint(ctx!, 0.9, 1.3, sx, sy); ctx!.globalCompositeOperation = 'source-over';
+    }
+
+    function play() { if (!ready) { setTimeout(play, 60); return; } host.classList.add('is-live'); if (reduced()) { running = false; drawStatic(); return; } running = true; last = 0; if (!raf) raf = requestAnimationFrame(step); }
+    function pause() { running = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+    readColours(); resize(); seed(); sampleTargets();
+    new ResizeObserver(() => { resize(); if (!running && ready) drawStatic(); }).observe(host);
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible && !document.hidden) play(); else pause(); }, { threshold: 0.05 }).observe(host);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); else if (visible) play(); });
+    document.addEventListener('themechange', () => { readColours(); if (!running) drawStatic(); });
+    document.addEventListener('displaychange', () => { readColours(); if (reduced()) { pause(); drawStatic(); } else if (visible) play(); });
+    host.addEventListener('pointermove', (e) => { const r = host.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    host.addEventListener('pointerleave', () => { mx = -1e4; my = -1e4; });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-particle-mark]').forEach(start);
+</script>

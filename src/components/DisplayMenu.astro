@@ -1,0 +1,76 @@
+---
+/* Display menu in the header: appearance, accent colour, motion and text size. Choices are kept in the browser and
+   applied before the page paints (see the inline script in Base.astro), so nothing flashes on reload. */
+const ACCENTS = [
+  { id: 'indigo', label: 'Indigo', swatch: '#5438e6' },
+  { id: 'ocean', label: 'Ocean', swatch: '#1f5fc4' },
+  { id: 'teal', label: 'Teal', swatch: '#0c8a8f' },
+  { id: 'graphite', label: 'Graphite', swatch: '#2f2f44' },
+];
+---
+<details class="dmenu relative" id="display-menu">
+  <summary class="btn btn-ghost btn-sm w-9 !px-0 list-none [&::-webkit-details-marker]:hidden" aria-label="Display options" title="Display options">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2" /><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" /></svg>
+  </summary>
+  <div class="dmenu-panel absolute right-0 z-50 mt-2 w-[290px] rounded-2xl border border-rule bg-surface p-4 shadow-card">
+    <p class="text-[13px] font-bold">Display</p>
+    <p class="mt-0.5 text-[12.5px] text-ink-3">Kept on this device only.</p>
+
+    <fieldset class="mt-4" data-opt="theme">
+      <legend class="text-[12.5px] font-semibold text-ink-2">Appearance</legend>
+      <div class="seg mt-1.5">
+        {[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => <button type="button" data-val={v}>{l}</button>)}
+      </div>
+    </fieldset>
+
+    <fieldset class="mt-4" data-opt="accent">
+      <legend class="text-[12.5px] font-semibold text-ink-2">Accent</legend>
+      <div class="mt-1.5 flex gap-2">
+        {ACCENTS.map((a) => <button type="button" class="swatch" data-val={a.id} style={`--sw:${a.swatch}`} aria-label={a.label} title={a.label}></button>)}
+      </div>
+    </fieldset>
+
+    <div class="mt-4 grid grid-cols-2 gap-3">
+      <fieldset data-opt="motion">
+        <legend class="text-[12.5px] font-semibold text-ink-2">Motion</legend>
+        <div class="seg mt-1.5">{[['on', 'On'], ['off', 'Off']].map(([v, l]) => <button type="button" data-val={v}>{l}</button>)}</div>
+      </fieldset>
+      <fieldset data-opt="text">
+        <legend class="text-[12.5px] font-semibold text-ink-2">Text size</legend>
+        <div class="seg mt-1.5">{[['normal', 'A'], ['large', 'A+']].map(([v, l]) => <button type="button" data-val={v}>{l}</button>)}</div>
+      </fieldset>
+    </div>
+  </div>
+</details>
+
+<style>
+  .seg { display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: var(--panel); }
+  .seg button { flex: 1; min-height: 32px; border-radius: 7px; font-size: 13px; font-weight: 650; color: var(--ink-2); background: transparent; border: 0; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; background: var(--sw); border: 2px solid transparent; outline-offset: 2px; cursor: pointer; box-shadow: inset 0 0 0 2px var(--surface); }
+  .swatch[aria-pressed="true"] { border-color: var(--ink); }
+</style>
+
+<script>
+  const KEYS: Record<string, string> = { theme: 'sc_theme', accent: 'sc_accent', motion: 'sc_motion', text: 'sc_text' };
+  const DEF: Record<string, string> = { theme: 'auto', accent: 'indigo', motion: 'on', text: 'normal' };
+  const root = document.documentElement, menu = document.getElementById('display-menu') as HTMLDetailsElement | null;
+  function get(k: string) { let v: string | null = null; try { v = localStorage.getItem(KEYS[k]); } catch (e) {} return v || DEF[k]; }
+  function apply(k: string, v: string) {
+    try { if (v === DEF[k]) localStorage.removeItem(KEYS[k]); else localStorage.setItem(KEYS[k], v); } catch (e) {}
+    if (k === 'theme') { if (v === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', v); document.dispatchEvent(new CustomEvent('themechange', { detail: v })); }
+    else if (v === DEF[k]) root.removeAttribute('data-' + k); else root.setAttribute('data-' + k, v);
+    document.dispatchEvent(new CustomEvent('displaychange', { detail: { [k]: v } }));
+    paint();
+  }
+  function paint() {
+    if (!menu) return;
+    menu.querySelectorAll<HTMLElement>('[data-opt]').forEach((f) => { const k = f.dataset.opt!, cur = get(k); f.querySelectorAll<HTMLButtonElement>('button[data-val]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.val === cur))); });
+  }
+  if (menu) {
+    paint();
+    menu.addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-val]'); if (!b) return; const f = b.closest<HTMLElement>('[data-opt]')!; apply(f.dataset.opt!, b.dataset.val!); });
+    document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target as Node)) menu.open = false; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary')!.focus(); } });
+  }
+</script>

@@ -1,0 +1,13 @@
+---
+/* The mark: three rising bars inside a ring. The ring is the orbit on the home page; the bars are the record.
+   Drawn once here so the header, footer, favicon and the particle version on the home page all share one shape. */
+interface Props { size?: number; class?: string; title?: string }
+const { size = 30, class: cls = '', title } = Astro.props;
+---
+<svg width={size} height={size} viewBox="0 0 100 100" class={cls} role={title ? 'img' : undefined} aria-hidden={title ? undefined : 'true'}>
+  {title && <title>{title}</title>}
+  <circle cx="50" cy="50" r="43" fill="none" stroke="var(--brand)" stroke-width="7" />
+  <rect x="29" y="54" width="11" height="20" rx="3" fill="var(--brand)" />
+  <rect x="44.5" y="42" width="11" height="32" rx="3" fill="var(--brand)" />
+  <rect x="60" y="28" width="11" height="46" rx="3" fill="var(--brand)" />
+</svg>

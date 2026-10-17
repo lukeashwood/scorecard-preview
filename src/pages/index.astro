@@ -4,6 +4,7 @@ import MeasureCard from '../components/MeasureCard.astro';
 import ThenNowCard from '../components/ThenNowCard.astro';
 import VerdictPill from '../components/VerdictPill.astro';
 import Icon from '../components/Icon.astro';
+import Orbit from '../components/Orbit.astro';
 import { SITE, url } from '../config/site';
 import { MEASURES, GOV_TARGETS, DELIVERIES, CHECKS, GENERATED_AT, tally, record } from '../lib/measures';
 import { headlineText } from '../lib/format';
@@ -35,40 +36,49 @@ const jsonld = [
 ];
 ---
 <Base fullTitle="Gov Score: Albanese Government report card in official figures" description="Is Australia better off since May 2022? Promises kept and broken, cost of living, inflation, debt and more, from official figures checked daily. Free and independent." jsonld={jsonld}>
-  <section class="border-b border-rule">
-    <div class="wrap grid gap-10 py-12 md:py-16 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16">
-      <div>
-        <p class="eyebrow">{SITE.edition} · {SITE.government.name}</p>
-        <h1 class="display mt-3 text-[clamp(38px,5.6vw,64px)]">We provide the facts. <span class="text-brand">You decide the score.</span></h1>
-        <p class="lede mt-5">Australia’s premier source of non-partisan data on federal government performance. The current government’s record on cost of living, housing, jobs, the Budget and more, set against decades of history and, where possible, the rest of the G20. All in one place. Every number links to its official source. No editorial, no spin, no party line.</p>
-        <div class="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a class="btn btn-primary" href="#record">Explore the evidence <Icon name="arrow" /></a>
-          <a class="inline-flex items-center gap-1.5 font-bold no-underline hover:underline" href={url('in-60-seconds/')}>Australia in 60 seconds <Icon name="arrow" size={15} /></a>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="hero-sky" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="hero-kicker">{SITE.edition} · {SITE.government.name} · figures checked {fmtStamp(GENERATED_AT).replace(/,.*$/, '')}</p>
+        <h1 id="hero-h" class="display hero-h">We provide the facts.<br />You decide the score.</h1>
+        <p class="hero-lede">The government’s record on cost of living, housing, jobs, the Budget and more, in official figures. Every number links to its source. No editorial, no spin, no party line.</p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a class="btn btn-light" href="#record">Explore the evidence <Icon name="arrow" /></a>
+          <a class="hero-link" href={url('in-60-seconds/')}>Australia in 60 seconds <Icon name="arrow" size={15} /></a>
         </div>
+        <ul class="hero-tally" aria-label="Commitments at a glance">
+          {segs.map((s) => <li><b class="num">{s.n}</b><span>{s.label}</span><i aria-hidden="true" style={`background:${s.color}`} /></li>)}
+          <li><a href={url('targets/')}>All {t.total} commitments <Icon name="arrow" size={13} /></a></li>
+        </ul>
       </div>
+      <div class="hero-orbit"><Orbit /></div>
+    </div>
+  </section>
 
+  <section class="border-b border-rule">
+    <div class="wrap py-10 md:py-12">
       <div class="card card-pad shadow-card">
         <div class="flex items-baseline justify-between gap-3">
           <p class="eyebrow">Commitments tracker</p>
           <p class="meta mono">{fmtStamp(GENERATED_AT)}</p>
         </div>
         <p class="mt-3 font-display text-[22px] font-semibold leading-snug">{t.total} measurable commitments, judged on official figures.</p>
-        <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-ink-2">
-          {segs.map((s) => <li class="inline-flex items-center gap-1.5"><span aria-hidden="true" class="inline-block h-2.5 w-2.5 rounded-full" style={`background:${s.color}`} /><b class="num text-ink">{s.n}</b> {s.label}</li>)}
-        </ul>
         <div class="mt-4 flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={segs.map((s) => `${s.n} ${s.label}`).join(', ')}>
           {segs.map((s) => <span style={`flex:${s.n};background:${s.color}`} />)}
         </div>
-        <ul class="mt-4 grid gap-0">
+        <ul class="mt-4 grid gap-0 md:grid-cols-2 md:gap-x-10">
           {[...GOV_TARGETS.map((m) => ({ href: url(`measures/${m.id}/`), title: m.title, verdict: m.verdict!.verdict })), ...DELIVERIES.map((d) => ({ href: url(`targets/#${d.id}`), title: d.title, verdict: d.verdict }))]
-            .sort((a, b) => ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[a.verdict]) - ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[b.verdict])).slice(0, 7).map((x) => (
-            <li class="rule-t first:border-t-0">
+            .sort((a, b) => ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[a.verdict]) - ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[b.verdict])).slice(0, 8).map((x) => (
+            <li class="rule-t">
               <a href={x.href} class="flex items-center justify-between gap-3 py-2 text-[14.5px] font-semibold text-ink no-underline hover:text-brand"><span>{x.title}</span><VerdictPill verdict={x.verdict} /></a>
             </li>
           ))}
         </ul>
-        <a href={url('targets/')} class="mt-2 inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">See all {t.total} commitments <Icon name="arrow" size={15} /></a>
-        <p class="meta mt-3">Only commitments the government itself made are counted. <a href={url('methodology/')}>How verdicts work</a></p>
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <a href={url('targets/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">See all {t.total} commitments <Icon name="arrow" size={15} /></a>
+          <p class="meta">Only commitments the government itself made are counted. <a href={url('methodology/')}>How verdicts work</a></p>
+        </div>
       </div>
     </div>
   </section>
@@ -193,6 +203,37 @@ const jsonld = [
 </Base>
 
 <style>
+  /* Hero: always on night, whatever the theme, so the mark and the orbit have the dark they need. */
+  .hero { position: relative; overflow: hidden; background: var(--night); color: var(--on-night); isolation: isolate; }
+  .hero-sky { position: absolute; inset: 0; z-index: -1; background:
+      radial-gradient(60% 50% at 78% 45%, color-mix(in srgb, var(--brand-glow) 22%, transparent) 0%, transparent 70%),
+      radial-gradient(40% 36% at 70% 70%, color-mix(in srgb, var(--aurora-1) 12%, transparent) 0%, transparent 70%),
+      radial-gradient(30% 30% at 88% 20%, color-mix(in srgb, var(--aurora-3) 10%, transparent) 0%, transparent 70%),
+      linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%); }
+  .hero-sky::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / 0.07) 0.6px, transparent 0.7px); background-size: 22px 22px; mask-image: radial-gradient(70% 70% at 70% 50%, #000 20%, transparent 100%); }
+  .hero-grid { display: grid; gap: 20px; padding-block: 16px 36px; }
+  .hero-orbit { order: -1; }
+  .hero-copy { max-width: 560px; }
+  .hero-kicker { font-size: 13px; font-weight: 600; color: var(--on-night-2); }
+  .hero-h { margin-top: 14px; font-size: clamp(40px, 5vw, 66px); color: var(--on-night); max-width: 11ch; }
+  .hero-lede { margin-top: 20px; max-width: 54ch; font-size: clamp(17px, 1.7vw, 19px); line-height: 1.55; color: var(--on-night-2); }
+  .btn-light { background: var(--on-night); color: var(--night); }
+  @media (hover: hover) and (pointer: fine) { .btn-light:hover { background: #fff; } }
+  .hero-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--on-night); text-decoration: none; }
+  .hero-link:hover { text-decoration: underline; }
+  .hero-tally { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--night-rule); font-size: 14px; color: var(--on-night-2); }
+  .hero-tally li { display: inline-flex; align-items: center; gap: 7px; }
+  .hero-tally b { font-size: 18px; color: var(--on-night); }
+  .hero-tally i { width: 8px; height: 8px; border-radius: 50%; }
+  .hero-tally a { color: var(--on-night); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+  .hero-tally a:hover { text-decoration: underline; }
+  .hero-orbit { width: 100%; }
+  @media (min-width: 1024px) {
+    .hero-orbit { order: 0; }
+    .hero-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 64px 48px; min-height: calc(100vh - var(--header-h)); max-height: 880px; }
+    .hero-orbit { justify-self: end; width: min(100%, 720px); }
+  }
+
   /* Household type switch: plain radio buttons, so it works without JavaScript. */
   .wallet-toggle { display: inline-flex; gap: 4px; padding: 4px; border: 0; margin: 0; border-radius: 999px; background: var(--panel); }
   .wallet-toggle label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; font-weight: 700; font-size: 15px; color: var(--ink-2); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
