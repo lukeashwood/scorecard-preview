@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import MeasureCard from '../components/MeasureCard.astro';
+import ThenNowCard from '../components/ThenNowCard.astro';
 import VerdictPill from '../components/VerdictPill.astro';
 import Icon from '../components/Icon.astro';
 import { SITE, url } from '../config/site';
@@ -88,6 +89,39 @@ const jsonld = [
     </div>
   </section>
 
+  {TH && (
+  <section class="border-b border-rule" id="household">
+    <div class="wrap grid gap-8 py-14 md:py-16 lg:grid-cols-[1.25fr_1fr] lg:items-center lg:gap-16">
+      <div class="wallet">
+        <p class="eyebrow">What it means for you</p>
+        <fieldset class="wallet-toggle mt-4">
+          <legend class="sr-only">Household type</legend>
+          <input type="radio" name="wallet" id="w-own" class="sr-only" checked /><label for="w-own">With a mortgage</label>
+          <input type="radio" name="wallet" id="w-rent" class="sr-only" /><label for="w-rent">Renting</label>
+        </fieldset>
+        {([['w-own-panel', TH.owner.diff], ['w-rent-panel', TH.renter.diff]] as const).map(([cls, d]) => (
+          <div class:list={['mt-6', cls]} aria-live="polite">
+            <p class="font-display text-[clamp(26px,3.4vw,36px)] leading-tight">A typical household is</p>
+            <p class="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span class="num font-display text-[clamp(76px,12vw,132px)] font-semibold leading-[0.9] tracking-tight text-brand">{$(Math.abs(d) / 52)}</span>
+              <span class="font-display text-[clamp(22px,2.8vw,32px)] leading-tight">a week<br />{d >= 0 ? 'better off' : 'worse off'}</span>
+            </p>
+            <p class="lede mt-4">than in June 2022. That adds up to <b class="text-ink">{$(Math.abs(d))} a year</b>.</p>
+          </div>
+        ))}
+      </div>
+      <div class="card card-pad shadow-card">
+        <p class="eyebrow">How this is worked out</p>
+        <p class="mt-2 text-[15.5px] text-ink-2">A couple on the median wage, with a car and a weekly shop. Their pay after tax, compared with groceries, petrol, car costs and either a mortgage or rent, against June 2022 and adjusted for inflation. Every input is an official figure.</p>
+        <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a class="btn btn-primary" href={url('calculator/')}>Work out your own number <Icon name="arrow" /></a>
+          <a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url('calculator/#typical')}>See the working <Icon name="arrow" size={15} /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  )}
+
   <section class="wrap pt-16" id="record">
     <p class="eyebrow">The record · since May 2022</p>
     <h2 class="h2 mt-2">What has changed since the government took office</h2>
@@ -119,40 +153,16 @@ const jsonld = [
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <p class="eyebrow">Key figures</p>
-        <h2 class="h2 mt-2">6 key figures</h2>
+        <h2 class="h2 mt-2">Then and now: 6 key figures</h2>
+        <p class="mt-2 text-[15.5px] text-ink-2">When the government took office, and the latest official figure.</p>
       </div>
       <a href={url('measures/')} class="inline-flex items-center gap-1.5 text-[15px] font-bold no-underline hover:underline">All {MEASURES.length} measures, topic by topic <Icon name="arrow" size={15} /></a>
     </div>
-    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {KEY.map((m, i) => <MeasureCard m={m} i={i} />)}
+    <div class="tn-row mt-6">
+      {KEY.map((m, i) => m.sinceElection ? <ThenNowCard m={m} i={i} /> : <MeasureCard m={m} i={i} />)}
     </div>
     <p class="mt-5 text-[15px]"><a href={url('charts/')} class="font-bold">See every chart on one page</a>, with 10 and 20 year views and G20 comparisons where they exist.</p>
   </section>
-
-  {TH && (
-  <section class="wrap pt-20" id="household">
-    <p class="eyebrow">Households</p>
-    <h2 class="h2 mt-2">What it means for a household</h2>
-    <div class="mt-6 grid gap-4 md:grid-cols-2">
-      <a href={url('calculator/#typical')} class="card card-link card-pad flex flex-col">
-        <p class="eyebrow">Worked example: a typical household</p>
-        <p class="mt-2 text-[15px] text-ink-2">A couple on the median wage, with a car and a weekly shop, after tax, prices and housing costs, against June 2022.</p>
-        <dl class="mt-4 grid grid-cols-2 gap-4">
-          {([['With a mortgage', TH.owner.diff], ['Renting', TH.renter.diff]] as const).map(([l, d]) => (
-            <div><dt class="meta">{l}</dt><dd class:list={['num font-display text-[28px] font-semibold leading-tight', d >= 0 ? 'text-good' : 'text-bad']}>{$(Math.abs(d))}</dd><dd class="meta">a year {d >= 0 ? 'better off' : 'worse off'}</dd></div>
-          ))}
-        </dl>
-        <p class="mt-auto pt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-brand">See the working <Icon name="arrow" size={15} /></p>
-      </a>
-      <a href={url('calculator/')} class="card card-link card-pad flex flex-col">
-        <p class="eyebrow">Your own pay</p>
-        <p class="mt-2 font-display text-[24px] font-semibold leading-tight">Are you better or worse off than in 2022?</p>
-        <p class="mt-2 text-[15px] text-ink-2">Enter what you earn. The calculator compares your take-home pay today with the same job in 2022-23, after tax and inflation, and can add your mortgage or rent.</p>
-        <p class="mt-auto pt-5 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-brand">Try the calculator <Icon name="arrow" size={15} /></p>
-      </a>
-    </div>
-  </section>
-  )}
 
   <section class="wrap pt-20">
     <div class="grid gap-4 md:grid-cols-3">
@@ -181,3 +191,20 @@ const jsonld = [
     </div>
   </section>
 </Base>
+
+<style>
+  /* Household type switch: plain radio buttons, so it works without JavaScript. */
+  .wallet-toggle { display: inline-flex; gap: 4px; padding: 4px; border: 0; margin: 0; border-radius: 999px; background: var(--panel); }
+  .wallet-toggle label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; font-weight: 700; font-size: 15px; color: var(--ink-2); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+  .wallet-toggle input:checked + label { background: var(--brand); color: var(--on-brand); }
+  .wallet-toggle input:focus-visible + label { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .w-rent-panel { display: none; }
+  .wallet:has(#w-rent:checked) .w-rent-panel { display: block; }
+  .wallet:has(#w-rent:checked) .w-own-panel { display: none; }
+
+  /* Key figures: a swipeable row on phones, a grid on wider screens. */
+  .tn-row { display: grid; gap: 16px; grid-auto-flow: column; grid-auto-columns: minmax(270px, 84%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+  .tn-row > :global(*) { scroll-snap-align: start; }
+  @media (min-width: 640px) { .tn-row { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; margin-inline: 0; padding-inline: 0; } }
+  @media (min-width: 1024px) { .tn-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
