@@ -4,7 +4,6 @@
    form (line, area, bars, scatter, step, lollipop, slope, heat strip, donut, gauge, pictogram, radial bars) so the
    ring reads as a gallery of real charts. Positions and tilt are set by a small script; without it the cards sit
    in a plain ring. */
-import ParticleMark from './ParticleMark.astro';
 import { url } from '../config/site';
 import { byId, ratedSeries, TODAY } from '../lib/measures';
 import { headlineText } from '../lib/format';
@@ -43,10 +42,11 @@ const arc = (cx: number, cy: number, r: number, a0: number, a1: number) => { con
 const TAU = Math.PI * 2;
 ---
 <div class="orbit" data-orbit>
-  <div class="orbit-centre"><ParticleMark size={440} /></div>
+  <div class="orbit-sphere" aria-hidden="true"></div>
   <ul class="orbit-ring" aria-label="A selection of measures">
     {cards.map(({ m, g, form, now, v }, i) => (
       <li class="orbit-item" style={`--n:${i};--count:${cards.length}`}>
+        <span class="orbit-back" aria-hidden="true"></span>
         <a href={url(`measures/${m.id}/`)} class="orbit-card" aria-label={`${m.title}: now ${now}`}>
           <span class="orbit-title">{m.title}</span>
           <span class="orbit-now">{now}</span>
@@ -75,23 +75,34 @@ const TAU = Math.PI * 2;
 </div>
 
 <style>
-  .orbit { position: relative; width: 100%; max-width: 760px; aspect-ratio: 1 / 0.92; margin-inline: auto; }
-  .orbit-centre { position: absolute; left: 50%; top: 50%; width: 58%; translate: -50% -50%; z-index: 2; pointer-events: auto; }
-  .orbit-ring { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; }
-  .orbit-item { position: absolute; left: 50%; top: 50%; width: clamp(128px, 22%, 176px); translate: -50% -50%; will-change: transform; transform-style: preserve-3d; }
-  /* Without the script: a ring laid out with CSS so the hero never looks broken. */
-  :global(html:not(.js)) .orbit-item { transform: rotate(calc(var(--n) * (360deg / var(--count)))) translateY(-41cqmin) rotate(calc(var(--n) * (-360deg / var(--count)))); }
-  .orbit-card { display: grid; gap: 2px; padding: 10px 11px 8px; border-radius: 12px; text-decoration: none; color: var(--on-night); background: rgb(255 255 255 / 0.06); border: 1px solid rgb(255 255 255 / 0.12); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 14px 34px -18px rgb(0 0 0 / 0.8); transition: border-color 160ms ease, background-color 160ms ease; }
-  .orbit-card:hover, .orbit-card:focus-visible { border-color: var(--brand-glow); background: rgb(255 255 255 / 0.1); }
-  .orbit-title { font-size: 11.5px; font-weight: 600; line-height: 1.25; color: var(--on-night-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .orbit-now { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1.05; font-variant-numeric: tabular-nums; }
-  .orbit-chart { width: 100%; height: 44px; margin-top: 4px; }
-  .orbit-election { stroke: var(--brand-glow); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.8; vector-effect: non-scaling-stroke; }
+  /* A ring of curved screens around an invisible sphere, seen from just above eye level. Real 3D: every card is
+     rotated around the ring's axis and pushed out to the ring's radius, the whole ring turns, and the far side
+     shows the frosted backs of the screens through the glow. */
+  .orbit { --r: clamp(150px, 19vw, 235px); --cw: calc(var(--r) * 0.52); --ch: calc(var(--cw) * 1.12); position: relative; width: 100%; height: calc(var(--ch) * 2.1); perspective: calc(var(--r) * 5); perspective-origin: 50% 30%; }
+  .orbit-sphere { position: absolute; left: 50%; top: 50%; width: calc(var(--r) * 1.9); aspect-ratio: 1; translate: -50% -46%; border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgb(70 120 255 / 0.55) 0%, rgb(40 70 200 / 0.3) 38%, rgb(20 30 90 / 0.12) 60%, transparent 72%); filter: blur(10px); }
+  .orbit-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; margin: 0; padding: 0; list-style: none; transform-style: preserve-3d; transform: rotateX(-12deg) rotateY(0deg); }
+  .orbit-item { position: absolute; left: calc(var(--cw) / -2); top: calc(var(--ch) / -2); width: var(--cw); height: var(--ch); transform-style: preserve-3d; transform: rotateY(calc(var(--n) * (360deg / var(--count)))) translateZ(var(--r)); }
+  .orbit-card, .orbit-back { position: absolute; inset: 0; border-radius: 14px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .orbit-card { display: grid; grid-template-rows: auto auto 1fr; gap: 2px; padding: 11px 12px 9px; text-decoration: none; color: #eef3ff; background: linear-gradient(170deg, rgb(32 60 160 / 0.62), rgb(10 22 70 / 0.78)); border: 1.5px solid rgb(120 170 255 / 0.85); box-shadow: 0 0 0 1px rgb(40 80 220 / 0.5), 0 0 22px rgb(60 120 255 / 0.55), inset 0 0 28px rgb(60 120 255 / 0.25); transition: box-shadow 160ms ease, border-color 160ms ease; }
+  .orbit-card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 40%); pointer-events: none; }
+  .orbit-card:hover, .orbit-card:focus-visible { border-color: #fff; box-shadow: 0 0 0 1px rgb(120 170 255 / 0.9), 0 0 34px rgb(90 150 255 / 0.9), inset 0 0 28px rgb(90 150 255 / 0.35); }
+  .orbit-back { transform: rotateY(180deg); background: rgb(30 55 150 / 0.22); border: 1.5px solid rgb(120 170 255 / 0.35); box-shadow: 0 0 18px rgb(60 120 255 / 0.3); }
+  .orbit-title { font-size: 11.5px; font-weight: 600; line-height: 1.25; color: rgb(220 230 255 / 0.85); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .orbit-now { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.05; font-variant-numeric: tabular-nums; color: #fff; text-shadow: 0 0 12px rgb(120 170 255 / 0.8); }
+  /* The ring turns on its own. Hovering a screen holds it; Motion off, or reduced motion, leaves it still. */
+  @media (prefers-reduced-motion: no-preference) {
+    .orbit-ring { animation: orbit-turn 48s linear infinite; }
+    .orbit:hover .orbit-ring { animation-play-state: paused; }
+  }
+  :global(html[data-motion="off"]) .orbit-ring { animation: none !important; }
+  @keyframes orbit-turn { from { transform: rotateX(-12deg) rotateY(0deg); } to { transform: rotateX(-7deg) rotateY(-360deg); } }
+  .orbit-chart { width: 100%; height: auto; align-self: end; margin-top: 6px; aspect-ratio: 150 / 54; }
+  .orbit-election { stroke: rgb(200 220 255 / 0.8); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.8; vector-effect: non-scaling-stroke; }
   .orbit-line { fill: none; stroke: var(--aurora-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
   .orbit-fill { fill: var(--aurora-1); opacity: 0.22; }
   .orbit-bar { fill: var(--brand-glow); opacity: 0.85; }
   .orbit-dot { fill: var(--aurora-3); opacity: 0.9; }
-  .orbit-end { fill: #fff; stroke: var(--night); stroke-width: 1.5; }
+  .orbit-end { fill: #fff; stroke: #0a1a4a; stroke-width: 1.5; }
   .orbit-line-2 { stroke: var(--brand-glow); }
   .orbit-line-3 { stroke: var(--aurora-3); stroke-width: 2.5; }
   .orbit-stem { stroke: var(--brand-glow); stroke-width: 1.2; opacity: 0.7; vector-effect: non-scaling-stroke; }
@@ -105,52 +116,10 @@ const TAU = Math.PI * 2;
   .orbit-person circle, .orbit-person path { fill: var(--aurora-1); }
   .orbit-person-ghost circle, .orbit-person-ghost path { fill: rgb(255 255 255 / 0.1); }
   .orbit-ray { stroke: var(--aurora-3); stroke-width: 2.2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-  @media (max-width: 640px) { .orbit { aspect-ratio: 1 / 1.1; max-width: 420px; } .orbit-centre { width: 60%; } .orbit-item { width: 118px; } .orbit-item:nth-child(n+8) { display: none; } .orbit-now { font-size: 17px; } .orbit-chart { height: 34px; } .orbit-card { padding: 8px 9px 6px; } }
+  @media (max-width: 640px) { .orbit { --r: clamp(120px, 34vw, 150px); --cw: calc(var(--r) * 0.58); --ch: calc(var(--cw) * 1.2); perspective: calc(var(--r) * 6); } .orbit-now { font-size: 18px; } .orbit-card { padding: 8px 9px 6px; } }
 </style>
 
 <script>
-  // Cards travel around a tilted ring: an ellipse on screen, with the far side smaller and dimmer, so the ring reads
-  // as a circle seen at an angle and the cards pass behind the mark. Pointer over the ring slows it; pointer over a
-  // card holds it still so it can be read and clicked.
-  function run(orbit: HTMLElement) {
-    const all = Array.from(orbit.querySelectorAll<HTMLElement>('.orbit-item'));
-    let items = all, n = all.length; if (!n) return;
-    const pickVisible = () => { items = all.filter((el) => getComputedStyle(el).display !== 'none'); n = items.length; };
-    pickVisible();
-    const root = document.documentElement;
-    const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches || root.getAttribute('data-motion') === 'off';
-    let angle = 0, speed = 1, target = 1, last = 0, raf = 0, visible = true;
-    const PERIOD = 46; // seconds for one lap
-    function place() {
-      const W = orbit.clientWidth, H = orbit.clientHeight, small = W < 520, rx = W * (small ? 0.38 : 0.42), ry = H * (small ? 0.38 : 0.30);
-      for (let i = 0; i < n; i++) {
-        const a = angle + (i / n) * Math.PI * 2;
-        const x = Math.cos(a) * rx, y = Math.sin(a) * ry, depth = (Math.sin(a) + 1) / 2; // 1 = front, 0 = back
-        const s = (small ? 0.78 : 0.72) + depth * (small ? 0.26 : 0.36), el = items[i];
-        // Tilt each card to sit on the ring's surface, like a screen wrapped around a sphere: flat at the front,
-        // turned nearly side-on at the edges, seen from slightly above.
-        const tiltY = -Math.cos(a) * 62, tiltX = 6 + depth * 4;
-        el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) perspective(900px) rotateX(${tiltX.toFixed(1)}deg) rotateY(${tiltY.toFixed(1)}deg) scale(${s.toFixed(3)})`;
-        el.style.opacity = (0.35 + depth * 0.65).toFixed(2);
-        el.style.zIndex = depth > 0.5 ? '3' : '1';
-      }
-    }
-    function frame(now: number) {
-      raf = 0; if (!visible) return;
-      const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
-      speed += (target - speed) * 0.08;
-      angle += (dt / PERIOD) * Math.PI * 2 * speed;
-      place();
-      if (!reduced()) raf = requestAnimationFrame(frame);
-    }
-    function go() { if (reduced()) { place(); return; } last = 0; if (!raf) raf = requestAnimationFrame(frame); }
-    orbit.addEventListener('pointerenter', () => { target = 0.25; });
-    orbit.addEventListener('pointerleave', () => { target = 1; });
-    items.forEach((el) => { el.addEventListener('pointerenter', () => { target = 0; }); el.addEventListener('pointerleave', () => { target = 0.25; }); el.addEventListener('focusin', () => { target = 0; }); el.addEventListener('focusout', () => { target = 1; }); });
-    new ResizeObserver(() => { pickVisible(); place(); }).observe(orbit);
-    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) go(); }, { threshold: 0.05 }).observe(orbit);
-    document.addEventListener('displaychange', go);
-    place(); go();
-  }
-  document.querySelectorAll<HTMLElement>('[data-orbit]').forEach(run);
+  // The ring is animated in CSS. This only keeps the "Motion off" choice in step when it changes mid-page.
+  document.addEventListener('displaychange', () => { document.querySelectorAll<HTMLElement>('[data-orbit] .orbit-ring').forEach((r) => { r.style.animation = ''; }); });
 </script>
