@@ -11,8 +11,7 @@ import type { Measure, Point } from '../lib/types';
 
 const SET: [string, string][] = [
   ['inflation', 'line'], ['unemployment', 'area'], ['mortgage', 'bars'], ['home_prices', 'scatter'],
-  ['gross_debt', 'step'], ['employment', 'lollipop'], ['real_wages', 'slope'], ['fuel_prices', 'heat'],
-  ['government_size', 'donut'], ['housing_accord', 'gauge'], ['people_per_home', 'pictogram'], ['electricity', 'radial'],
+  ['gross_debt', 'step'], ['housing_accord', 'gauge'], ['people_per_home', 'pictogram'], ['government_size', 'donut'],
 ];
 const W = 150, H = 54, pad = 3;
 
@@ -78,7 +77,7 @@ const TAU = Math.PI * 2;
   /* A ring of curved screens around an invisible sphere, seen from just above eye level. Real 3D: every card is
      rotated around the ring's axis and pushed out to the ring's radius, the whole ring turns, and the far side
      shows the frosted backs of the screens through the glow. */
-  .orbit { --r: clamp(150px, 19vw, 235px); --cw: calc(var(--r) * 0.52); --ch: calc(var(--cw) * 1.12); position: relative; width: 100%; height: calc(var(--ch) * 2.1); perspective: calc(var(--r) * 5); perspective-origin: 50% 30%; }
+  .orbit { --r: clamp(150px, 19vw, 235px); --cw: calc(var(--r) * 0.58); --ch: calc(var(--cw) * 1.1); position: relative; width: 100%; height: calc(var(--ch) * 2.1); perspective: calc(var(--r) * 5); perspective-origin: 50% 30%; }
   .orbit-sphere { position: absolute; left: 50%; top: 50%; width: calc(var(--r) * 1.9); aspect-ratio: 1; translate: -50% -46%; border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgb(70 120 255 / 0.55) 0%, rgb(40 70 200 / 0.3) 38%, rgb(20 30 90 / 0.12) 60%, transparent 72%); filter: blur(10px); }
   .orbit-ring { position: absolute; left: 50%; top: 50%; width: 0; height: 0; margin: 0; padding: 0; list-style: none; transform-style: preserve-3d; transform: rotateX(-12deg) rotateY(0deg); }
   .orbit-item { position: absolute; left: calc(var(--cw) / -2); top: calc(var(--ch) / -2); width: var(--cw); height: var(--ch); transform-style: preserve-3d; transform: rotateY(calc(var(--n) * (360deg / var(--count)))) translateZ(var(--r)); }
@@ -116,7 +115,7 @@ const TAU = Math.PI * 2;
   .orbit-person circle, .orbit-person path { fill: var(--aurora-1); }
   .orbit-person-ghost circle, .orbit-person-ghost path { fill: rgb(255 255 255 / 0.1); }
   .orbit-ray { stroke: var(--aurora-3); stroke-width: 2.2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-  @media (max-width: 640px) { .orbit { --r: clamp(120px, 34vw, 150px); --cw: calc(var(--r) * 0.58); --ch: calc(var(--cw) * 1.2); perspective: calc(var(--r) * 6); } .orbit-now { font-size: 18px; } .orbit-card { padding: 8px 9px 6px; } }
+  @media (max-width: 640px) { .orbit { --r: clamp(120px, 34vw, 150px); --cw: calc(var(--r) * 0.6); --ch: calc(var(--cw) * 1.2); perspective: calc(var(--r) * 6); } .orbit-now { font-size: 18px; } .orbit-card { padding: 8px 9px 6px; } }
 </style>
 
 <script>
