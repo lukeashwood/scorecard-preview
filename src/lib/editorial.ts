@@ -52,7 +52,7 @@ export const EDITORIAL: Record<string, Editorial> = {
       },
     },
   },
-  bulk_billing: {
+  bulk_billing: { headlineFromSeries: true,
     group: 'target', influence: 'direct', better: 'higher', labels: ['Medicare statistics'],
     influenceNote: 'Medicare rebates and bulk-billing incentives are set by the federal government. Individual GPs decide whether to bulk bill.',
     target: {
@@ -169,7 +169,7 @@ export const VERDICT_MEANING: Record<Verdict, string> = {
   met: 'The commitment has been delivered.',
   on_track: 'The latest official figures are consistent with the commitment being delivered.',
   in_progress: 'The deadline is still ahead and the figures are moving the right way; it’s too early for a verdict.',
-  at_risk: 'The figures are behind where the published rule says they need to be, by less than the rule’s off-track margin, and the deadline is still ahead.',
+  at_risk: 'The figures are behind where the published rule says they need to be, by less than the rule’s off-track margin. The commitment could still be met.',
   off_track: 'On the latest official figures, the commitment is behind the threshold set in its published rule.',
   not_met: 'The deadline has passed and the commitment was not delivered.',
 };

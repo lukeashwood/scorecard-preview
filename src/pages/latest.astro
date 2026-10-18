@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import VerdictPill from '../components/VerdictPill.astro';
+import DirectionBadge from '../components/DirectionBadge.astro';
+import { url } from '../config/site';
+import { GENERATED_AT, MEASURES } from '../lib/measures';
+import { fmtDate, fmtPeriod, fmtStamp, headlineText } from '../lib/format';
+const rows = MEASURES.filter((m) => m.lastDataDate).sort((a, b) => b.lastDataDate!.localeCompare(a.lastDataDate!));
+const byMonth = new Map<string, typeof rows>();
+for (const m of rows) { const k = m.lastDataDate!.slice(0, 7); byMonth.set(k, [...(byMonth.get(k) ?? []), m]); }
+---
+<Base title="Latest figures: what landed and when" description="Every measure on Gov Score ordered by the date of its newest official figure, with the verdict where a commitment applies. Also available as an RSS feed." section="latest/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">Latest figures</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What landed, and when</h1>
+    <p class="lede mt-3">Every measure, newest official figure first. Open one for the change since the government took office, the change over the past year, and the source. Data last checked {fmtStamp(GENERATED_AT)}.</p>
+    <p class="mt-3 text-[15px]"><a href={url('feed.xml')} class="font-bold">RSS feed</a> for newsrooms and feed readers · <a href={url('subscribe/')} class="font-bold">Email updates</a></p>
+    {[...byMonth.entries()].map(([k, list]) => (
+      <section class="mt-10">
+        <h2 class="h2">{new Date(k + '-15T00:00:00Z').toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</h2>
+        <div class="card mt-4 overflow-hidden"><ul>{list.map((m) => (
+          <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid gap-x-4 gap-y-1 px-5 py-3 text-ink no-underline hover:bg-panel sm:grid-cols-[110px_1fr_auto] sm:items-center">
+            <span class="meta mono">{fmtDate(m.lastDataDate!)}</span>
+            <span><span class="font-semibold">{m.title}</span> <span class="num font-bold">{headlineText(m.headline)}</span><span class="meta block">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</span></span>
+            <span class="flex flex-wrap items-center gap-2">{m.verdict ? <VerdictPill verdict={m.verdict.verdict} label={m.ed.target?.verdictLabels?.[m.verdict.verdict]} /> : m.sinceElection ? <DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} prefix="Since May 2022" /> : null}</span>
+          </a></li>))}</ul></div>
+      </section>
+    ))}
+    <p class="meta mt-8">Dates are the period the newest figure covers (the end of the month, quarter or financial year), not the day the agency published it. The site keeps no history of earlier values, so this is a list of what has landed, not old-against-new; the change columns on each measure page carry the comparison.</p>
+  </div>
+</Base>

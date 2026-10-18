@@ -65,7 +65,8 @@ export function recordLine(m: Measure): string | null {
   const earlier = pts.slice(0, -1);
   const yrs = (a: string, b: string) => (+b.slice(0, 4) - +a.slice(0, 4)) + (+b.slice(5, 7) - +a.slice(5, 7)) / 12;
   const span = yrs(pts[0][0], ld);
-  const name = rs.unit === '%' || rs.unit === '$bn' || rs.unit === '$' || rs.unit === "$'000" ? 'level' : 'figure';
+  // A measure judged as a share of GDP says so, so 'lowest since' is never read as a dollar claim.
+  const name = (rs.unit === '%' || rs.unit === '$bn' || rs.unit === '$' || rs.unit === "$'000" ? 'level' : 'figure') + (m.ed.useExtra != null ? ` as a ${rs.name.replace(/^% of/i, 'share of')}` : '');
   for (const [kind, cmp] of [['highest', (v: number) => v > lv], ['lowest', (v: number) => v < lv]] as const) {
     const prev = [...earlier].reverse().find((p) => cmp(p[1]));
     if (!prev) { if (span >= 8) return `The ${kind} ${name} in figures back to ${pts[0][0].slice(0, 4)}.`; continue; }

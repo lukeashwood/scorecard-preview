@@ -105,7 +105,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
         </div>
         {mode === 'time' && <div className="flex gap-1">
           <button type="button" className="btn btn-sm btn-ghost" aria-pressed={view === 'table'} onClick={() => setView(view === 'chart' ? 'table' : 'chart')}>{view === 'chart' ? 'Show as table' : 'Show as chart'}</button>
-          <button type="button" className="btn btn-sm btn-ghost hidden sm:inline-flex" onClick={downloadCsv}>Download CSV</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={downloadCsv}>Download CSV</button>
           {howToHref && <a className="btn btn-sm btn-ghost hidden sm:inline-flex" href={howToHref} title="Download the data and redraw this chart in a spreadsheet">Make your own chart</a>}
         </div>}
       </div>
@@ -197,6 +197,8 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
     return [...elections].sort((a, b) => a.date.localeCompare(b.date)).flatMap((el) => {
       if (isBar) return [];
       const ex = x(parseDate(el.date)); if (ex < 0 || ex > iw) return [];
+      // On a phone there is no room for every annotation: keep the dashed lines, label only elections.
+      if (iw < 480 && !/election/i.test(el.label)) return [{ key: el.date + el.label, ex, label: '', tx: ex, anchor: 'start' as const, lvl: 0 }];
       const label = el.label.toUpperCase(); const tw = monoW(label, 10.5);
       const right = ex + 4 + tw <= iw; const x0 = right ? ex + 4 : Math.max(0, ex - 4 - tw), x1 = x0 + tw;
       let lvl = 0; while (placed.some((p) => p.lvl === lvl && p.x0 < x1 + 6 && x0 < p.x1 + 6)) lvl++;

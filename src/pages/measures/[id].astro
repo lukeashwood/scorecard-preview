@@ -35,7 +35,13 @@ const related = MEASURES.filter((x) => x.id !== m.id && (x.ed.supports === m.id 
 const context = m.context.filter((c) => !(m.ed.dropContext ?? []).some((re) => re.test(c)));
 const kind = m.ed.group === 'target' ? 'Commitment' : m.ed.group === 'condition' ? 'Condition' : 'Context';
 const pageUrl = new URL(url(`measures/${m.id}/`), Astro.site).href;
-const cite = `${SITE.name} (${GENERATED_AT.slice(0, 4)}). ${m.title}: ${headlineText(m.headline)} (${m.headline.period ?? ''}). Source: ${m.sources.map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i).join('; ')}. Retrieved ${fmtDate(GENERATED_AT)}, from ${pageUrl}`;
+// Citation: the statistical publishers are the authors; a minister's media release is context on the page, not a source for the figure.
+const citePublishers = m.sources.filter((s) => !/treasurer|minister|prime minister|media release/i.test(`${s.publisher} ${s.title}`)).map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i);
+const citeAuthors = (citePublishers.length ? citePublishers : m.sources.map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i)).join('; ');
+const citeYear = GENERATED_AT.slice(0, 4);
+const citeFigure = `${m.title}: ${headlineText(m.headline)}${m.headline.period ? ` (${m.headline.period})` : ''}`;
+const cite = `${citeAuthors} (${citeYear}). ${citeFigure}. Via ${SITE.name}, retrieved ${fmtDate(GENERATED_AT)}, ${pageUrl}`;
+const citeApa = `${citeAuthors}. (${citeYear}). ${citeFigure} [Data set]. Retrieved ${fmtDate(GENERATED_AT)}, via ${SITE.name}: ${pageUrl}`;
 const fh = factualHeadline(m); const rec = recordLine(m);
 const seoTitle = MEASURE_SEO[m.id] ?? `${m.title}, Australia`;
 const seoDesc = clip(`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}${m.headline.period ? ` (${m.headline.period})` : ''}. Official figures, sourced and checked daily.`);
@@ -69,6 +75,7 @@ const jsonld = {
             <ShareButton text={shareText(m)} href={pageUrl} label="Share a link" class="!justify-start !border-0" />
             <a class="btn btn-ghost btn-sm !justify-start !border-0" href={url(`share/wide/${m.id}.png`)} download={`govscore-${m.id}.png`}>Download image</a>
             <a class="btn btn-ghost btn-sm !justify-start !border-0" href={url(`share/tall/${m.id}.png`)} download={`govscore-${m.id}-portrait.png`}>Portrait image for Instagram</a>
+            <a class="btn btn-ghost btn-sm !justify-start !border-0" href="#cite">Cite this figure</a>
           </div>
         </details>
         <script is:inline>
@@ -174,8 +181,12 @@ const jsonld = {
         </div>
         <div class="card card-pad">
           <p class="eyebrow" id="cite">Cite this</p>
-          <p id="cite-text" class="mt-2 text-[13.5px] leading-snug text-ink-2">{cite}</p>
-          <button type="button" id="cite-btn" class="btn btn-quiet btn-sm mt-3">Copy citation</button>
+          <p class="meta mt-1">Harvard</p>
+          <p id="cite-text" class="mt-1 text-[13.5px] leading-snug text-ink-2">{cite}</p>
+          <button type="button" id="cite-btn" class="btn btn-quiet btn-sm mt-2" data-for="cite-text">Copy Harvard</button>
+          <p class="meta mt-4">APA</p>
+          <p id="cite-apa" class="mt-1 text-[13.5px] leading-snug text-ink-2">{citeApa}</p>
+          <button type="button" id="cite-btn-apa" class="btn btn-quiet btn-sm mt-2" data-for="cite-apa">Copy APA</button>
         </div>
       </aside>
     </div>
@@ -192,8 +203,8 @@ const jsonld = {
     </nav>
   </article>
   <script is:inline>
-    (function () { var b = document.getElementById('cite-btn'), t = document.getElementById('cite-text'); if (!b || !t) return;
-      b.addEventListener('click', function () { var done = function (ok) { b.textContent = ok ? 'Copied' : 'Copy failed: select the text instead'; setTimeout(function () { b.textContent = 'Copy citation'; }, 2200); };
-        if (navigator.clipboard) navigator.clipboard.writeText(t.textContent).then(function () { done(true); }, function () { done(false); }); else done(false); }); })();
+    document.querySelectorAll('[data-for]').forEach(function (b) { var t = document.getElementById(b.dataset.for); if (!t) return; var label = b.textContent;
+      b.addEventListener('click', function () { var done = function (ok) { b.textContent = ok ? 'Copied' : 'Copy failed: select the text instead'; setTimeout(function () { b.textContent = label; }, 2200); };
+        if (navigator.clipboard) navigator.clipboard.writeText(t.textContent).then(function () { done(true); }, function () { done(false); }); else done(false); }); });
   </script>
 </Base>

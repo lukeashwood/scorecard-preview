@@ -5,6 +5,7 @@ import ThenNowCard from '../components/ThenNowCard.astro';
 import VerdictPill from '../components/VerdictPill.astro';
 import Icon from '../components/Icon.astro';
 import Orbit from '../components/Orbit.astro';
+import ReportForm from '../components/ReportForm.astro';
 import { SITE, url } from '../config/site';
 import { MEASURES, GOV_TARGETS, DELIVERIES, CHECKS, GENERATED_AT, tally, record } from '../lib/measures';
 import { headlineText } from '../lib/format';
@@ -13,6 +14,9 @@ import { fmtStamp } from '../lib/format';
 import { byId, BUDGET } from '../lib/measures';
 import type { TaxRules } from '../lib/personalTax';
 import { typicalHousehold } from '../lib/typicalHousehold';
+import { latestFigures } from '../lib/latest';
+import { fmtDate } from '../lib/format';
+const latest = latestFigures(6, 45);
 
 const t = tally();
 const rec = record();
@@ -28,6 +32,15 @@ const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
 const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[–—]/g, '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
 const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
+// Tracker preview: 8 commitments as an even mix. Sorted worst to best, then taken alternately from each end, so the
+// first screen reflects the whole tally rather than the worst of it.
+const allCommitments = [...GOV_TARGETS.map((m) => ({ href: url(`measures/${m.id}/`), title: m.title, verdict: m.verdict!.verdict })), ...DELIVERIES.map((d) => ({ href: url(`targets/#${d.id}`), title: d.title, verdict: d.verdict }))]
+  .sort((a, b) => ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[a.verdict]) - ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[b.verdict]));
+const preview: typeof allCommitments = [];
+for (let i = 0, j = allCommitments.length - 1; preview.length < 8 && i <= j; i++, j--) { preview.push(allCommitments[i]); if (i !== j && preview.length < 8) preview.push(allCommitments[j]); }
+// Delivery commitments (a law passed, a scheme open) and measured outcomes (a number reached) are counted separately as well as together.
+const delivered = DELIVERIES.filter((d) => d.verdict === 'met').length;
+const outcomesGood = GOV_TARGETS.filter((m) => m.verdict!.verdict === 'met' || m.verdict!.verdict === 'on_track').length;
 
 const home = new URL(url(), Astro.site).href;
 const jsonld = [
@@ -53,49 +66,6 @@ const jsonld = [
         </ul>
       </div>
       <div class="hero-orbit"><Orbit /></div>
-    </div>
-  </section>
-
-  <section class="border-b border-rule">
-    <div class="wrap py-10 md:py-12">
-      <div class="card card-pad shadow-card">
-        <div class="flex items-baseline justify-between gap-3">
-          <p class="eyebrow">Commitments tracker</p>
-          <p class="meta mono">{fmtStamp(GENERATED_AT)}</p>
-        </div>
-        <p class="mt-3 font-display text-[22px] font-semibold leading-snug">{t.total} measurable commitments, judged on official figures.</p>
-        <div class="mt-4 flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={segs.map((s) => `${s.n} ${s.label}`).join(', ')}>
-          {segs.map((s) => <span style={`flex:${s.n};background:${s.color}`} />)}
-        </div>
-        <ul class="mt-4 grid gap-0 md:grid-cols-2 md:gap-x-10">
-          {[...GOV_TARGETS.map((m) => ({ href: url(`measures/${m.id}/`), title: m.title, verdict: m.verdict!.verdict })), ...DELIVERIES.map((d) => ({ href: url(`targets/#${d.id}`), title: d.title, verdict: d.verdict }))]
-            .sort((a, b) => ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[a.verdict]) - ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[b.verdict])).slice(0, 8).map((x) => (
-            <li class="rule-t">
-              <a href={x.href} class="flex items-center justify-between gap-3 py-2 text-[14.5px] font-semibold text-ink no-underline hover:text-brand"><span>{x.title}</span><VerdictPill verdict={x.verdict} /></a>
-            </li>
-          ))}
-        </ul>
-        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <a href={url('targets/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">See all {t.total} commitments <Icon name="arrow" size={15} /></a>
-          <p class="meta">Only commitments the government itself made are counted. <a href={url('methodology/')}>How verdicts work</a></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="border-b border-rule bg-panel">
-    <div class="wrap grid gap-x-8 gap-y-5 py-7 sm:grid-cols-2 lg:grid-cols-4">
-      {[
-        { icon: 'ext', h: 'Every figure is sourced', p: 'Each number links to the official release it came from.' },
-        { icon: 'shield', h: 'Tested every day', p: `${CHECKS.checks_total} automated checks on the latest data run: sources reached, figures in range, totals adding up.` },
-        { icon: 'scale', h: 'Verdicts only on real promises', p: 'No pass or fail on things the government never committed to.' },
-        { icon: 'quote', h: 'Mistakes are published', p: 'Corrections are logged in public, with dates.' },
-      ].map((x) => (
-        <div class="flex gap-3">
-          <span class="mt-0.5 text-brand"><Icon name={x.icon} size={20} /></span>
-          <p class="text-[14.5px] leading-snug"><span class="block font-bold">{x.h}</span><span class="text-ink-2">{x.p}</span></p>
-        </div>
-      ))}
     </div>
   </section>
 
@@ -129,39 +99,30 @@ const jsonld = [
           <a class="btn btn-primary" href={url('calculator/')}>Work out your own number <Icon name="arrow" /></a>
           <a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url('calculator/#typical')}>See the working <Icon name="arrow" size={15} /></a>
         </div>
+        <div class="mt-6 border-t border-rule pt-5">
+          <p class="text-[15px] font-semibold">Email me when this number changes</p>
+          <div class="mt-3"><ReportForm kind="signup">
+            <input type="hidden" name="topics" value="household" />
+            <label class="sr-only" for="hh-email">Email address</label>
+            <input id="hh-email" class="input" type="email" name="email" required placeholder="you@example.com" autocomplete="email" />
+          </ReportForm></div>
+          <p class="meta mt-2">1 short email when the household figure moves. No opinion, no spin, unsubscribe any time.</p>
+        </div>
       </div>
     </div>
   </section>
   )}
 
-  <section class="wrap pt-16" id="record">
-    <p class="eyebrow">The record · since May 2022</p>
-    <h2 class="h2 mt-2">What changed during the government’s term</h2>
-    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. This is a count of what moved, not of what the government caused: each measure says how much control Canberra has, and where the starting point was unusual.</p>
-    <div class="mt-7 grid gap-5 md:grid-cols-2">
-      {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
-        <div class="card overflow-hidden">
-          <div class:list={['flex items-center justify-between gap-3 px-5 py-3', g.bg]}><h3 class:list={['h3', g.tx]}>{g.h}</h3><span class:list={['num font-display text-[26px] font-semibold', g.tx]}>{g.list.length}</span></div>
-          <ul>{g.list.map((m) => (
-            <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
-              <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
-              <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}
-            {g.list.length === 0 && <li class="rule-t px-5 py-4 text-ink-2">None on the latest figures.</li>}</ul>
-        </div>))}
+  {latest.length > 0 && (
+  <section class="border-b border-rule bg-panel">
+    <div class="wrap py-6">
+      <div class="flex flex-wrap items-baseline justify-between gap-3"><p class="eyebrow">Latest figures</p><a href={url('latest/')} class="text-[14px] font-bold no-underline hover:underline">All, newest first <Icon name="arrow" size={14} /></a></div>
+      <ul class="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">{latest.map(({ m, date }) => (
+        <li><a href={url(`measures/${m.id}/`)} class="flex items-baseline justify-between gap-3 text-[14.5px] text-ink no-underline hover:text-brand"><span><span class="font-semibold">{m.title}</span> <span class="num font-bold">{headlineText(m.headline)}</span></span><span class="meta mono whitespace-nowrap">{fmtDate(date)}</span></a></li>))}</ul>
     </div>
-    {rec.steady.length > 0 && (
-      <div class="card mt-5 overflow-hidden">
-        <div class="flex items-center justify-between gap-3 bg-panel px-5 py-3"><h3 class="h3">Little changed</h3><span class="num font-display text-[26px] font-semibold">{rec.steady.length}</span></div>
-        <ul class="grid md:grid-cols-2">{rec.steady.map((m) => (
-          <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
-            <span class="font-semibold">{m.title}</span><span class="num font-bold text-ink-2">{m.sinceElection!.label}</span>
-            <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul>
-      </div>
-    )}
-    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
   </section>
-
-  <section class="wrap pt-20" id="figures">
+  )}
+  <section class="wrap pt-14 pb-16" id="figures">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div>
         <p class="eyebrow">Key figures</p>
@@ -176,11 +137,85 @@ const jsonld = [
     <p class="mt-5 text-[15px]"><a href={url('charts/')} class="font-bold">See every chart on one page</a>, with 10 and 20 year views and G20 comparisons where they exist.</p>
   </section>
 
+  <section class="border-y border-rule">
+    <div class="wrap py-10 md:py-12">
+      <div class="card card-pad shadow-card">
+        <div class="flex items-baseline justify-between gap-3">
+          <p class="eyebrow">Commitments tracker</p>
+          <p class="meta mono">{fmtStamp(GENERATED_AT)}</p>
+        </div>
+        <p class="mt-3 font-display text-[22px] font-semibold leading-snug">{t.total} measurable commitments, judged on official figures.</p>
+        <div class="mt-4 flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={segs.map((s) => `${s.n} ${s.label}`).join(', ')}>
+          {segs.map((s) => <span style={`flex:${s.n};background:${s.color}`} />)}
+        </div>
+        <ul class="mt-4 grid gap-0 md:grid-cols-2 md:gap-x-10">
+          {preview.map((x) => (
+            <li class="rule-t">
+              <a href={x.href} class="flex items-center justify-between gap-3 py-2 text-[14.5px] font-semibold text-ink no-underline hover:text-brand"><span>{x.title}</span><VerdictPill verdict={x.verdict} /></a>
+            </li>
+          ))}
+        </ul>
+        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <a href={url('targets/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">See all {t.total} commitments <Icon name="arrow" size={15} /></a>
+          <p class="meta"><b class="text-ink">{delivered} of {DELIVERIES.length}</b> things promised delivered (a law passed, a scheme opened); <b class="text-ink">{outcomesGood} of {GOV_TARGETS.length}</b> measured targets met or on track. Only commitments the government itself made are counted. <a href={url('methodology/')}>How verdicts work</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-b border-rule bg-panel">
+    <div class="wrap grid gap-x-8 gap-y-5 py-7 sm:grid-cols-2 lg:grid-cols-4">
+      {[
+        { icon: 'ext', h: 'Every figure is sourced', p: 'Each number links to the official release it came from.' },
+        { icon: 'shield', h: 'Tested every day', p: `${CHECKS.checks_total} automated checks on the latest data run: sources reached, figures in range, totals adding up.` },
+        { icon: 'scale', h: 'Verdicts only on real promises', p: 'No pass or fail on things the government never committed to.' },
+        { icon: 'quote', h: 'Mistakes are published', p: 'Corrections are logged in public, with dates.' },
+      ].map((x) => (
+        <div class="flex gap-3">
+          <span class="mt-0.5 text-brand"><Icon name={x.icon} size={20} /></span>
+          <p class="text-[14.5px] leading-snug"><span class="block font-bold">{x.h}</span><span class="text-ink-2">{x.p}</span></p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap pt-16" id="record">
+    <p class="eyebrow">The record · since May 2022</p>
+    <h2 class="h2 mt-2">What changed during the government’s term</h2>
+    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. This is a count of what moved, not of what the government caused: each measure says how much control Canberra has, and where the starting point was unusual.</p>
+    <div class="mt-7 grid gap-5 md:grid-cols-2">
+      {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
+        <div class="card overflow-hidden">
+          <div class:list={['flex items-center justify-between gap-3 px-5 py-3', g.bg]}><h3 class:list={['h3', g.tx]}>{g.h}</h3><span class:list={['num font-display text-[26px] font-semibold', g.tx]}>{g.list.length}</span></div>
+          <ul>{g.list.slice(0, 4).map((m) => (
+            <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
+              <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
+              <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}
+            {g.list.length === 0 && <li class="rule-t px-5 py-4 text-ink-2">None on the latest figures.</li>}</ul>
+          {g.list.length > 4 && <details class="group"><summary class="flex cursor-pointer list-none items-center gap-2 border-t border-rule px-5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden"><span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> All {g.list.length}</summary>
+            <ul>{g.list.slice(4).map((m) => (
+              <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
+                <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
+                <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul></details>}
+        </div>))}
+    </div>
+    {rec.steady.length > 0 && (
+      <div class="card mt-5 overflow-hidden">
+        <div class="flex items-center justify-between gap-3 bg-panel px-5 py-3"><h3 class="h3">Little changed</h3><span class="num font-display text-[26px] font-semibold">{rec.steady.length}</span></div>
+        <ul class="grid md:grid-cols-2">{rec.steady.map((m) => (
+          <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
+            <span class="font-semibold">{m.title}</span><span class="num font-bold text-ink-2">{m.sinceElection!.label}</span>
+            <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul>
+      </div>
+    )}
+    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
+  </section>
+
   <section class="wrap pt-20">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {[
         { href: 'budget/build/', eyebrow: 'Interactive', h: 'Build your own Federal Budget', p: 'Start from the real Budget. Change any tax or spending line and watch the deficit, debt and interest bill respond.' },
-        { href: 'learn/', eyebrow: 'Plain English', h: 'Learn how it works', p: 'Deficit or debt? Who sets interest rates? Short, interactive explainers with no jargon.' },
+        { href: 'classrooms/', eyebrow: 'Learn and teach', h: 'Explainers and classroom tools', p: 'Deficit or debt? Who sets interest rates? Short explainers with no jargon, plus a page for teachers and students.' },
         { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'Every measure in one interactive 3D model, showing how they all fit together in the bigger picture.' },
         { href: 'make-your-own-chart/', eyebrow: 'Free to reuse', h: 'Make your own chart', p: 'Download any series as a spreadsheet, redraw it your way for a newsletter, report or classroom, and credit the source in 1 line.' },
       ].map((c, i) => (
@@ -239,7 +274,7 @@ const jsonld = [
   }
 
   /* Household type switch: plain radio buttons, so it works without JavaScript. */
-  .wallet-toggle { display: inline-flex; gap: 4px; padding: 4px; border: 0; margin: 0; border-radius: 999px; background: var(--panel); }
+  .wallet-toggle { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 0; margin: 0; max-width: 100%; border-radius: 24px; background: var(--panel); }
   .wallet-toggle label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; white-space: nowrap; border-radius: 999px; font-weight: 700; font-size: 15px; color: var(--ink-2); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
   @media (max-width: 420px) { .wallet-toggle label { padding: 0 10px; font-size: 13.5px; } }
   .wallet-toggle input:checked + label { background: var(--brand); color: var(--on-brand); }

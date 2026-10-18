@@ -119,6 +119,10 @@ export const MEASURES: Measure[] = data.metrics
       if (last) m = { ...m, headline: { value: last[1], unit: e.unit, decimals: e.decimals, caption: `${m.title.toLowerCase()} as a share of GDP (latest actual)`, period: fmtPeriod(last[0], 'fy') }, chart: { ...m.chart, estimateFrom: m.chart.estimateFrom } };
     }
     const usesActual = ed.useExtra != null;
+    if (ed.headlineFromSeries) {
+      const rs = ratedSeries(m); const a = rs ? actuals(m, rs.points) : []; const last = a[a.length - 1];
+      if (rs && last) m = { ...m, headline: { ...m.headline, value: last[1], unit: rs.unit, decimals: rs.decimals, period: fmtPeriod(last[0], inferFreq(a, m.chart.freq)), caption: `${m.headline.caption} (annual rate; the verdict is judged on this)` } };
+    }
     if (ed.title) m = { ...m, title: ed.title };
     if (ed.headlineDecimals != null) m = { ...m, headline: { ...m.headline, decimals: ed.headlineDecimals } };
     return {

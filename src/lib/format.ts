@@ -46,7 +46,12 @@ export function compact(v: number, sign = false): string {
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-export function parseDate(s: string): Date { const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(Date.UTC(y, (m || 1) - 1, d || 1)); }
+export function parseDate(s: string): Date {
+  // Publishers vary: "2026-07-30", "30-Jul-2026", "30 July 2026". Read all 3 rather than guess the year from a day number.
+  const dmy = s.match(/^(\d{1,2})[-\s]([A-Za-z]{3})[a-z]*[-\s](\d{4})/);
+  if (dmy) return new Date(Date.UTC(+dmy[3], MONTHS.findIndex((m) => m.toLowerCase() === dmy[2].toLowerCase().slice(0, 3)), +dmy[1]));
+  const [y, m, d] = s.slice(0, 10).split('-').map(Number); return new Date(Date.UTC(y, (m || 1) - 1, d || 1));
+}
 export function fmtDate(s: string): string { const d = parseDate(s); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
 export function fmtMonth(s: string): string { const d = parseDate(s); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; }
 /** Label a data point by its frequency: "Jun qtr 2026", "2025-26", "Jul 2026". */

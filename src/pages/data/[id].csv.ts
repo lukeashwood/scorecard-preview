@@ -10,7 +10,7 @@ export const GET: APIRoute = ({ params }) => {
   let rows: string[];
   if (m.chart.bars) rows = ['category,value,unit', ...m.chart.bars.map((b) => `${q(b.name)},${b.value},${q(m.chart.unit)}`)];
   else {
-    const series = m.chart.series ?? []; const maps = series.map((s) => new Map(s.points));
+    const series = [...(m.chart.series ?? []), ...(m.chart.extra ?? []).map((e) => ({ name: `${e.name} (${e.unit})`, points: e.points }))]; const maps = series.map((s) => new Map(s.points));
     const dates = [...new Set(series.flatMap((s) => s.points.map((p) => p[0])))].sort();
     rows = ['date,' + series.map((s) => q(s.name)).join(',') + ',forecast', ...dates.map((d) => d + ',' + maps.map((mm) => mm.get(d) ?? '').join(',') + ',' + (m.chart.estimateFrom && d >= m.chart.estimateFrom ? 'yes' : 'no'))];
   }

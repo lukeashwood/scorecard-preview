@@ -50,6 +50,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <meta name="twitter:image" content={ogImg} />
   {preview && <meta name="robots" content="noindex, nofollow" />}
   <link rel="sitemap" href={url('sitemap-index.xml')} />
+  <link rel="alternate" type="application/rss+xml" title={`${SITE.name}: latest figures`} href={url('feed.xml')} />
   {ldList.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
 </head>
 <body class={bodyClass}>

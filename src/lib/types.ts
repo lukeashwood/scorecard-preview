@@ -105,6 +105,8 @@ export interface Editorial {
   noPastYear?: boolean;
   /** A shorter display title than the one in the data feed. */
   title?: string;
+  /** Lead with the latest point of the series the verdict is judged on, so the headline and the verdict are the same number. */
+  headlineFromSeries?: boolean;
   /** Decimal places for the headline figure, when the data feed's are more precise than readers need. */
   headlineDecimals?: number;
 }
