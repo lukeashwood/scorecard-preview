@@ -22,3 +22,17 @@ describe('controversy questions', () => {
     expect(stale, `Questions for entries that no longer exist: ${stale.join(', ')}`).toEqual([]);
   });
 });
+
+/* Internal links between controversy pages and measure pages: every id in the map must exist on both sides, so a
+   renamed or retired measure cannot leave a dead link. */
+describe('controversy to measure links', () => {
+  test('every mapped id exists', async () => {
+    const { CONTROVERSY_MEASURES } = await import('../src/lib/controversy-measures');
+    const { MEASURES } = await import('../src/lib/measures');
+    const cids = new Set(CONTROVERSIES.map((c) => c.id)), mids = new Set(MEASURES.map((m) => m.id));
+    const badC = Object.keys(CONTROVERSY_MEASURES).filter((k) => !cids.has(k));
+    const badM = Object.values(CONTROVERSY_MEASURES).flat().filter((k) => !mids.has(k));
+    expect(badC, `Unknown controversy ids: ${badC.join(', ')}`).toEqual([]);
+    expect(badM, `Unknown measure ids: ${badM.join(', ')}`).toEqual([]);
+  });
+});

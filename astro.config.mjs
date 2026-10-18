@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,6 +34,28 @@ const plainDashes = {
 const site = process.env.SITE_URL || 'https://govscore.com.au';
 const base = process.env.SITE_BASE || '/';
 
+/* Sitemap lastmod. Search engines stop trusting lastmod when every page claims to change on every build, so it is set
+   only where it is true: pages built from the daily figures carry the figures' timestamp, each controversy page carries
+   the date its entry was last checked, and pages whose text rarely changes carry none. */
+const here = fileURLToPath(new URL('.', import.meta.url));
+const readJson = (p) => JSON.parse(readFileSync(join(here, p), 'utf8'));
+const figuresAt = new Date(readJson('src/data/metrics.json').summary.generated_at).toISOString();
+const checkedOn = {};
+for (const x of readJson('src/data/controversies.json').items) checkedOn[x.id] = x.verified_on;
+for (const x of readJson('src/data/disputes.json').items ?? []) checkedOn[x.id] = x.verified_on;
+for (const f of readdirSync(join(here, 'src/lib')).filter((f) => /^disputes-.*\.ts$/.test(f))) {
+  const s = readFileSync(join(here, 'src/lib', f), 'utf8');
+  const id = s.match(/\bid: '([^']+)'/)?.[1], on = s.match(/verified_on: '(\d{4}-\d{2}-\d{2})'/)?.[1];
+  if (id && on) checkedOn[id] = on;
+}
+const STATIC_PAGES = /^\/(about|classrooms|find|for|learn(\/[^/]+)?|make-your-own-chart|methodology|my)\/$/;
+function lastmodFor(pathname) {
+  const c = pathname.match(/^\/controversies\/([^/]+)\/$/);
+  if (c) return checkedOn[c[1]] ? new Date(`${checkedOn[c[1]]}T00:00:00Z`).toISOString() : figuresAt;
+  if (STATIC_PAGES.test(pathname)) return undefined;
+  return figuresAt;
+}
+
 export default defineConfig({
   site,
   base,
@@ -40,8 +63,9 @@ export default defineConfig({
   integrations: [react(), sitemap({
     filter: (page) => !/\/(subscribe|corrections)\/$/.test(page),
     serialize(item) {
-      item.lastmod = new Date().toISOString();
       const p = new URL(item.url).pathname;
+      const lastmod = lastmodFor(base !== '/' && p.startsWith(base) ? p.slice(base.replace(/\/$/, '').length) : p);
+      if (lastmod) item.lastmod = lastmod; else delete item.lastmod;
       item.changefreq = p === '/' || p.startsWith('/measures/') ? 'daily' : 'weekly';
       item.priority = p === '/' ? 1.0 : /^\/(calculator|budget\/build|targets|in-60-seconds)\/$/.test(p) ? 0.9 : p.startsWith('/measures/') ? 0.8 : 0.6;
       return item;
