@@ -15,6 +15,22 @@ const fullTitle = fullTitleProp ?? (title ? (title.length > 49 ? title : `${titl
 const description = clip(descRaw, 160);
 const ldList = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+/* Breadcrumbs for search engines on every page below the home page, unless the page supplies its own.
+   Names come from the navigation labels where the path is a nav item, otherwise the page title. */
+const basePath = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const crumbPath = Astro.url.pathname.startsWith(basePath) ? Astro.url.pathname.slice(basePath.length).replace(/\/+$/, '') : '';
+if (crumbPath && crumbPath !== '404' && !ldList.some((ld) => ld['@type'] === 'BreadcrumbList')) {
+  const labels: Record<string, string> = Object.fromEntries([...NAV, ...FOOTER_NAV].map((n) => [n.href.replace(/\/$/, ''), n.label]));
+  const segs = crumbPath.split('/');
+  const items = [{ '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href }];
+  segs.forEach((seg, i) => {
+    const p = segs.slice(0, i + 1).join('/');
+    const last = i === segs.length - 1;
+    const name = labels[p] ?? (last && title ? title : seg.replace(/[-_]/g, ' ').replace(/^\w/, (c) => c.toUpperCase()));
+    items.push({ '@type': 'ListItem', position: i + 2, name, item: new URL(url(`${p}/`), Astro.site).href });
+  });
+  ldList.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items });
+}
 const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 ---
 <!doctype html>
@@ -63,10 +79,10 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <header class="site sticky top-0 z-40 border-b border-rule bg-paper/90 backdrop-blur">
     <div class="aurora-line" aria-hidden="true"></div>
     <div class="wrap flex h-16 items-center gap-4">
-      <a href={url()} class="flex items-center gap-2.5 text-ink no-underline" aria-label={`${SITE.name} home`}>
+      <a href={url()} class="flex items-center gap-2.5 text-ink no-underline" aria-label={`${SITE.name} ${SITE.edition} home`}>
         <Logo size={32} />
         <span class="leading-none">
-          <span class="block font-display text-[19px] font-semibold tracking-tight">{SITE.name}</span>
+          <span class="block font-display text-[19px] font-semibold tracking-tight">{SITE.name}</span>{' '}
           <span class="mono block pt-0.5 text-[10.5px] uppercase tracking-[0.12em] text-ink-3">{SITE.edition}</span>
         </span>
       </a>

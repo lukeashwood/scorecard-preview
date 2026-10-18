@@ -44,11 +44,11 @@ const outcomesGood = GOV_TARGETS.filter((m) => m.verdict!.verdict === 'met' || m
 
 const home = new URL(url(), Astro.site).href;
 const jsonld = [
-  { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, alternateName: 'Gov Score Australia', description: SITE.description, url: home, inLanguage: 'en-AU' },
-  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, url: home, logo: new URL(url('favicon.svg'), Astro.site).href, description: 'An independent site that tracks the Australian Government against official figures.' },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, alternateName: 'Gov Score Australia', description: SITE.description, url: home, inLanguage: 'en-AU', publisher: { '@type': 'Organization', name: SITE.name, url: home }, potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${new URL(url('find/'), Astro.site).href}?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, url: home, logo: { '@type': 'ImageObject', url: new URL(url('icon-512.png'), Astro.site).href, width: 512, height: 512 }, description: 'An independent site that tracks the Australian Government against official figures.' },
 ];
 ---
-<Base fullTitle="Gov Score: Albanese Government report card in official figures" description="Is Australia better off since May 2022? Promises kept and broken, cost of living, inflation, debt and more, from official figures checked daily. Free and independent." jsonld={jsonld}>
+<Base fullTitle="Gov Score: Albanese Government report card, official figures" description="Is Australia better off since May 2022? Promises kept and broken, cost of living, inflation, debt and more, from official figures checked daily. Free and independent." jsonld={jsonld}>
   <section class="hero" aria-labelledby="hero-h">
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="wrap hero-grid">

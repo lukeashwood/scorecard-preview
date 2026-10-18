@@ -1,12 +1,18 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { TaxReceipt, DeficitDebt, InflationPay, MortgageRates, PayOffSooner } from '../../islands/Explainers.tsx';
-import { url } from '../../config/site';
+import { SITE, url } from '../../config/site';
 import { LESSONS, type Lesson } from '../../lib/learn';
-import { BUDGET } from '../../lib/measures';
+import { BUDGET, GENERATED_AT } from '../../lib/measures';
 export function getStaticPaths() { return LESSONS.map((l) => ({ params: { slug: l.slug }, props: { l } })); }
 const { l } = Astro.props as { l: Lesson };
 const Y = BUDGET.years[0];
+const pageUrl = new URL(url(`learn/${l.slug}/`), Astro.site).href;
+const jsonld = {
+  '@context': 'https://schema.org', '@type': ['Article', 'LearningResource'], headline: l.title, description: l.question, url: pageUrl, mainEntityOfPage: pageUrl,
+  inLanguage: 'en-AU', isAccessibleForFree: true, timeRequired: `PT${l.minutes}M`, learningResourceType: 'interactive explainer', educationalLevel: 'beginner',
+  dateModified: GENERATED_AT, author: { '@type': 'Organization', name: SITE.name }, publisher: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href },
+};
 const TOOLS = [
   { href: 'budget/build/', label: 'Build your own Federal Budget' },
   { href: 'calculator/', label: 'Are you better off than in 2022?' },
@@ -14,7 +20,7 @@ const TOOLS = [
   { href: 'briefing/', label: 'Every measure in 3D' },
 ];
 ---
-<Base title={/\?$/.test(l.title) ? `${l.title} Explained simply` : `${l.title}, explained simply`} description={`${l.question} A short interactive explainer in plain English, using official Australian figures.`} section="learn/">
+<Base title={/\?$/.test(l.title) ? `${l.title} Explained simply` : `${l.title}, explained simply`} description={`${l.question} A short interactive explainer in plain English, using official Australian figures.`} section="learn/" jsonld={jsonld}>
   <article class="wrap pt-10 md:pt-14">
     <p class="eyebrow"><a href={url('learn/')} class="text-ink-3 no-underline hover:underline">← Learn</a> · {l.minutes} minute read</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{l.title}</h1>
