@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { SITE, url } from '../../config/site';
 import { MEASURES, GENERATED_AT } from '../../lib/measures';
+import { CHECKS } from '../../lib/measures';
 import { fmtStamp, fmtPeriod } from '../../lib/format';
 ---
 <Base title="Australian economic data: free CSV and JSON downloads" description="Download every official Australian series on the site as CSV, or everything at once as JSON: inflation, wages, debt, migration and more. Free to reuse with credit.">
@@ -14,7 +15,14 @@ import { fmtStamp, fmtPeriod } from '../../lib/format';
       <a class="btn btn-primary" href={url('data/measures.json')} download><Icon name="download" />Everything (JSON)</a>
       <a class="btn btn-ghost" href={url('methodology/')}>Read the methodology</a>
     </div>
-    <div class="card mt-10 overflow-hidden">
+    <div class="card card-pad mt-8">
+      <p class="eyebrow">Automated checks, latest run</p>
+      <dl class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {([['Checks run', CHECKS.checks_total], ['Passed', CHECKS.checks_passed], ['Warning', CHECKS.checks_warn], ['Failed', CHECKS.checks_failed]] as const).map(([l, n]) => <div><dt class="meta">{l}</dt><dd class="num font-display text-[26px] font-semibold leading-tight">{n}</dd></div>)}
+      </dl>
+      <p class="meta mt-3">Run {fmtStamp(GENERATED_AT)}. A failed check keeps the last verified figure on the page and marks it under review. The check-by-check log is not yet published.</p>
+    </div>
+    <div class="card mt-6 overflow-hidden">
       <div class="table-scroll"><table class="dt">
         <thead><tr><th>Measure</th><th>Topic</th><th>Latest data</th><th>Collected</th><th class="r">Download</th></tr></thead>
         <tbody>{MEASURES.map((m) => <tr><td><a class="font-semibold" href={url(`measures/${m.id}/`)}>{m.title}</a></td><td class="text-ink-2">{m.sectionTitle}</td><td class="num whitespace-nowrap">{m.lastDataDate ? fmtPeriod(m.lastDataDate, m.chart.freq) : m.headline.period ?? '-'}</td><td class="text-ink-2">{m.automated ? 'Automatic feed' : 'By hand from source'}</td><td class="r"><a href={url(`data/${m.id}.csv`)} download class="whitespace-nowrap font-semibold">CSV</a></td></tr>)}</tbody>

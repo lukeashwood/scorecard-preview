@@ -118,7 +118,7 @@ const jsonld = [
               <span class="font-display text-[clamp(22px,2.8vw,32px)] leading-tight">a week<br />{d >= 0 ? 'better off' : 'worse off'}</span>
             </p>
             <p class="lede mt-4">than in June 2022. That adds up to <b class="text-ink">{$(Math.abs(d))} a year</b>.</p>
-            <p class="meta mt-3 max-w-[60ch]">{who} After tax and inflation, against June 2022. Official figures throughout; it measures what changed, not who caused it.</p>
+            <p class="meta mt-3 max-w-[60ch]">{who} After tax and inflation, against June 2022. Official figures throughout; it measures what changed, not who caused it. The weekly figure is the yearly one divided by 52, each rounded separately.</p>
           </div>
         ))}
       </div>
@@ -136,8 +136,8 @@ const jsonld = [
 
   <section class="wrap pt-16" id="record">
     <p class="eyebrow">The record · since May 2022</p>
-    <h2 class="h2 mt-2">What has changed since the government took office</h2>
-    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. Not all of it is the government’s doing: each measure says how much control Canberra has, and where the starting point was unusual.</p>
+    <h2 class="h2 mt-2">What changed during the government’s term</h2>
+    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. This is a count of what moved, not of what the government caused: each measure says how much control Canberra has, and where the starting point was unusual.</p>
     <div class="mt-7 grid gap-5 md:grid-cols-2">
       {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
         <div class="card overflow-hidden">
