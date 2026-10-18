@@ -1,0 +1,56 @@
+---
+/* The Housing Accord as 120 houses, each standing for 10,000 homes. Filled houses are homes completed since the
+   Accord began; outlined orange ones are the gap to an even pace; grey outlines are the homes still to come.
+   Someone who never reads charts can see "off track" at a glance, and the numbers underneath say it in words. */
+import { accordProgress, ACCORD } from '../lib/accord';
+import { fmtPeriod, num } from '../lib/format';
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+const a = accordProgress();
+const PER = 10_000, N = ACCORD.target / PER;
+const builtN = a ? Math.round(a.built / PER) : 0;
+const paceN = a ? Math.round(a.dueByNow / PER) : 0;
+const cells = Array.from({ length: N }, (_, i) => (i < builtN ? 'built' : i < paceN ? 'gap' : 'todo'));
+const HOUSE = 'M5 15 L16 5 L27 15 V27 H5 Z';
+---
+{a && (
+  <figure class="houses" data-compact={compact ? '' : undefined}>
+    <div class="houses-grid" role="img" aria-label={`${num(a.built)} homes completed since the Accord began, against ${num(a.dueByNow)} needed by now at an even pace towards 1.2 million. Each house is 10,000 homes.`}>
+      {cells.map((c) => <svg viewBox="0 0 32 32" class={`house house-${c}`} aria-hidden="true"><path d={HOUSE} /></svg>)}
+    </div>
+    <ul class="houses-key" aria-hidden="true">
+      <li><svg viewBox="0 0 32 32" class="house house-built"><path d={HOUSE} /></svg>Built so far: <b class="num">{num(a.built)}</b></li>
+      <li><svg viewBox="0 0 32 32" class="house house-gap"><path d={HOUSE} /></svg>Behind an even pace: <b class="num">{num(a.shortfall)}</b></li>
+      <li><svg viewBox="0 0 32 32" class="house house-todo"><path d={HOUSE} /></svg>Still to come</li>
+    </ul>
+    {!compact && (
+      <dl class="houses-stats">
+        <div><dt>Each house</dt><dd>10,000 homes</dd></div>
+        <div><dt>Needed by now at an even pace</dt><dd>{num(a.dueByNow)}</dd></div>
+        <div><dt>Pace needed from here</dt><dd>{num(Math.floor(a.paceNeeded))} <span>a quarter</span></dd></div>
+      </dl>
+    )}
+    <figcaption class="meta mt-3">Completions from {fmtPeriod(a.first[0], 'q')} to {fmtPeriod(a.latest[0], 'q')}, {a.elapsed} of {ACCORD.quarters} quarters. An even pace is {num(a.perQuarter)} a quarter. Source: ABS Building Activity.</figcaption>
+  </figure>
+)}
+
+<style>
+  .houses-grid { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); gap: 5px; }
+  @media (max-width: 480px) { .houses-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; } }
+  .house { width: 100%; height: auto; display: block; }
+  .house path { stroke-width: 2; stroke-linejoin: round; }
+  .house-built path { fill: var(--brand); stroke: var(--brand); }
+  .house-gap path { fill: var(--warn-tint); stroke: var(--warn); }
+  .house-todo path { fill: var(--surface); stroke: var(--rule-strong); }
+  .houses-key { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 18px 0 0; padding: 0; list-style: none; font-size: 14.5px; color: var(--ink-2); }
+  .houses-key li { display: inline-flex; align-items: center; gap: 8px; }
+  .houses-key .house { width: 20px; flex: none; }
+  .houses-key b { color: var(--ink); }
+  .houses-stats { display: grid; gap: 12px; margin-top: 18px; }
+  @media (min-width: 640px) { .houses-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .houses-stats div { background: var(--panel); border-radius: 12px; padding: 14px 16px; }
+  .houses-stats dt { font-size: 13px; color: var(--ink-3); }
+  .houses-stats dd { margin: 4px 0 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .houses-stats dd span { font-family: var(--font-sans); font-size: 14px; font-weight: 400; color: var(--ink-2); }
+  [data-compact] .houses-grid { gap: 3px; }
+</style>

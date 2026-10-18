@@ -1,6 +1,7 @@
 ---
 import VerdictPill from './VerdictPill.astro';
 import Evidence from './Evidence.astro';
+import HousesGrid from './HousesGrid.astro';
 import { url } from '../config/site';
 import { headlineText, fmtMonth } from '../lib/format';
 import type { Measure } from '../lib/types';
@@ -21,5 +22,6 @@ const t = m.ed.target!;
       <p class="text-right"><span class="num font-display text-[26px] font-semibold leading-none">{headlineText(m.headline)}</span><span class="meta block max-w-[24ch]">{m.headline.caption}</span></p>
     </div>
   </div>
+  {m.id === 'housing_accord' && <div class="mt-5 border-t border-rule pt-5"><p class="eyebrow mb-3">1.2 million homes, as houses</p><HousesGrid compact /></div>}
   <Evidence m={m} />
 </article>

@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Chart from '../../islands/Chart.tsx';
+import HousesGrid from '../../components/HousesGrid.astro';
 import VerdictPill from '../../components/VerdictPill.astro';
 import DirectionBadge from '../../components/DirectionBadge.astro';
 import InfluenceChip from '../../components/InfluenceChip.astro';
@@ -84,6 +85,12 @@ const jsonld = {
       </div>
     </dl>
 
+    {m.id === 'housing_accord' && (
+      <section class="card card-pad mt-6" aria-label="Progress towards 1.2 million homes">
+        <h2 class="h3 mb-4">Where the 1.2 million homes are up to</h2>
+        <HousesGrid />
+      </section>
+    )}
     <section class="card card-pad mt-6" aria-label="Chart">
       <div class="mb-1 flex flex-wrap items-center justify-between gap-2">
         <h2 class="h3">{m.ed.chartTitle ?? ((m.chart.series?.length ?? 0) > 1 ? m.title : rs?.name ?? m.title)}</h2>
