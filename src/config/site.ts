@@ -2,7 +2,7 @@
 export const SITE = {
   name: 'Gov Score',
   edition: 'Australia',
-  tagline: 'We provide the facts. You decide the opinion.',
+  tagline: 'Holding the government to account, in its own numbers.',
   description:
     'The Australian Government of the day in official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, dated and tested daily, in plain English.',
   locale: 'en-AU',
