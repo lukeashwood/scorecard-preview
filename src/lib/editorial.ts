@@ -2,12 +2,9 @@
    measurable commitment, so it gets a verdict), what is a CONDITION (a fact about the country, shown with its direction and
    no verdict), and how much the federal government actually controls each one. The methodology page is generated from it,
    so what readers are told is exactly what the code does. Change a rule here => bump SITE.rulesVersion and log it. */
-import type { Editorial, RawMetric, Verdict } from './types';
+import type { Editorial, Verdict } from './types';
 
 const v = (verdict: Verdict, reason: string) => ({ verdict, reason });
-const fromPipeline = (m: RawMetric, reasons: Record<string, string>) =>
-  m.status === 'pass' ? v('on_track', reasons.pass) : m.status === 'warn' ? v('at_risk', reasons.warn) : v('off_track', reasons.fail);
-
 const BP1 = 'https://budget.gov.au/content/bp1/download/bp1_2026-27.pdf';
 
 export const EDITORIAL: Record<string, Editorial> = {
@@ -19,8 +16,14 @@ export const EDITORIAL: Record<string, Editorial> = {
       owner: 'government', ownerLabel: 'Election promise (2021)',
       commitment: 'Cut household power bills by $275 a year by 2025.', deadline: '2025-12-31',
       sourceLabel: 'RMIT ABC Fact Check: promise check on the $275 cut', sourceUrl: 'https://www.abc.net.au/news/2023-05-19/promise-check-cut-power-bills-by-275-dollars/101791146',
-      rule: 'Not met if the regulated default power price in the benchmark regions is not $275 a year lower than when the promise was made, now that the 2025 deadline has passed.',
-      rate: (m) => (m.headline.value <= -275 ? v('met', 'Default prices are at least $275 lower.') : v('not_met', 'The 2025 deadline has passed and default prices are higher, not $275 lower.')),
+      rule: 'The deadline (31 December 2025) has passed, so the verdict is final. Met if the regulated default offer for a typical household is at least $275 a year lower than in 2022-23 in every benchmark region (NSW, South-East Queensland, South Australia and Victoria). Not met otherwise.',
+      rate: (m) => {
+        const regions = (m.chart.bars ?? []).filter((b) => !/promise/i.test(b.name));
+        if (!regions.length) return v('in_progress', 'No default-offer figures published yet.');
+        const allMet = regions.every((b) => b.value <= -275);
+        const lo = Math.min(...regions.map((b) => b.value)), hi = Math.max(...regions.map((b) => b.value));
+        return allMet ? v('met', 'Default offers are at least $275 a year lower in every benchmark region.') : v('not_met', `The 2025 deadline has passed. Default offers are ${lo >= 0 ? 'higher' : 'not $275 lower'} in every benchmark region: from ${lo >= 0 ? '+' : ''}$${lo} to +$${hi} a year.`);
+      },
     },
   },
   housing_accord: { noSince: true,
@@ -41,8 +44,12 @@ export const EDITORIAL: Record<string, Editorial> = {
       owner: 'government', ownerLabel: 'Climate Change Act 2022',
       commitment: 'Cut greenhouse emissions to 43% below 2005 levels by 2030.', deadline: '2030-12-31',
       sourceLabel: 'Climate Change Act 2022', sourceUrl: 'https://www.legislation.gov.au/C2022A00037/latest/text',
-      rule: 'Judged on the government’s own latest emissions projections: on track if they show the 2030 target being met, off track if they show it being missed.',
-      rate: (m) => fromPipeline(m, { pass: 'The government’s own projections show the target being met.', warn: 'The government’s own projections show the target only narrowly met.', fail: 'The government’s own latest projections show the 2030 target being missed.' }),
+      rule: 'Judged on the government’s own latest published projection for 2030. On track if the projected cut is at or above 43% below 2005 levels; off track if it is below 43%. No other test is applied before the deadline.',
+      rate: (m) => {
+        const proj = m.chart.bars?.find((b) => /projected/i.test(b.name))?.value; const tgt = m.chart.bars?.find((b) => /target/i.test(b.name))?.value ?? 43;
+        if (proj == null) return v('in_progress', 'No official 2030 projection published yet.');
+        return proj >= tgt ? v('on_track', `The government’s own projection is a ${proj}% cut by 2030, at or above the ${tgt}% target.`) : v('off_track', `The government’s own latest projection is a ${proj}% cut by 2030, short of the ${tgt}% target.`);
+      },
     },
   },
   bulk_billing: {
@@ -52,11 +59,13 @@ export const EDITORIAL: Record<string, Editorial> = {
       owner: 'government', ownerLabel: 'Election commitment (2025)',
       commitment: '9 in 10 GP visits bulk billed by 2030.', deadline: '2030-12-31',
       sourceLabel: 'Prime Minister: delivering bulk billing for all Australians', sourceUrl: 'https://www.pm.gov.au/media/delivering-bulk-billing-all-australians',
-      rule: 'Met at 90% or more. Before the 2030 deadline it is “in progress” while the rate is rising, and “at risk” if it is flat or falling.',
+      rule: 'Met when the annual (financial-year) GP bulk-billing rate reaches 90% or more. Before the 2030 deadline: in progress if the latest annual rate is higher than the year before; at risk if it is the same or lower. The annual rate is used for the verdict because quarterly rates move with the seasons; the latest quarterly rate is shown as the headline.',
       rate: (m) => {
-        if (m.headline.value >= 90) return v('met', 'The bulk-billing rate is at or above 90%.');
-        const p = m.chart.series?.[0]?.points ?? []; const rising = p.length > 1 && p[p.length - 1][1] > p[p.length - 2][1];
-        return rising ? v('in_progress', `At ${m.headline.value}% and rising; the deadline is 2030.`) : v('at_risk', `At ${m.headline.value}% and not rising; the deadline is 2030.`);
+        const p = (m.chart.series?.[0]?.points ?? []); const last = p[p.length - 1], prev = p[p.length - 2];
+        if (!last) return v('in_progress', 'No annual figure published yet.');
+        if (last[1] >= 90) return v('met', `The annual bulk-billing rate is ${last[1]}%, at or above 90%.`);
+        const rising = !!prev && last[1] > prev[1];
+        return rising ? v('in_progress', `The annual rate is ${last[1]}%, up from ${prev![1]}% the year before; the deadline is 2030.`) : v('at_risk', `The annual rate is ${last[1]}%${prev ? `, not above ${prev[1]}% the year before` : ''}; the deadline is 2030.`);
       },
     },
   },
@@ -67,8 +76,15 @@ export const EDITORIAL: Record<string, Editorial> = {
       owner: 'government', ownerLabel: 'National Cabinet (2023)',
       commitment: 'Slow annual growth in NDIS costs to no more than 8% by 1 July 2026.', deadline: '2026-07-01',
       sourceLabel: 'Office of Impact Analysis: NDIS reforms (states the National Cabinet target)', sourceUrl: 'https://oia.pmc.gov.au/sites/default/files/posts/2026/07/Impact%20Analysis%20(01.07.26%20Update)_0.pdf',
-      rule: 'On track if the latest reported annual growth in scheme costs is 8% or less; off track if it is above 8%.',
-      rate: (m) => (m.headline.value <= 8 ? v('on_track', `Latest annual growth is ${m.headline.value}%.`) : v('off_track', `Latest annual growth is ${m.headline.value}%, above the 8% target.`)),
+      rule: 'The test is annual growth in scheme costs for the 12 months to 30 June 2026. Met if that figure is 8% or less; not met if it is above 8%. Until that figure is published, the latest reported 12-month growth stands in: on track at 8% or less, off track above 8%.',
+      rate: (m) => {
+        const period = m.headline.period ?? ''; const mm = period.match(/to (January|February|March|April|May|June|July|August|September|October|November|December) (\d{4})/i);
+        const MON = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+        const final = !!mm && (+mm[2] > 2026 || (+mm[2] === 2026 && MON.indexOf(mm[1].toLowerCase()) >= 5));
+        const ok = m.headline.value <= 8;
+        if (final) return ok ? v('met', `Growth in the ${period} was ${m.headline.value}%, within the 8% target.`) : v('not_met', `Growth in the ${period} was ${m.headline.value}%, above the 8% target at the 1 July 2026 deadline.`);
+        return ok ? v('on_track', `Growth in the ${period} was ${m.headline.value}%, within 8%. The deadline figure (year to June 2026) is not yet published.`) : v('off_track', `Growth in the ${period} was ${m.headline.value}%, above the 8% target. The deadline figure (year to June 2026) is not yet published.`);
+      },
     },
   },
   gross_debt: {
@@ -153,8 +169,8 @@ export const VERDICT_MEANING: Record<Verdict, string> = {
   met: 'The commitment has been delivered.',
   on_track: 'The latest official figures are consistent with the commitment being delivered.',
   in_progress: 'The deadline is still ahead and the figures are moving the right way; it’s too early for a verdict.',
-  at_risk: 'The figures are behind where they need to be, but the commitment could still be delivered.',
-  off_track: 'On the latest official figures, the commitment will not be delivered without a clear change.',
+  at_risk: 'The figures are behind where the published rule says they need to be, by less than the rule’s off-track margin, and the deadline is still ahead.',
+  off_track: 'On the latest official figures, the commitment is behind the threshold set in its published rule.',
   not_met: 'The deadline has passed and the commitment was not delivered.',
 };
 export const INFLUENCE_LABEL = { direct: 'Direct federal control', shared: 'Shared control', indirect: 'Indirect influence' } as const;

@@ -1,25 +1,30 @@
 {
- "corrections": [],
- "rules": [
-  {
-   "date": "2026-10-07",
-   "version": "2.3",
-   "summary": "Institutions supply data, not judgements. Results are set only by the commitment and the official figures; no institution's view of what the figures mean, and no commentary, can change a result. On the Controversies page, a statement by an official or institution is quoted as that person's view and never makes a claim established on its own; a new 'Stated position' label marks what one side says."
-  },
-  {
-   "date": "2026-10-07",
-   "version": "2.2",
-   "summary": "If the government changes, delays or drops a commitment after making it, the original commitment is still the one judged, on its original number and deadline. The new target is shown beside it with the date it changed."
-  },
-  {
-   "date": "2026-09-18",
-   "version": "2.1",
-   "summary": "The change since the government took office (mid-2022) is now the main comparison on every measure, with the change over the past year shown second. Charts shade the government's term. Each comparison carries a note where the mid-2022 starting point was unusual. Dollar figures that can be negative, such as the budget balance, are compared in dollars rather than percentages. Housing completions are left out of since-office comparisons because the series is not seasonally adjusted."
-  },
-  {
-   "date": "2026-09-18",
-   "version": "2.0",
-   "summary": "Verdicts are now given only on measurable commitments the government itself made. All other measures show their direction over the past year with no verdict. Each measure states how much control the federal government has over it. Gross debt is judged as a share of GDP, the way the government's own fiscal strategy states it."
-  }
- ]
+  "corrections": [],
+  "rules": [
+    {
+      "date": "2026-10-18",
+      "version": "2.4",
+      "summary": "Every verdict rule now states a number or a document, not a judgement. Power bills: met only if every benchmark region is $275 lower (was NSW alone). Emissions: judged on the government's published 2030 projection against 43%, read directly from the figures (was the data feed's pass/warn/fail). Bulk billing: judged on the annual rate against the year before (was the latest point in whichever series). NDIS: the deadline test is growth in the year to June 2026; until published, the latest 12-month figure stands in. The general wording for 'off track' no longer says 'without a clear change'."
+    },
+    {
+      "date": "2026-10-07",
+      "version": "2.3",
+      "summary": "Institutions supply data, not judgements. Results are set only by the commitment and the official figures; no institution's view of what the figures mean, and no commentary, can change a result. On the Controversies page, a statement by an official or institution is quoted as that person's view and never makes a claim established on its own; a new 'Stated position' label marks what one side says."
+    },
+    {
+      "date": "2026-10-07",
+      "version": "2.2",
+      "summary": "If the government changes, delays or drops a commitment after making it, the original commitment is still the one judged, on its original number and deadline. The new target is shown beside it with the date it changed."
+    },
+    {
+      "date": "2026-09-18",
+      "version": "2.1",
+      "summary": "The change since the government took office (mid-2022) is now the main comparison on every measure, with the change over the past year shown second. Charts shade the government's term. Each comparison carries a note where the mid-2022 starting point was unusual. Dollar figures that can be negative, such as the budget balance, are compared in dollars rather than percentages. Housing completions are left out of since-office comparisons because the series is not seasonally adjusted."
+    },
+    {
+      "date": "2026-09-18",
+      "version": "2.0",
+      "summary": "Verdicts are now given only on measurable commitments the government itself made. All other measures show their direction over the past year with no verdict. Each measure states how much control the federal government has over it. Gross debt is judged as a share of GDP, the way the government's own fiscal strategy states it."
+    }
+  ]
 }
