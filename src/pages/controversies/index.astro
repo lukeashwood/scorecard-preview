@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.astro';
 import { SITE, url } from '../../config/site';
 import { fmtDate } from '../../lib/format';
 import { pairFor } from '../../lib/controversy-questions';
+import FavButton from '../../components/FavButton.astro';
 import { CONTROVERSIES, STATUS_LABEL, TYPE_LABEL, STANDING_LABEL } from '../../lib/controversies';
 const ministers = [...new Set(CONTROVERSIES.map((c) => c.minister))].sort();
 const nPolicy = CONTROVERSIES.filter((c) => c.type === 'policy').length, nConduct = CONTROVERSIES.length - nPolicy;
@@ -42,6 +43,7 @@ const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 
             <span class:list={['pill', c.type === 'policy' && !c.featured ? 'pill-brand' : 'pill-neutral']}>{TYPE_LABEL[c.type]}</span>
             <span class="pill pill-neutral !font-semibold">{STATUS_LABEL[c.status]}</span>
             <span class="meta mono">{fmtDate(c.date)}</span>
+            <FavButton type="controversy" id={c.id} small class="ml-auto" />
           </div>
           <h2 class="mt-2.5 font-display text-[22px] font-semibold leading-snug"><span class="block">{pairFor(c.id, c.type).critical}</span><span class="block text-ink-2">{pairFor(c.id, c.type).benign}</span></h2>
           <p class="mt-2 text-[15px] font-semibold text-ink">{c.title}</p>

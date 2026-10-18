@@ -1,0 +1,131 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { url } from '../config/site';
+import { MEASURES, SECTIONS, GOV_TARGETS, DELIVERIES } from '../lib/measures';
+import { CONTROVERSIES } from '../lib/controversies';
+import { pairFor } from '../lib/controversy-questions';
+import { LESSONS } from '../lib/learn';
+import { headlineText } from '../lib/format';
+import laws from '../data/laws.json';
+/* The guided finder: a short set of questions that narrows to the thing, then asks what you want to do with it.
+   Everything it needs is written into the page at build time, so it works instantly and offline. */
+const topics = SECTIONS.map((s) => ({ id: s.id, title: s.title, blurb: s.blurb, measures: MEASURES.filter((m) => m.section === s.id).map((m) => ({ id: m.id, title: m.title, now: headlineText(m.headline), q: m.question })) })).filter((t) => t.measures.length);
+const promises = [
+  ...GOV_TARGETS.map((m) => ({ id: m.id, title: m.ed.target!.commitment, verdict: m.verdict!.verdict, href: url(`measures/${m.id}/`), measure: m.id })),
+  ...DELIVERIES.map((d) => ({ id: d.id, title: d.commitment, verdict: d.verdict, href: url(`targets/#${d.id}`), measure: null })),
+];
+const ministers = [...new Set(CONTROVERSIES.map((c) => c.minister))].sort();
+const conCats = [...new Set(CONTROVERSIES.map((c) => c.category))].sort();
+const cons = CONTROVERSIES.map((c) => ({ id: c.id, q: pairFor(c.id, c.type).critical, minister: c.minister, category: c.category, href: url(`controversies/#${c.id}`) }));
+const lawList = (laws as any).laws.map((l: any) => ({ id: l.id, title: l.title, status: l.status, href: url(`laws/#${l.id}`) }));
+const lawStatuses = [...new Set(lawList.map((l: any) => l.status))];
+const lessons = LESSONS.map((l) => ({ id: l.slug, title: l.title, q: l.question, href: url(`learn/${l.slug}/`) }));
+const DATA = { topics, promises, ministers, conCats, cons, lawList, lawStatuses, lessons, base: url('') };
+---
+<Base title="Let us help you find it" description="Not sure where to look? Answer 2 or 3 quick questions and Gov Score takes you to the figure, promise, controversy or law you need, and what to do with it." section="find/">
+  <div class="wrap-narrow pt-10 md:pt-14">
+    <p class="eyebrow">Let us help you find it</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What are you looking for?</h1>
+    <p class="lede mt-3">Answer a question or 2 and we take you straight there. Or <a href="#" id="find-search-link">type what you want</a> instead.</p>
+    <div id="finder" class="mt-8" data-json={JSON.stringify(DATA)}>
+      <ol id="find-crumbs" class="mb-4 flex flex-wrap gap-2 text-[14px]" aria-label="Your answers"></ol>
+      <div id="find-step" class="grid gap-3"></div>
+      <p class="mt-5"><button type="button" id="find-back" class="btn btn-ghost btn-sm" hidden><Icon name="arrow" size={14} class="rotate-180" /> Back</button></p>
+    </div>
+    <p class="meta mt-10">Prefer to browse? <a href={url('measures/')}>Measures</a> · <a href={url('targets/')}>Promises</a> · <a href={url('controversies/')}>Controversies</a> · <a href={url('laws/')}>Laws</a> · <a href={url('learn/')}>Learn</a></p>
+  </div>
+  <style is:global>
+    .fo { display: grid; gap: 4px; text-align: left; width: 100%; padding: 16px 18px; border: 1px solid var(--rule); border-radius: 14px; background: var(--surface); color: var(--ink); cursor: pointer; font: inherit; }
+    .fo:hover { border-color: var(--brand); background: var(--brand-tint); }
+    .fo b { font-size: 17px; }
+    .fo span { font-size: 14px; color: var(--ink-2); }
+    .fo-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 16px; }
+    .fo-row b { font-size: 15.5px; }
+    .crumb { display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border-radius: 999px; padding: 4px 12px; color: var(--ink-2); }
+    .act { display: grid; gap: 3px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 12px; color: var(--ink); text-decoration: none; background: var(--surface); }
+    .act:hover { border-color: var(--brand); background: var(--brand-tint); }
+    .act b { font-size: 15.5px; } .act span { font-size: 13.5px; color: var(--ink-2); }
+  </style>
+  <script is:inline>
+    (function () {
+      var root = document.getElementById('finder'), D = JSON.parse(root.dataset.json), step = document.getElementById('find-step'), crumbs = document.getElementById('find-crumbs'), back = document.getElementById('find-back');
+      var B = D.base, stack = [], path = [];
+      var VERD = { met: 'Met', on_track: 'On track', in_progress: 'In progress', at_risk: 'At risk', off_track: 'Off track', not_met: 'Not met' };
+      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      function opt(b, s, fn) { var el = document.createElement('button'); el.type = 'button'; el.className = 'fo'; el.innerHTML = '<b>' + esc(b) + '</b>' + (s ? '<span>' + esc(s) + '</span>' : ''); el.addEventListener('click', fn); return el; }
+      function row(b, s, fn) { var el = document.createElement('button'); el.type = 'button'; el.className = 'fo fo-row'; el.innerHTML = '<b>' + esc(b) + '</b>' + (s ? '<span>' + esc(s) + '</span>' : ''); el.addEventListener('click', fn); return el; }
+      function act(b, s, href, cls) { var a = document.createElement('a'); a.className = 'act' + (cls ? ' ' + cls : ''); a.href = href; a.innerHTML = '<b>' + esc(b) + '</b><span>' + esc(s) + '</span>'; return a; }
+      function show(render, label) {
+        stack.push(render); if (label) path.push(label);
+        step.innerHTML = ''; render(step);
+        crumbs.innerHTML = path.map(function (p) { return '<li class="crumb">' + esc(p) + '</li>'; }).join('');
+        back.hidden = stack.length <= 1; window.scrollTo({ top: Math.min(window.scrollY, root.getBoundingClientRect().top + window.scrollY - 90), behavior: 'smooth' });
+      }
+      back.addEventListener('click', function () { if (stack.length <= 1) return; stack.pop(); path.pop(); var r = stack.pop(); var l = path.pop(); show(r, l); });
+      function save(key) { try { var f = JSON.parse(localStorage.getItem('gs_favs') || '[]'); if (f.indexOf(key) < 0) f.push(key); localStorage.setItem('gs_favs', JSON.stringify(f)); } catch (e) {} }
+
+      function actionsForMeasure(m) {
+        return function (el) {
+          el.innerHTML = '<p class="text-ink-2 mb-1">' + esc(m.title) + ', now <b class="text-ink">' + esc(m.now) + '</b>. What do you want to do with it?</p>';
+          el.appendChild(act('See the figure and the chart', 'Latest figure, since May 2022, the past year, 20 years, sources and a plain-English explanation.', B + 'measures/' + m.id + '/'));
+          el.appendChild(act('Share an image', 'A ready-made picture with the figure, the chart, the source and the date. Landscape for X and Facebook, portrait for Instagram.', B + 'measures/' + m.id + '/#share'));
+          el.appendChild(act('Download the data', 'The whole series as a spreadsheet file, with the source lines at the top. Then make your own chart.', B + 'data/' + m.id + '.csv'));
+          el.appendChild(act('Cite it', 'A reference in Harvard or APA, with the ABS or RBA as the author.', B + 'measures/' + m.id + '/#cite'));
+          var s = act('Save it to My Gov Score', 'So it is waiting for you next visit, in this browser.', B + 'my/'); s.addEventListener('click', function () { save('measure:' + m.id); }); el.appendChild(s);
+        };
+      }
+      function measuresIn(t) {
+        return function (el) {
+          el.innerHTML = '<p class="text-ink-2 mb-1">' + esc(t.blurb || t.title) + '. Which one?</p>';
+          t.measures.forEach(function (m) { el.appendChild(row(m.title, m.now, function () { show(actionsForMeasure(m), m.title); })); });
+        };
+      }
+      function topicsStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">Which topic?</p>';
+        D.topics.forEach(function (t) { el.appendChild(opt(t.title, t.measures.length + ' measures. ' + (t.blurb || ''), function () { show(measuresIn(t), t.title); })); });
+      }
+      function promisesStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">Which promises?</p>';
+        var groups = [['All ' + D.promises.length + ' promises', function () { return true; }], ['Kept, or on track', function (p) { return p.verdict === 'met' || p.verdict === 'on_track'; }], ['Not kept, or off track', function (p) { return p.verdict === 'not_met' || p.verdict === 'off_track'; }], ['Still open: in progress or at risk', function (p) { return p.verdict === 'in_progress' || p.verdict === 'at_risk'; }]];
+        groups.forEach(function (g) { var list = D.promises.filter(g[1]); if (!list.length) return; el.appendChild(opt(g[0], list.length + (list.length === 1 ? ' promise' : ' promises'), function () { show(function (e2) { e2.innerHTML = '<p class="text-ink-2 mb-1">Which one?</p>'; list.forEach(function (p) { e2.appendChild(row(p.title, VERD[p.verdict], function () { show(function (e3) { e3.innerHTML = '<p class="text-ink-2 mb-1">' + esc(p.title) + ' is <b class="text-ink">' + VERD[p.verdict] + '</b>. What next?</p>'; e3.appendChild(act('See the verdict, the rule and the evidence', 'Why it got this verdict, the exact test, and the official source.', p.href)); if (p.measure) { e3.appendChild(act('Share an image', 'With the verdict, the figure and the source on it.', B + 'measures/' + p.measure + '/#share')); e3.appendChild(act('Download the data', 'The series behind the verdict, as a spreadsheet.', B + 'data/' + p.measure + '.csv')); } var s = act('Save it to My Gov Score', 'So it is waiting for you next visit.', B + 'my/'); s.addEventListener('click', function () { save('promise:' + p.id); }); e3.appendChild(s); }, p.title.slice(0, 40)); })); }); }, g[0]); })); });
+      }
+      function consStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">Find a controversy by…</p>';
+        el.appendChild(opt('Minister', D.ministers.length + ' ministers', function () { show(function (e2) { e2.innerHTML = '<p class="text-ink-2 mb-1">Which minister?</p>'; D.ministers.forEach(function (mi) { var list = D.cons.filter(function (c) { return c.minister === mi; }); e2.appendChild(row(mi, list.length + (list.length === 1 ? ' entry' : ' entries'), function () { show(conList(list), mi); })); }); }, 'By minister'); }));
+        el.appendChild(opt('Kind of issue', D.conCats.join(', '), function () { show(function (e2) { e2.innerHTML = '<p class="text-ink-2 mb-1">What kind?</p>'; D.conCats.forEach(function (k) { var list = D.cons.filter(function (c) { return c.category === k; }); e2.appendChild(row(k, list.length + ' entries', function () { show(conList(list), k); })); }); }, 'By kind'); }));
+        el.appendChild(act('Just show me all of them', 'Newest first, with filters on the page.', B + 'controversies/'));
+      }
+      function conList(list) { return function (e3) { e3.innerHTML = '<p class="text-ink-2 mb-1">Which one? Each opens with the question both sides are asking.</p>'; list.forEach(function (c) { e3.appendChild(act(c.q, c.minister + ' · ' + c.category, c.href)); }); }; }
+      function lawsStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">Which laws?</p>';
+        D.lawStatuses.forEach(function (st) { var list = D.lawList.filter(function (l) { return l.status === st; }); el.appendChild(opt(st.charAt(0).toUpperCase() + st.slice(1).replace(/_/g, ' '), list.length + ' bills', function () { show(function (e2) { e2.innerHTML = '<p class="text-ink-2 mb-1">Which one?</p>'; list.forEach(function (l) { e2.appendChild(act(l.title, l.status, l.href)); }); }, st); })); });
+        el.appendChild(act('All of them, with a search box', 'Every government bill tracked, filter by status.', B + 'laws/'));
+      }
+      function learnStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">What do you want explained?</p>';
+        D.lessons.forEach(function (l) { el.appendChild(act(l.title, l.q, l.href)); });
+        el.appendChild(act('How this site works', 'Where the figures come from, how verdicts are reached, how measures are chosen.', B + 'methodology/'));
+      }
+      function dataStep(el) {
+        el.innerHTML = '<p class="text-ink-2 mb-1">What do you want to make?</p>';
+        el.appendChild(act('My own chart, from one series', 'Pick the measure, download the spreadsheet, follow the 6 steps.', B + 'make-your-own-chart/'));
+        el.appendChild(act('A spreadsheet of everything', 'All ' + D.topics.reduce(function (n, t) { return n + t.measures.length; }, 0) + ' series as CSV, or 1 JSON file.', B + 'data/'));
+        el.appendChild(act('A share image of a figure', 'Pick the measure first, then Share, then Download image.', B + 'measures/'));
+        el.appendChild(act('A reference for an essay or article', 'Every measure page has Cite this, in Harvard and APA.', B + 'measures/'));
+      }
+      function start(el) {
+        el.innerHTML = '';
+        el.appendChild(opt('A figure or a chart', 'Inflation, jobs, wages, housing, the Budget, debt, energy and more.', function () { show(topicsStep, 'A figure'); }));
+        el.appendChild(opt('Whether a promise was kept', D.promises.length + ' promises, each with a verdict and the rule behind it.', function () { show(promisesStep, 'A promise'); }));
+        el.appendChild(opt('Am I better or worse off?', 'A typical household in dollars a week, or your own pay.', function () { show(function (e2) { e2.innerHTML = ''; e2.appendChild(act('A typical household', 'A couple with a mortgage, a couple renting, or a single renter.', B + '#household')); e2.appendChild(act('My own pay', 'Enter what you earn and get your own number.', B + 'calculator/')); }, 'Better off?'); }));
+        el.appendChild(opt('A controversy', 'What was claimed, what the government said, what came of it.', function () { show(consStep, 'A controversy'); }));
+        el.appendChild(opt('A law', 'What has passed, what is stuck, what was dropped.', function () { show(lawsStep, 'A law'); }));
+        el.appendChild(opt('Data I can reuse', 'A spreadsheet, a share image, a chart of your own or a reference.', function () { show(dataStep, 'Data'); }));
+        el.appendChild(opt('An explanation', 'Deficit or debt? Who sets interest rates? Short, plain lessons.', function () { show(learnStep, 'Learn'); }));
+      }
+      show(start, null);
+      var sl = document.getElementById('find-search-link'); if (sl) sl.addEventListener('click', function (e) { e.preventDefault(); var i = document.querySelector('[data-search] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } else location.href = B + 'measures/'; });
+    })();
+  </script>
+</Base>

@@ -2,6 +2,7 @@
 import VerdictPill from './VerdictPill.astro';
 import Icon from './Icon.astro';
 import Picture from './Picture.astro';
+import FavButton from './FavButton.astro';
 import { fmtMonth, fmtDate } from '../lib/format';
 import { DELIVERIES_VERIFIED } from '../lib/measures';
 import { url } from '../config/site';
@@ -29,5 +30,5 @@ const { d, i = 0 } = Astro.props;
       <p class="border-t border-rule px-3.5 py-2.5 text-[13px] text-ink-3">Think this is wrong? <a href={url('corrections/')}>Report it</a> · <a href={url('methodology/')}>How verdicts work</a></p>
     </details>
   </div>
-  <VerdictPill verdict={d.verdict} large />
+  <div class="flex items-center gap-2"><FavButton type="promise" id={d.id} small /><VerdictPill verdict={d.verdict} large /></div>
 </article>

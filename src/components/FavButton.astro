@@ -1,0 +1,15 @@
+---
+/* "Save" on a measure, promise, controversy or law. Kept in this browser's own storage (nothing is sent anywhere), and
+   shown together on the My Gov Score page. The script that runs them lives once in the layout. */
+interface Props { type: 'measure' | 'promise' | 'controversy' | 'law'; id: string; label?: string; class?: string; small?: boolean }
+const { type, id, label = 'Save', class: cls = '', small = false } = Astro.props;
+---
+<button type="button" class:list={['fav btn btn-ghost', small ? 'btn-sm' : '', cls]} data-fav={`${type}:${id}`} aria-pressed="false" title="Save to My Gov Score">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path class="fav-star" d="M12 3.5l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.5l-5.4 2.9 1-6.1L3.2 10l6.1-.9z" /></svg>
+  <span class="fav-label">{label}</span>
+</button>
+
+<style>
+  .fav[aria-pressed="true"] .fav-star { fill: var(--gold); stroke: var(--gold); }
+  .fav[aria-pressed="true"] { border-color: var(--gold); }
+</style>

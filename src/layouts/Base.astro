@@ -5,6 +5,7 @@ import { GENERATED_AT } from '../lib/measures';
 import { fmtStamp } from '../lib/format';
 import { clip } from '../lib/seo';
 import Logo from '../components/Logo.astro';
+import SiteSearch from '../components/SiteSearch.astro';
 import DisplayMenu from '../components/DisplayMenu.astro';
 
 interface Props { title?: string; fullTitle?: string; description?: string; section?: string; jsonld?: Record<string, unknown> | Record<string, unknown>[]; bodyClass?: string; forceDark?: boolean; ogType?: string; ogImage?: string }
@@ -82,7 +83,9 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
         </details>
       </nav>
       <div class="ml-auto flex items-center gap-2 lg:ml-2">
-        <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden sm:inline-flex">Get updates</a>
+        <SiteSearch class="hidden w-[210px] xl:block 2xl:w-[260px]" id="site-search" />
+        <a href={url('my/')} class="btn btn-ghost btn-sm hidden whitespace-nowrap sm:inline-flex" data-my-link aria-label="My Gov Score"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.5l-5.4 2.9 1-6.1L3.2 10l6.1-.9z" /></svg><span class="hidden 2xl:inline">My Gov Score</span><span class="fav-count hidden rounded-full bg-brand px-1.5 text-[11px] font-bold text-on-brand"></span></a>
+        <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden whitespace-nowrap sm:inline-flex">Get updates</a>
         <DisplayMenu />
         <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 lg:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
@@ -91,6 +94,9 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     </div>
     <nav id="mobile-nav" class="max-h-[calc(100vh-64px)] overflow-y-auto border-t border-rule bg-paper lg:hidden" aria-label="Main (mobile)" hidden>
       <div class="wrap grid gap-3 py-4">
+        <SiteSearch id="site-search-m" />
+        <a href={url('find/')} class="rounded-lg px-3 py-2.5 text-[16px] font-semibold text-brand no-underline hover:bg-panel">Not sure? Let us help you find it →</a>
+        <a href={url('my/')} class="rounded-lg px-3 py-2.5 text-[16px] font-semibold text-ink no-underline hover:bg-panel">★ My Gov Score</a>
         {NAV_GROUPS.map((g) => (
           <div><p class="px-3 pb-1 text-[11.5px] font-bold uppercase tracking-[0.08em] text-ink-3">{g.q}</p>
             <div class="grid">{g.items.map((n) => <a href={url(n.href)} aria-current={section === n.href ? 'page' : undefined} class="rounded-lg px-3 py-2.5 text-[16px] font-semibold text-ink no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:text-brand">{n.label}</a>)}</div></div>
@@ -142,5 +148,20 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && mn && !mn.hidden) { mn.hidden = true; mb.setAttribute('aria-expanded', 'false'); mb.focus(); } });
     })();
   </script>
+<script is:inline>
+  (function () {
+    var KEY = 'gs_favs';
+    function read() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+    function write(f) { try { localStorage.setItem(KEY, JSON.stringify(f)); } catch (e) {} }
+    function count() { var n = read().length; document.querySelectorAll('.fav-count').forEach(function (c) { c.textContent = n; c.classList.toggle('hidden', !n); }); }
+    document.querySelectorAll('[data-fav]').forEach(function (b) {
+      var k = b.dataset.fav, lab = b.querySelector('.fav-label');
+      function paint() { var on = read().indexOf(k) >= 0; b.setAttribute('aria-pressed', on ? 'true' : 'false'); if (lab) lab.textContent = on ? 'Saved' : 'Save'; }
+      b.addEventListener('click', function () { var f = read(), i = f.indexOf(k); if (i >= 0) f.splice(i, 1); else f.push(k); write(f); paint(); count(); });
+      paint();
+    });
+    count();
+  })();
+</script>
 </body>
 </html>

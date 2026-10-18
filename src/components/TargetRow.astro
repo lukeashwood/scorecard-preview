@@ -2,6 +2,7 @@
 import VerdictPill from './VerdictPill.astro';
 import Evidence from './Evidence.astro';
 import HousesGrid from './HousesGrid.astro';
+import FavButton from './FavButton.astro';
 import { url } from '../config/site';
 import { headlineText, fmtMonth } from '../lib/format';
 import type { Measure } from '../lib/types';
@@ -18,7 +19,7 @@ const t = m.ed.target!;
       {t.revised && <p class="mt-2 rounded-lg bg-warn-tint px-3 py-2 text-[14px] text-ink-2"><b class="text-warn">Target changed {fmtMonth(t.revised.date)}:</b> {t.revised.text} Gov Score still judges the original commitment. <a href={t.revised.sourceUrl} rel="noopener">{t.revised.sourceLabel}</a></p>}
     </div>
     <div class="flex items-center justify-between gap-5 md:flex-col md:items-end md:gap-2">
-      <VerdictPill verdict={m.verdict!.verdict} label={t.verdictLabels?.[m.verdict!.verdict]} large />
+      <div class="flex items-center gap-2"><FavButton type="promise" id={`p-${m.id}`} small /><VerdictPill verdict={m.verdict!.verdict} label={t.verdictLabels?.[m.verdict!.verdict]} large /></div>
       <p class="text-right"><span class="num font-display text-[26px] font-semibold leading-none">{headlineText(m.headline)}</span><span class="meta block max-w-[24ch]">{m.headline.caption}</span></p>
     </div>
   </div>

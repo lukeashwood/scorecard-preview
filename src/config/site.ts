@@ -35,7 +35,7 @@ export const NAV_GROUPS = [
   { q: 'What did they promise?', items: [{ href: 'targets/', label: 'Promises', top: true }] },
   { q: 'What happened?', items: [{ href: 'measures/', label: 'Measures', top: true }, { href: 'charts/', label: 'Charts', top: true }, { href: 'latest/', label: 'Latest figures', top: false }, { href: 'in-60-seconds/', label: 'In 60 seconds', top: false }, { href: 'calculator/', label: 'Are you better off?', top: false }] },
   { q: 'Why did it happen?', items: [{ href: 'relationships/', label: 'Compare', top: true }, { href: 'budget/', label: 'Budget', top: true }, { href: 'budget/build/', label: 'Build your own Budget', top: false }, { href: 'laws/', label: 'Laws', top: false }] },
-  { q: 'More', items: [{ href: 'controversies/', label: 'Controversies', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'classrooms/', label: 'For classrooms', top: false }, { href: 'briefing/', label: 'Briefing (3D)', top: false }, { href: 'make-your-own-chart/', label: 'Make your own chart', top: false }] },
+  { q: 'More', items: [{ href: 'find/', label: 'Help me find it', top: false }, { href: 'for/', label: 'Who it’s for', top: false }, { href: 'controversies/', label: 'Controversies', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'classrooms/', label: 'For classrooms', top: false }, { href: 'briefing/', label: 'Briefing (3D)', top: false }, { href: 'make-your-own-chart/', label: 'Make your own chart', top: false }] },
 ] as const;
 export const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
@@ -43,7 +43,7 @@ export const FOOTER_NAV = [
   { href: 'methodology/', label: 'Methodology' },
   { href: 'about/', label: 'About' },
   { href: 'corrections/', label: 'Corrections' },
-  { href: 'latest/', label: 'Latest figures' },
+  { href: 'my/', label: 'My Gov Score' },
   { href: 'data/', label: 'Data & downloads' },
   { href: 'subscribe/', label: 'Email updates' },
 ] as const;

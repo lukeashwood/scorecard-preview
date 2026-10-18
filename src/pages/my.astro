@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import ReportForm from '../components/ReportForm.astro';
+import { url } from '../config/site';
+---
+<Base title="My Gov Score: the measures and promises you saved" description="Everything you have saved on Gov Score, in one place: measures, promises, controversies and laws. Kept in your browser, no account needed." section="my/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">My Gov Score</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">The things you keep coming back for</h1>
+    <p class="lede mt-3 max-w-[70ch]">Tap <b>Save</b> on any measure, promise, controversy or law and it appears here, with its latest figure, so your next visit starts where you left off.</p>
+
+    <div id="my-list" class="mt-8" data-index={url('search-index.json')}>
+      <div id="my-empty" class="card card-pad">
+        <p class="font-display text-[22px] font-semibold">Nothing saved yet</p>
+        <p class="mt-2 text-ink-2">Open any <a href={url('measures/')}>measure</a>, <a href={url('targets/')}>promise</a>, <a href={url('controversies/')}>controversy</a> or <a href={url('laws/')}>law</a> and tap Save. A good start for most people: <a href={url('measures/inflation/')}>Inflation</a>, <a href={url('measures/mortgage/')}>Mortgage costs</a>, <a href={url('measures/power_bills/')}>Power bills</a> and <a href={url('measures/housing_accord/')}>the 1.2 million homes</a>.</p>
+      </div>
+      <div id="my-groups" class="grid gap-8" hidden></div>
+    </div>
+
+    <div class="mt-10 grid gap-6 md:grid-cols-2">
+      <div class="card card-pad">
+        <p class="eyebrow">How this works</p>
+        <p class="mt-2 text-[15px] text-ink-2">Your saved items are kept in this browser’s own storage on this device, like a bookmark. Nothing is sent to us and no account is needed. That also means: a different device or browser will not see them, clearing your browsing data removes them, and a private or incognito window forgets them when it closes. Accounts, which will sync saves across devices and turn them into email alerts, are being built.</p>
+        <p class="mt-3"><button type="button" id="my-clear" class="btn btn-ghost btn-sm">Clear all saved items</button></p>
+      </div>
+      <div class="card card-pad">
+        <p class="eyebrow">Email me when these change</p>
+        <p class="mt-2 text-[15px] text-ink-2">Leave your email and we will build the alert around the items you have saved. Until accounts exist, you will get the launch list emails.</p>
+        <div class="mt-3"><ReportForm kind="signup">
+          <input type="hidden" name="topics" id="my-topics" value="saved items" />
+          <label class="sr-only" for="my-email">Email address</label>
+          <input id="my-email" class="input" type="email" name="email" required placeholder="you@example.com" autocomplete="email" />
+        </ReportForm></div>
+      </div>
+    </div>
+  </div>
+  <script is:inline>
+    (function () {
+      var KEY = 'gs_favs', root = document.getElementById('my-list'), empty = document.getElementById('my-empty'), groups = document.getElementById('my-groups');
+      var LABEL = { measure: 'Measures', promise: 'Promises', controversy: 'Controversies', law: 'Laws' };
+      function read() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+      var favs = read(); if (!favs.length) return;
+      fetch(root.dataset.index).then(function (r) { return r.json(); }).then(function (items) {
+        var by = {}; items.forEach(function (i) { by[i.type + ':' + i.id] = i; });
+        var sets = {}; favs.forEach(function (k) { var i = by[k]; if (!i) return; (sets[i.type] = sets[i.type] || []).push(i); });
+        var html = Object.keys(LABEL).filter(function (t) { return sets[t]; }).map(function (t) {
+          return '<section><h2 class="h2">' + LABEL[t] + '</h2><div class="card mt-3 overflow-hidden"><ul>' + sets[t].map(function (i) {
+            return '<li class="rule-t flex items-center justify-between gap-3 px-5 py-3"><a href="' + i.href + '" class="text-ink no-underline hover:text-brand"><span class="font-semibold">' + i.title.replace(/</g, '&lt;') + '</span><span class="meta block">' + i.sub.replace(/</g, '&lt;') + '</span></a><button type="button" class="btn btn-ghost btn-sm" data-unfav="' + t + ':' + i.id + '">Remove</button></li>';
+          }).join('') + '</ul></div></section>';
+        }).join('');
+        if (!html) return;
+        groups.innerHTML = html; groups.hidden = false; empty.hidden = true;
+        var tp = document.getElementById('my-topics'); if (tp) tp.value = favs.join(', ');
+        groups.querySelectorAll('[data-unfav]').forEach(function (b) { b.addEventListener('click', function () { var f = read().filter(function (k) { return k !== b.dataset.unfav; }); localStorage.setItem(KEY, JSON.stringify(f)); location.reload(); }); });
+      });
+      var clear = document.getElementById('my-clear'); if (clear) clear.addEventListener('click', function () { localStorage.removeItem(KEY); location.reload(); });
+    })();
+  </script>
+</Base>

@@ -1,4 +1,5 @@
 ---
+import FavButton from '../../components/FavButton.astro';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { url } from '../../config/site';
@@ -30,11 +31,12 @@ const nPrivate = laws.filter((l) => l.sponsor === 'private').length;
 
     <ul class="mt-5 grid gap-4" id="law-list">
       {laws.map((l) => (
-        <li class="card p-5 md:p-6" data-status={l.status} data-sponsor={l.sponsor} data-text={(l.title + ' ' + l.summary + ' ' + (l.controversy?.category ?? '')).toLowerCase()} hidden={l.sponsor === 'private'}>
+        <li id={l.id} class="card p-5 md:p-6" data-status={l.status} data-sponsor={l.sponsor} data-text={(l.title + ' ' + l.summary + ' ' + (l.controversy?.category ?? '')).toLowerCase()} hidden={l.sponsor === 'private'}>
           <div class="flex flex-wrap items-center gap-2">
             <span class={`pill pill-${STATUS[l.status]?.tone ?? 'neutral'}`}>{STATUS[l.status]?.label ?? l.status}</span>
             {l.sponsor === 'private' && <span class="pill pill-neutral">Private member’s bill</span>}
             <span class="meta mono">{fmtDate(l.status_date)}</span>
+            <FavButton type="law" id={l.id} small class="ml-auto" />
           </div>
           <h2 class="mt-2.5 font-display text-[22px] font-semibold leading-snug">{l.title}</h2>
           <p class="meta mt-1">{l.status_note}</p>

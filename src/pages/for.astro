@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { SITE, url } from '../config/site';
+import { MEASURES, GOV_TARGETS, DELIVERIES, CHECKS } from '../lib/measures';
+const n = MEASURES.length, nP = GOV_TARGETS.length + DELIVERIES.length;
+const AUD = [
+  { id: 'newsrooms', eyebrow: 'For newsrooms', h: 'A figure you can quote in 2 minutes, with the source attached', who: 'Reporters, producers, fact-checkers and editors.',
+    gets: [
+      ['Every number links to the official release it came from, and every page has a Cite this box in Harvard and APA.', url('measures/')],
+      ['Download a chart as a print-ready image with the source and date already on it, or the data as a spreadsheet with the source lines at the top.', url('make-your-own-chart/')],
+      ['Latest figures, newest first, and an RSS feed so a new release lands in your reader the day it is out.', url('latest/')],
+      [`Verdicts on the government’s ${nP} measurable promises, each with its published rule, so you can test the call yourself.`, url('targets/')],
+      ['A public corrections log, dated. If we got something wrong, it says so.', url('corrections/')],
+    ], later: 'A weekly email of what changed, with the old number, the new number and the source.' },
+  { id: 'parties', eyebrow: 'For parties, MPs and advisers', h: 'The record, in the government’s own numbers, ready to share', who: 'Members, advisers, candidates and party staff, on any side.',
+    gets: [
+      ['Every promise with a verdict and a rule. The same rules apply whichever party is in government, so a verdict here is defensible on the floor.', url('targets/')],
+      ['A share image for every measure, in landscape for X and Facebook and portrait for Instagram, with the source on it.', url('measures/')],
+      ['Then and now: where each measure stood in May 2022 and where it is today, on the home page.', url('/#figures')],
+      ['Save the measures you are working on and find them in one place next time.', url('my/')],
+      ['Controversies with the government’s response and the outcome beside the claim, so nothing is one-sided.', url('controversies/')],
+    ], later: 'An alert the day a verdict or a headline figure changes, with the share image attached.' },
+  { id: 'researchers', eyebrow: 'For economists and researchers', h: 'The full series, the method and the downloads', who: 'Bank and think-tank economists, academics, analysts.',
+    gets: [
+      [`All ${n} series as CSV, or everything as 1 JSON file, with units, the series each verdict is judged on, forecast flags and the ABS series names.`, url('data/')],
+      ['The method for every derived figure: real wages, the household calculator, the since-office comparison, the verdict rules.', url('methodology/')],
+      ['G20 comparisons where a fair one exists, with the caveats stated.', url('charts/')],
+      [`${CHECKS.checks_total} automated checks on every data run, with the pass, warning and fail counts published.`, url('methodology/#checks')],
+      ['A published policy on how measures are chosen, added and removed.', url('methodology/#selection')],
+    ], later: 'The check-by-check log, and an API.' },
+  { id: 'classrooms', eyebrow: 'For teachers and students', h: 'Official figures for the classroom, and references a marker will accept', who: 'Senior Economics and Civics teachers, university students.',
+    gets: [
+      ['6 measures mapped to the topics you teach, each with a 20-year chart and a plain-English explanation.', url('classrooms/')],
+      ['A Budget simulator students can hand in as a link, and short explainers with no jargon.', url('budget/build/')],
+      ['Make your own chart: a spreadsheet download and a credit line, written for a 16-year-old to follow.', url('make-your-own-chart/')],
+      ['Cite this on every page, with the ABS or RBA as author, in Harvard and APA.', url('measures/unemployment/#cite')],
+    ], later: 'Printable chart packs by topic, and a termly email for school libraries.' },
+  { id: 'households', eyebrow: 'For everyone else', h: 'Are you better or worse off? In 2 numbers, then your own', who: 'Anyone who pays bills and wonders where the money went.',
+    gets: [
+      ['A typical household, in dollars a week, on the home page. Switch between a couple with a mortgage, a couple renting and a single renter.', url('/#household')],
+      ['Put in your own pay and get your own number.', url('calculator/')],
+      ['Power bills, the 1.2 million homes and the other promises, with a plain verdict.', url('targets/')],
+      ['Australia in 60 seconds, for the version you can read on the bus.', url('in-60-seconds/')],
+    ], later: 'An email when the household figure moves.' },
+];
+---
+<Base title="Who Gov Score is for, and what you get" description="What Gov Score gives newsrooms, parties and advisers, researchers, classrooms and households: sourced figures, promise verdicts, downloads, share images and saved items." section="for/">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">Who it’s for</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What you get from {SITE.name}</h1>
+    <p class="lede mt-3 max-w-[70ch]">One set of official figures, used in different ways. Pick the one that sounds like you.</p>
+    <ul class="mt-6 flex flex-wrap gap-2">{AUD.map((a) => <li><a href={`#${a.id}`} class="pill pill-neutral !py-1.5 !text-[13.5px] no-underline">{a.eyebrow.replace('For ', '')}</a></li>)}</ul>
+    {AUD.map((a) => (
+      <section id={a.id} class="mt-12 scroll-mt-24">
+        <p class="eyebrow">{a.eyebrow}</p>
+        <h2 class="h2 mt-2">{a.h}</h2>
+        <p class="mt-1 text-ink-2">{a.who}</p>
+        <ul class="mt-5 grid gap-3 md:grid-cols-2">{a.gets.map(([t, h]) => <li><a href={h} class="card card-link card-pad flex gap-3 !text-ink"><span class="mt-0.5 text-brand"><Icon name="check" size={18} /></span><span class="text-[15px] leading-snug">{t}</span></a></li>)}</ul>
+        <p class="meta mt-3"><b class="text-ink-2">Coming:</b> {a.later}</p>
+      </section>
+    ))}
+    <div class="card mt-14 grid gap-6 bg-brand-tint p-7 md:grid-cols-[1fr_auto] md:items-center" style="border-color:transparent">
+      <div><h2 class="h2">Start with the figures you care about</h2><p class="mt-2 max-w-[60ch] text-ink-2">Save any measure, promise, controversy or law and it appears on your own page. Then tell us your email and the alerts will be built around what you saved.</p></div>
+      <div class="flex flex-wrap gap-3"><a class="btn btn-primary" href={url('my/')}>My Gov Score</a><a class="btn btn-ghost" href={url('subscribe/')}>Get updates</a></div>
+    </div>
+  </div>
+</Base>

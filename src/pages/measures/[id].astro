@@ -16,6 +16,7 @@ import DirectionBadge from '../../components/DirectionBadge.astro';
 import InfluenceChip from '../../components/InfluenceChip.astro';
 import Icon from '../../components/Icon.astro';
 import ShareButton from '../../components/ShareButton.astro';
+import FavButton from '../../components/FavButton.astro';
 import { shareText } from '../../lib/share';
 import { SITE, url } from '../../config/site';
 import { MEASURES, GENERATED_AT, freshness, ratedSeries } from '../../lib/measures';
@@ -69,7 +70,9 @@ const jsonld = {
         <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">{m.title}</h1>
         <p class="lede mt-3">{m.question}</p>
         <p class="mt-3 max-w-[70ch] text-[17px] font-semibold leading-snug text-ink">{fh}{rec && <span class="text-brand"> {rec}</span>}</p>
-        <details class="share-menu no-print relative mt-4 inline-block">
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+        <FavButton type="measure" id={m.id} small />
+        <details class="share-menu no-print relative inline-block" id="share">
           <summary class="btn btn-ghost btn-sm list-none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" /></svg>Share <span aria-hidden="true">▾</span></summary>
           <div class="card absolute left-0 z-30 mt-2 grid w-[250px] gap-1 p-2 shadow-card">
             <ShareButton text={shareText(m)} href={pageUrl} label="Share a link" class="!justify-start !border-0" />
@@ -78,6 +81,7 @@ const jsonld = {
             <a class="btn btn-ghost btn-sm !justify-start !border-0" href="#cite">Cite this figure</a>
           </div>
         </details>
+        </div>
         <script is:inline>
           document.addEventListener('click', function (e) { document.querySelectorAll('details.share-menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; }); });
         </script>
