@@ -67,7 +67,7 @@ const TAU = Math.PI * 2;
     {cards.map(({ href, title, g, form, now, v }, i) => (
       <li class="orbit-item" style={`--n:${i};--count:${cards.length}`}>
         <span class="orbit-back" aria-hidden="true"></span>
-        <a href={href} class="orbit-card" aria-label={`${title}: now ${now}`}>
+        <a href={href} class="orbit-card">
           <span class="orbit-title">{title}</span>
           <span class="orbit-now">{now}</span>
           <svg viewBox={`0 0 ${W} ${H}`} class="orbit-chart" aria-hidden="true" preserveAspectRatio={PICTURE.includes(form) ? 'xMidYMid meet' : 'none'}>
