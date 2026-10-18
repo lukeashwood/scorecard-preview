@@ -1,0 +1,80 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { url } from '../../config/site';
+import { RUN, RUN_HISTORY, groupedChecks, splitDetail } from '../../lib/checks';
+import { fmtStamp } from '../../lib/format';
+const groups = groupedChecks();
+const problems = groups.filter((g) => g.worst !== 'pass');
+const clean = groups.filter((g) => g.worst === 'pass');
+const recent = [...RUN_HISTORY].reverse().slice(0, 14);
+const LABEL = { pass: 'Passed', warn: 'Warning', fail: 'Failed' } as const;
+const TONE = { pass: 'good', warn: 'warn', fail: 'bad' } as const;
+---
+<Base title="Check-by-check log: the latest data run" description="Every automated check from the latest daily data run on Gov Score, one line each: what was tested, what it found, and whether it passed, warned or failed.">
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow"><a href={url('data/')}>Data and downloads</a> / Check log</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every check, one line each</h1>
+    <p class="lede mt-3">The daily data run re-fetches each automated series and tests it. This is the full log of the latest run, {fmtStamp(RUN.generated_at)}: {RUN.checks_total} checks, {RUN.checks_passed} passed, {RUN.checks_warn} with a warning and {RUN.checks_failed} failed. A failed check keeps the last verified figure on the page and marks it under review; nothing on the site is updated from a figure that failed.</p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a class="btn btn-ghost" href={url('data/checks.json')} download><Icon name="download" />This log (JSON)</a>
+      <a class="btn btn-ghost" href={url('methodology/#checks')}>What each kind of check does</a>
+    </div>
+
+    <dl class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {([['Checks run', RUN.checks_total, 'neutral'], ['Passed', RUN.checks_passed, 'good'], ['Warning', RUN.checks_warn, 'warn'], ['Failed', RUN.checks_failed, 'bad']] as const).map(([l, n, t]) => <div class="card card-pad"><dt class="meta">{l}</dt><dd class={`num font-display text-[28px] font-semibold leading-tight ${t === 'good' ? 'text-good' : t === 'warn' ? 'text-warn' : t === 'bad' ? 'text-bad' : ''}`}>{n}</dd></div>)}
+    </dl>
+
+    <h2 class="h2 mt-12">Needs attention</h2>
+    <p class="mt-2 text-ink-2">Groups with at least 1 warning or failure, worst first. A warning is most often a source that was slow to answer or a hand-entered figure that is due for its next check; a failure is a source that could not be reached, a figure outside its plausible range, or a total that did not add up.</p>
+    {problems.length === 0 ? <p class="mt-4 text-ink-2">Nothing. Every check passed on this run.</p> : (
+      <div class="mt-4 grid gap-4">{problems.map((g) => (
+        <details class="card card-pad" open={g.worst === 'fail'}>
+          <summary class="flex cursor-pointer flex-wrap items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+            <span class="font-semibold">{g.link ? <a href={url(g.link)} class="no-underline hover:underline">{g.name}</a> : g.name}</span>
+            <span class="flex flex-wrap gap-2">
+              {g.counts.fail > 0 && <span class="pill pill-bad">{g.counts.fail} failed</span>}
+              {g.counts.warn > 0 && <span class="pill pill-warn">{g.counts.warn} warning{g.counts.warn === 1 ? '' : 's'}</span>}
+              {g.counts.pass > 0 && <span class="pill pill-good">{g.counts.pass} passed</span>}
+            </span>
+            <span class="meta ml-auto">{g.checks.length} check{g.checks.length === 1 ? '' : 's'} ▸</span>
+          </summary>
+          <div class="table-scroll mt-4"><table class="dt">
+            <thead><tr><th>Result</th><th>Check</th><th>What it found</th></tr></thead>
+            <tbody>{g.checks.map((c) => { const d = splitDetail(c.detail); return (
+              <tr><td><span class={`pill pill-${TONE[c.status]}`}>{LABEL[c.status]}</span>{c.critical && <span class="meta block">critical</span>}</td><td>{c.check}</td><td class="text-ink-2 break-words">{d.url ? <><a href={d.url} rel="nofollow noopener" class="break-all">{d.url}</a> {d.text}</> : d.text}</td></tr>); })}</tbody>
+          </table></div>
+        </details>
+      ))}</div>
+    )}
+
+    <h2 class="h2 mt-12">Passed</h2>
+    <p class="mt-2 text-ink-2">Everything else. Open a group to see each test and the figure it checked.</p>
+    <div class="mt-4 grid gap-3">{clean.map((g) => (
+      <details class="card px-5 py-3">
+        <summary class="flex cursor-pointer flex-wrap items-center gap-3 list-none [&::-webkit-details-marker]:hidden">
+          <span class="font-semibold">{g.link ? <a href={url(g.link)} class="no-underline hover:underline">{g.name}</a> : g.name}</span>
+          <span class="pill pill-good">{g.counts.pass} passed</span>
+          <span class="meta ml-auto">▸</span>
+        </summary>
+        <div class="table-scroll mt-3"><table class="dt">
+          <thead><tr><th>Check</th><th>What it found</th></tr></thead>
+          <tbody>{g.checks.map((c) => { const d = splitDetail(c.detail); return (<tr><td>{c.check}</td><td class="text-ink-2 break-words">{d.url ? <><a href={d.url} rel="nofollow noopener" class="break-all">{d.url}</a> {d.text}</> : d.text}</td></tr>); })}</tbody>
+        </table></div>
+      </details>
+    ))}</div>
+
+    {recent.length > 1 && (
+      <section class="mt-12">
+        <h2 class="h2">Recent runs</h2>
+        <p class="mt-2 text-ink-2">The counts from each of the last {recent.length} runs. The number of checks grows as measures and sources are added.</p>
+        <div class="card mt-4 overflow-hidden"><div class="table-scroll"><table class="dt">
+          <thead><tr><th>Run</th><th class="r">Checks</th><th class="r">Passed</th><th class="r">Warning</th><th class="r">Failed</th></tr></thead>
+          <tbody>{recent.map((h) => <tr><td class="mono whitespace-nowrap">{fmtStamp(h.generated_at)}</td><td class="num r">{h.checks_total}</td><td class="num r">{h.checks_passed}</td><td class="num r">{h.checks_warn}</td><td class="num r">{h.checks_failed}</td></tr>)}</tbody>
+        </table></div></div>
+      </section>
+    )}
+
+    <p class="meta mt-8">Only the latest run's line-by-line log is kept on the site; earlier runs keep their counts. Figures entered by hand are not re-fetched daily: the run checks that their verification date is recent and that their sources still resolve, and flags them when a re-check is due.</p>
+  </div>
+</Base>

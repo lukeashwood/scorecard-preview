@@ -1,6 +1,17 @@
 {
-  "corrections": [],
+  "corrections": [
+    {
+      "date": "2026-10-19",
+      "page": "measures/power_bills",
+      "summary": "Power bills: the $275 promise. The verdict compared 2022-23 default offers with the 2026-27 offers, which were set after the promise's 31 December 2025 deadline. It now uses the 2025-26 offers, the prices in force at the deadline. The headline rise for a typical NSW household is now +$453 a year (was +$387), and the range across the 4 benchmark regions is +$272 to +$523 (was +$188 to +$494). The verdict stays Not met. The 2026-27 offers are kept on the page as context. Reported by an outside review."
+    }
+  ],
   "rules": [
+    {
+      "date": "2026-10-19",
+      "version": "2.5",
+      "summary": "Power bills: the rule now names the year it is judged on. A commitment with a deadline is tested against the official figure in force at that deadline (for the $275 promise, the 2025-26 default offers), not against figures published after it. Later figures can be shown beside the verdict but cannot change it."
+    },
     {
       "date": "2026-10-18",
       "version": "2.4",
