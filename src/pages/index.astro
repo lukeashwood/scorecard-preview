@@ -56,17 +56,17 @@ const jsonld = [
         <p class="hero-kicker">{SITE.edition} · {SITE.government.name} · figures checked {fmtStamp(GENERATED_AT).replace(/,.*$/, '')}</p>
         <h1 id="hero-h" class="display hero-h">Holding the government to account,<br />in its own numbers.</h1>
         <p class="hero-lede">The government’s record on cost of living, housing, jobs, the Budget and more, in official figures. Every number links to its source. No editorial, no spin, no party line.</p>
-        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a class="btn btn-light" href="#record">Explore the evidence <Icon name="arrow" /></a>
+        <div class="mt-8"><a class="btn btn-light" href="#record">Explore the evidence <Icon name="arrow" /></a></div>
+        <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
           <a class="hero-link" href={url('in-60-seconds/')}>Australia in 60 seconds <Icon name="arrow" size={15} /></a>
           <a class="hero-link" href={url('find/')}>Help me find it <Icon name="arrow" size={15} /></a>
         </div>
-        <ul class="hero-tally" aria-label="Commitments at a glance">
-          {segs.map((s) => <li><b class="num">{s.n}</b><span>{s.label}</span><i aria-hidden="true" style={`background:${s.color}`} /></li>)}
-          <li><a href={url('targets/')}>All {t.total} commitments <Icon name="arrow" size={13} /></a></li>
-        </ul>
       </div>
       <div class="hero-orbit"><Orbit /></div>
+      <ul class="hero-tally" aria-label="Commitments at a glance">
+        {segs.map((s) => <li><b class="num">{s.n}</b><span>{s.label}</span><i aria-hidden="true" style={`background:${s.color}`} /></li>)}
+        <li><a href={url('targets/')}>All {t.total} commitments <Icon name="arrow" size={13} /></a></li>
+      </ul>
     </div>
   </section>
 
@@ -260,9 +260,9 @@ const jsonld = [
       radial-gradient(30% 30% at 88% 20%, color-mix(in srgb, var(--aurora-3) 10%, transparent) 0%, transparent 70%),
       linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%); }
   .hero-sky::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / 0.07) 0.6px, transparent 0.7px); background-size: 22px 22px; mask-image: radial-gradient(70% 70% at 70% 50%, #000 20%, transparent 100%); }
-  .hero-grid { display: grid; gap: 20px; padding-block: 16px 36px; }
-  .hero-orbit { order: -1; }
-  .hero-copy { max-width: 560px; }
+  .hero-grid { display: grid; grid-template-areas: 'orbit' 'copy' 'tally'; gap: 20px; padding-block: 16px 36px; }
+  .hero-copy { grid-area: copy; } .hero-orbit { grid-area: orbit; } .hero-tally { grid-area: tally; }
+  .hero-copy { max-width: 600px; }
   .hero-kicker { font-size: 13px; font-weight: 600; color: var(--on-night-2); }
   .hero-h { margin-top: 14px; font-size: clamp(40px, 5vw, 66px); color: var(--on-night); max-width: 11ch; }
   .hero-lede { margin-top: 20px; max-width: 54ch; font-size: clamp(17px, 1.7vw, 19px); line-height: 1.55; color: var(--on-night-2); }
@@ -270,7 +270,7 @@ const jsonld = [
   @media (hover: hover) and (pointer: fine) { .btn-light:hover { background: #fff; } }
   .hero-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--on-night); text-decoration: none; }
   .hero-link:hover { text-decoration: underline; }
-  .hero-tally { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--night-rule); font-size: 14px; color: var(--on-night-2); }
+  .hero-tally { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; padding-top: 18px; border-top: 1px solid var(--night-rule); font-size: 14px; color: var(--on-night-2); }
   .hero-tally li { display: inline-flex; align-items: center; gap: 7px; }
   .hero-tally b { font-size: 18px; color: var(--on-night); }
   .hero-tally i { width: 8px; height: 8px; border-radius: 50%; }
@@ -278,9 +278,13 @@ const jsonld = [
   .hero-tally a:hover { text-decoration: underline; }
   .hero-orbit { width: 100%; }
   @media (min-width: 1024px) {
-    .hero-orbit { order: 0; }
-    .hero-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 64px 48px; min-height: calc(100vh - var(--header-h)); max-height: 880px; }
-    .hero-orbit { justify-self: end; width: min(100%, 720px); }
+    /* Content sets the height: no viewport lock, so a tall screen doesn't leave a band of empty night above and below.
+       The orbit takes the wider column and starts level with the headline; the commitments tally sits under it as a
+       caption, which balances the two columns. */
+    .hero-grid { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); grid-template-areas: 'copy orbit' 'copy tally'; grid-template-rows: auto 1fr; align-items: start; gap: 0 40px; padding-block: 48px 44px; }
+    .hero-copy { padding-top: 24px; }
+    .hero-orbit { justify-self: stretch; width: 100%; margin-top: -8px; }
+    .hero-tally { justify-content: center; margin-top: 36px; padding-top: 16px; }
     .hero-grid { overflow: visible; }
   }
 
