@@ -1,0 +1,20 @@
+{
+ "name": "Gov Score",
+ "short_name": "Gov Score",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ],
+ "theme_color": "#080b1a",
+ "background_color": "#080b1a",
+ "display": "browser",
+ "start_url": "/"
+}
