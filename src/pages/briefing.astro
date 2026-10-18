@@ -33,7 +33,7 @@ const base = url();
     .cat-stage { height: calc(100svh - 64px); }
     .phone-intro { display: none; background: #060e26; color: var(--hud-white); border-bottom: 1px solid var(--hud-line); }
     .phone-intro .wrap { padding-block: 28px; }
-    .phone-intro h1 { font-family: var(--hud-font); text-transform: uppercase; letter-spacing: .05em; font-size: 28px; margin: 0 0 8px; }
+    .phone-intro .ph-title { font-family: var(--hud-font); font-weight: 700; color: var(--hud-white); text-wrap: balance; text-transform: uppercase; letter-spacing: .05em; font-size: 28px; margin: 0 0 8px; }
     .phone-intro p { color: var(--hud-grey); margin: 0 0 16px; font-size: 15px; }
     @media (max-width: 760px) {
       body.catpage:not(.show3d) .phone-intro { display: block; }
@@ -43,7 +43,7 @@ const base = url();
 
   <section class="phone-intro" aria-label="About this page">
     <div class="wrap">
-      <h1>Every measure, mapped</h1>
+      <p class="ph-title">Every measure, mapped</p>
       <p>On a phone, the topics and measures are listed below. The 3D model works best on a larger screen, but you can open it here too.</p>
       <button type="button" class="btn-hud accent" id="btn-open-3d">Open the 3D model</button>
     </div>

@@ -33,7 +33,8 @@ const DATA = { topics, promises, ministers, conCats, cons, lawList, lawStatuses,
       <div id="find-step" class="grid gap-3"></div>
       <p class="mt-5"><button type="button" id="find-back" class="btn btn-ghost btn-sm" hidden><Icon name="arrow" size={14} class="rotate-180" /> Back</button></p>
     </div>
-    <p class="meta mt-10">Prefer to browse? <a href={url('measures/')}>Measures</a> · <a href={url('targets/')}>Promises</a> · <a href={url('controversies/')}>Controversies</a> · <a href={url('laws/')}>Laws</a> · <a href={url('learn/')}>Learn</a></p>
+    <p class="mt-10 max-w-[70ch] text-[15px] text-ink-2">This finder covers everything on Gov Score: {topics.reduce((n, t) => n + t.measures.length, 0)} official measures across {topics.length} topics, {promises.length} government promises with a verdict each, {cons.length} controversies, {lawList.length} bills, and {lessons.length} plain-English explainers. Each answer narrows the list, then you choose what to do with the item: view it, share an image, download the data or cite it.</p>
+    <p class="meta mt-4">Prefer to browse? <a href={url('measures/')}>Measures</a> · <a href={url('targets/')}>Promises</a> · <a href={url('controversies/')}>Controversies</a> · <a href={url('laws/')}>Laws</a> · <a href={url('learn/')}>Learn</a></p>
   </div>
   <style is:global>
     .fo { display: grid; gap: 4px; text-align: left; width: 100%; padding: 16px 18px; border: 1px solid var(--rule); border-radius: 14px; background: var(--surface); color: var(--ink); cursor: pointer; font: inherit; }
@@ -124,7 +125,19 @@ const DATA = { topics, promises, ministers, conCats, cons, lawList, lawStatuses,
         el.appendChild(opt('Data I can reuse', 'A spreadsheet, a share image, a chart of your own or a reference.', function () { show(dataStep, 'Data'); }));
         el.appendChild(opt('An explanation', 'Deficit or debt? Who sets interest rates? Short, plain lessons.', function () { show(learnStep, 'Learn'); }));
       }
+      function resultsStep(q) {
+        return function (el) {
+          el.innerHTML = '<p class="text-ink-2 mb-1">Searching for <b class="text-ink">' + esc(q) + '</b>…</p>';
+          fetch(B + 'search-index.json').then(function (r) { return r.json(); }).then(function (d) {
+            var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+            var hits = d.map(function (i) { var t = i.title.toLowerCase(), s = 0; for (var k = 0; k < words.length; k++) { var w = words[k]; if (t.indexOf(w) === 0) s += 6; else if (t.indexOf(w) >= 0) s += 4; else if (i.text.indexOf(w) >= 0) s += 1; else return null; } return { i: i, s: s }; }).filter(Boolean).sort(function (a, b) { return b.s - a.s; }).slice(0, 12);
+            el.innerHTML = '<p class="text-ink-2 mb-1">' + (hits.length ? hits.length + ' results for <b class="text-ink">' + esc(q) + '</b>. Not it? Go back and answer the questions instead.' : 'Nothing found for <b class="text-ink">' + esc(q) + '</b>. Try a shorter word, or go back and answer the questions instead.') + '</p>';
+            hits.forEach(function (h) { el.appendChild(act(h.i.title, h.i.sub || '', h.i.href)); });
+          }).catch(function () { el.innerHTML = '<p class="text-ink-2 mb-1">Search is not available right now. Go back and answer the questions instead.</p>'; });
+        };
+      }
       show(start, null);
+      var q = new URLSearchParams(location.search).get('q'); if (q && q.trim()) show(resultsStep(q.trim()), 'Search');
       var sl = document.getElementById('find-search-link'); if (sl) sl.addEventListener('click', function (e) { e.preventDefault(); var i = document.querySelector('[data-search] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center' }); } else location.href = B + 'measures/'; });
     })();
   </script>
