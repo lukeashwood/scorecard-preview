@@ -226,8 +226,8 @@ const jsonld = [
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {[
         { href: 'budget/build/', eyebrow: 'Interactive', h: 'Build your own Federal Budget', p: 'Start from the real Budget. Change any tax or spending line and watch the deficit, debt and interest bill respond.' },
-        { href: 'classrooms/', eyebrow: 'Learn and teach', h: 'Explainers and classroom tools', p: 'Deficit or debt? Who sets interest rates? Short explainers with no jargon, plus a page for teachers and students.' },
         { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'Every measure in one interactive 3D model, showing how they all fit together in the bigger picture.' },
+        { href: 'classrooms/', eyebrow: 'Learn and teach', h: 'Explainers and classroom tools', p: 'Deficit or debt? Who sets interest rates? Short explainers with no jargon, plus a page for teachers and students.' },
         { href: 'make-your-own-chart/', eyebrow: 'Free to reuse', h: 'Make your own chart', p: 'Download any series as a spreadsheet, redraw it your way for a newsletter, report or classroom, and credit the source in 1 line.' },
       ].map((c, i) => (
         <a href={url(c.href)} class="card card-link card-pad rise flex flex-col" style={`--i:${i}`}>
