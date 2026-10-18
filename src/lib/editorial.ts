@@ -16,13 +16,13 @@ export const EDITORIAL: Record<string, Editorial> = {
       owner: 'government', ownerLabel: 'Election promise (2021)',
       commitment: 'Cut household power bills by $275 a year by 2025.', deadline: '2025-12-31',
       sourceLabel: 'RMIT ABC Fact Check: promise check on the $275 cut', sourceUrl: 'https://www.abc.net.au/news/2023-05-19/promise-check-cut-power-bills-by-275-dollars/101791146',
-      rule: 'The deadline (31 December 2025) has passed, so the verdict is final. Met if the regulated default offer for a typical household is at least $275 a year lower than in 2022-23 in every benchmark region (NSW, South-East Queensland, South Australia and Victoria). Not met otherwise.',
+      rule: 'The deadline (31 December 2025) has passed, so the verdict is final. Judged on the regulated default offers in force at the deadline, the 2025-26 offers that applied from 1 July 2025. Met if the 2025-26 default offer for a typical household was at least $275 a year lower than in 2022-23 in every benchmark region (NSW, South-East Queensland, South Australia and Victoria). Not met otherwise. Offers set after the deadline are shown for context and do not change the verdict.',
       rate: (m) => {
         const regions = (m.chart.bars ?? []).filter((b) => !/promise/i.test(b.name));
         if (!regions.length) return v('in_progress', 'No default-offer figures published yet.');
         const allMet = regions.every((b) => b.value <= -275);
         const lo = Math.min(...regions.map((b) => b.value)), hi = Math.max(...regions.map((b) => b.value));
-        return allMet ? v('met', 'Default offers are at least $275 a year lower in every benchmark region.') : v('not_met', `The 2025 deadline has passed. Default offers are ${lo >= 0 ? 'higher' : 'not $275 lower'} in every benchmark region: from ${lo >= 0 ? '+' : ''}$${lo} to +$${hi} a year.`);
+        return allMet ? v('met', 'The 2025-26 default offers were at least $275 a year lower than 2022-23 in every benchmark region.') : v('not_met', `At the 2025 deadline, default offers were ${lo >= 0 ? 'higher' : 'not $275 lower'} than 2022-23 in every benchmark region: from ${lo >= 0 ? '+' : ''}$${lo} to +$${hi} a year.`);
       },
     },
   },

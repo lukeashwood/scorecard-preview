@@ -21,7 +21,7 @@ import { fmtStamp, fmtPeriod } from '../../lib/format';
       <dl class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {([['Checks run', CHECKS.checks_total], ['Passed', CHECKS.checks_passed], ['Warning', CHECKS.checks_warn], ['Failed', CHECKS.checks_failed]] as const).map(([l, n]) => <div><dt class="meta">{l}</dt><dd class="num font-display text-[26px] font-semibold leading-tight">{n}</dd></div>)}
       </dl>
-      <p class="meta mt-3">Run {fmtStamp(GENERATED_AT)}. A failed check keeps the last verified figure on the page and marks it under review. The check-by-check log is not yet published.</p>
+      <p class="meta mt-3">Run {fmtStamp(GENERATED_AT)}. A failed check keeps the last verified figure on the page and marks it under review. <a href={url('data/checks/')} class="font-bold">See every check, one line each</a>, or take the log as <a href={url('data/checks.json')} download>JSON</a>.</p>
     </div>
     <div class="card mt-6 overflow-hidden">
       <div class="table-scroll"><table class="dt">
