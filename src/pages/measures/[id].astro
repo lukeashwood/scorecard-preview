@@ -111,7 +111,7 @@ const jsonld = {
         <h2 class="h3">{m.ed.chartTitle ?? ((m.chart.series?.length ?? 0) > 1 ? m.title : rs?.name ?? m.title)}</h2>
         <ul class="flex flex-wrap gap-1.5">{m.ed.labels.map((l) => <li class="pill pill-neutral !font-semibold">{l}</li>)}</ul>
       </div>
-      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} g20={g20For(m.id)} />
+      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} csvHeader={[m.title, `Unit: ${m.ed.unitOverride ?? m.chart.unit}`, ...m.sources.map((s) => `Source: ${s.publisher}, ${s.title}, ${s.url}`), `Downloaded from ${SITE.name}, ${pageUrl}, ${GENERATED_AT.slice(0, 10)}. Credit the sources above and ${SITE.name}.`]} g20={g20For(m.id)} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
     </section>
 
@@ -172,7 +172,7 @@ const jsonld = {
             <li class="text-[14px] leading-snug"><a href={s.url} rel="noopener" class="font-semibold">{s.title} <Icon name="ext" size={12} class="inline" /></a><span class="meta block">{s.publisher}{s.published ? ` · published ${fmtDate(s.published)}` : ''}{s.retrieved_at ? ` · retrieved ${fmtDate(s.retrieved_at)}` : ''}</span>{s.data_url && <a class="meta mono block break-all" href={s.data_url} rel="noopener">{s.data_url.replace(/^https?:\/\//, '').slice(0, 60)}</a>}</li>))}</ul>
         </div>
         <div class="card card-pad">
-          <p class="eyebrow">Cite this</p>
+          <p class="eyebrow" id="cite">Cite this</p>
           <p id="cite-text" class="mt-2 text-[13.5px] leading-snug text-ink-2">{cite}</p>
           <button type="button" id="cite-btn" class="btn btn-quiet btn-sm mt-3">Copy citation</button>
         </div>

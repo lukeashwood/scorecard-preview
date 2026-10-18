@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { SITE, url } from '../config/site';
+import { MEASURES, GENERATED_AT } from '../lib/measures';
+import { fmtDate } from '../lib/format';
+const example = MEASURES.find((m) => m.id === 'inflation') ?? MEASURES[0];
+const exampleUrl = new URL(url(`measures/${example.id}/`), Astro.site).href;
+const publishers = example.sources.map((s) => s.publisher).filter((v, i, a) => a.indexOf(v) === i).join('; ');
+const credit = `Source: ${publishers}, via ${SITE.name} (govscore.com.au), data to ${fmtDate(GENERATED_AT)}.`;
+const jsonld = { '@context': 'https://schema.org', '@type': 'HowTo', name: 'Make your own chart from Gov Score data', description: 'Download any series on Gov Score as a spreadsheet file, build your own chart, and credit the source.', step: [
+  { '@type': 'HowToStep', name: 'Open the measure', text: 'Open the measure page for the figure you want.' },
+  { '@type': 'HowToStep', name: 'Download the CSV', text: 'Click Download CSV above the chart.' },
+  { '@type': 'HowToStep', name: 'Open it in a spreadsheet', text: 'Open the file in Excel, Google Sheets or Numbers.' },
+  { '@type': 'HowToStep', name: 'Make the chart', text: 'Select the date column and the value column and insert a line chart.' },
+  { '@type': 'HowToStep', name: 'Credit the source', text: 'Copy the source line from the top of the file under your chart.' },
+] };
+---
+<Base title="Make your own chart from official Australian data" description="Download any series on Gov Score as a CSV, open it in Excel, Google Sheets or Numbers, build your own chart, and credit the source. Free to reuse." section="data/" jsonld={jsonld}>
+  <div class="wrap-narrow pt-10 md:pt-14">
+    <p class="eyebrow">Data and downloads</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Make your own chart</h1>
+    <p class="lede mt-3">Every chart on this site can be downloaded as a spreadsheet file and redrawn your way, for a newsletter, a classroom, a report or a post. It takes about 2 minutes and costs nothing. Here is how, and how to credit it.</p>
+
+    <ol class="mt-10 grid gap-6">
+      {[
+        { h: 'Open the measure you want', p: <>Go to <a href={url('measures/')}>Measures</a> and open the page for the figure, for example <a href={url(`measures/${example.id}/`)}>{example.title}</a>. The <a href={url('charts/')}>Charts</a> page has every chart on one screen if you would rather browse.</> },
+        { h: 'Click “Download CSV”', p: <>It is above the chart, next to “Show as table”. A CSV is a plain spreadsheet file that every spreadsheet program can open. You get the whole series, not just the years showing on screen, and the file is named with the measure and today’s date.</> },
+        { h: 'Open it in your spreadsheet', p: <><b>Excel:</b> double-click the file. If every row lands in 1 cell, go to Data, then From Text/CSV, and choose the file. <b>Google Sheets:</b> File, Import, Upload, then “Replace spreadsheet”. <b>Numbers:</b> double-click the file.</> },
+        { h: 'Read the top of the file', p: <>The first few lines start with <span class="mono">#</span>. They are not data: they give the measure name, the unit, the official source with a link, and the date it was downloaded. Keep them, you will need them for step 5. The data starts at the row that says <span class="mono">date</span>.</> },
+        { h: 'Make the chart', p: <>Select the <span class="mono">date</span> column and the value column next to it, then insert a line chart (Insert, Chart, Line in all 3 programs). Where a file has more than 1 value column, each is a line on the site’s chart; pick the one you want. If there is a <span class="mono">forecast</span> column, rows marked <span class="mono">yes</span> are Budget forecasts, not results, so label or leave them out.</> },
+        { h: 'Credit the source under the chart', p: <>Copy the source line from the top of the file. A short form that covers everyone’s terms:</> },
+      ].map((s, i) => (
+        <li class="card card-pad grid gap-2 sm:grid-cols-[52px_1fr]">
+          <span class="num font-display text-[34px] font-semibold leading-none text-brand">{i + 1}</span>
+          <div><h2 class="h3">{s.h}</h2><p class="mt-2 text-[15.5px] leading-relaxed text-ink-2">{s.p}</p>
+            {i === 5 && <div class="mt-3 rounded-lg bg-panel p-4"><p class="mono text-[13.5px]" id="credit-text">{credit}</p><button type="button" id="credit-btn" class="btn btn-quiet btn-sm mt-3">Copy this credit line</button></div>}
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <h2 class="h2 mt-14">The rules for reuse, in short</h2>
+    <ul class="mt-4 grid gap-3 text-[15.5px] text-ink-2">
+      <li class="flex gap-3"><span class="mt-1 text-good"><Icon name="check" size={18} /></span><span><b class="text-ink">You can</b> redraw, publish, print and share any chart, including commercially. The underlying figures are published by the ABS, the Reserve Bank and other agencies under Creative Commons Attribution 4.0, and this site’s own tables and calculations are offered under the same licence.</span></li>
+      <li class="flex gap-3"><span class="mt-1 text-good"><Icon name="check" size={18} /></span><span><b class="text-ink">You must</b> name the original publisher (the ABS, the RBA and so on) and say the data came via {SITE.name}. The credit line above does both.</span></li>
+      <li class="flex gap-3"><span class="mt-1 text-bad"><Icon name="x" size={18} /></span><span><b class="text-ink">Please don’t</b> present a Budget forecast as a result, change the figures, or imply the ABS or this site endorses what you say about them. The numbers are theirs; the conclusion is yours.</span></li>
+    </ul>
+
+    <h2 class="h2 mt-14">Shortcuts</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <a href={url('data/')} class="card card-link card-pad"><p class="eyebrow">Every series</p><p class="mt-2 font-display text-[21px] font-semibold leading-tight">All 43 measures as CSV, or everything in 1 file</p><p class="mt-2 text-[14.5px] text-ink-2">For spreadsheets with several charts, or for researchers.</p></a>
+      <a href={url(`measures/${example.id}/#cite`)} class="card card-link card-pad"><p class="eyebrow">Quoting a figure, not a chart</p><p class="mt-2 font-display text-[21px] font-semibold leading-tight">Every measure page has a “Cite this” box</p><p class="mt-2 text-[14.5px] text-ink-2">A ready-made reference with the figure, the date and the source, for essays and articles.</p></a>
+    </div>
+    <p class="meta mt-8">Example source line from the {example.title} file: <span class="mono">{`# Source: ${example.sources[0].publisher}, ${example.sources[0].title}`}</span>. Page: <a href={exampleUrl}>{exampleUrl}</a></p>
+  </div>
+  <script is:inline>
+    (function () { var b = document.getElementById('credit-btn'), t = document.getElementById('credit-text'); if (!b || !t) return;
+      b.addEventListener('click', function () { navigator.clipboard.writeText(t.textContent).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy this credit line'; }, 1500); }); }); })();
+  </script>
+</Base>

@@ -13,6 +13,7 @@ import { fmtStamp, fmtPeriod } from '../../lib/format';
     <p class="lede mt-3">Every series on the site, free to reuse with credit. Files are rebuilt whenever the data updates; the latest build was {fmtStamp(GENERATED_AT)}.</p>
     <div class="mt-7 flex flex-wrap gap-3">
       <a class="btn btn-primary" href={url('data/measures.json')} download><Icon name="download" />Everything (JSON)</a>
+      <a class="btn btn-ghost" href={url('make-your-own-chart/')}>Make your own chart</a>
       <a class="btn btn-ghost" href={url('methodology/')}>Read the methodology</a>
     </div>
     <div class="card card-pad mt-8">

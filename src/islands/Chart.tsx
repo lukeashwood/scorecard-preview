@@ -17,6 +17,8 @@ interface Props {
   /** Plot this extra series (e.g. % of GDP) instead of series[0]. */
   useExtra?: number;
   csvName?: string;
+  /** Header lines written at the top of the CSV download: title, unit, sources and credit. */
+  csvHeader?: string[];
   height?: number;
   /** G20 comparisons that fit this measure (empty when there is no like-for-like international series). */
   g20?: G20Ind[];
@@ -37,7 +39,7 @@ function useWidth<T extends HTMLElement>() {
   return [ref, w] as const;
 }
 
-export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', height = 340, g20 = [] }: Props) {
+export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', csvHeader = [], height = 340, g20 = [] }: Props) {
   const unit = unitOverride ?? (useExtra != null ? spec.extra![useExtra].unit : spec.unit);
   const decimals = useExtra != null ? spec.extra![useExtra].decimals : spec.decimals;
   const series = useMemo(() => {
@@ -74,7 +76,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
       rows = ['date,' + series.map((s) => `"${s.name.replace(/"/g, '""')}"`).join(','), ...dates.map((d) => d + ',' + maps.map((m) => m.get(d) ?? '').join(','))];
     }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' })); a.download = `${csvName}.csv`; a.click();
+    a.href = URL.createObjectURL(new Blob([[...csvHeader.map((h) => '# ' + h), ...rows].join('\n') + '\n'], { type: 'text/csv' })); a.download = `${csvName}.csv`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
