@@ -81,11 +81,25 @@ export function typicalHousehold(now: TaxRules | null) {
     const left0 = rows.reduce((t, r) => t + r.a, 0), left1 = rows.reduce((t, r) => t + r.b, 0), left0Today = left0 * g(cpi!);
     return { rows, left0, left1, left0Today, diff: left1 - left0Today };
   };
+  // A single earner renting: 1 person on the median wage, the same rent, car and petrol, and half the household
+  // grocery bill (the HES publishes household averages, not a one-person shop, so half is an assumption).
+  const singleCommon = [
+    { l: 'Income, before tax', a: pay0 / 2, b: pay1 / 2, n: `1 person on the median wage, grown by the Wage Price Index (+${wpi!.toFixed(1)}%)` },
+    { l: 'Income tax and Medicare levy', a: -tax0 / 2, b: -tax1 / 2, n: `${RULES_2223.label} rates, then ${now.label} rates` },
+  ];
+  const singleLiving = [
+    { l: 'Groceries', a: -groc0 / 2, b: -groc1 / 2, n: `Half the household shop; food prices +${food!.toFixed(1)}%` },
+    ...living.slice(1),
+  ];
+  const singleRows = [...singleCommon, { l: 'Rent', a: -rent0, b: -rent1, n: `Median market rent, about $${Math.round(rent0 / 52)} a week then, $${Math.round(rent1 / 52)} now (+${rentGrowth.toFixed(1)}%)` }, ...singleLiving];
+  const sLeft0 = singleRows.reduce((t, r) => t + r.a, 0), sLeft1 = singleRows.reduce((t, r) => t + r.b, 0), sLeft0Today = sLeft0 * g(cpi!);
+  const single = { rows: singleRows, left0: sLeft0, left1: sLeft1, left0Today: sLeft0Today, diff: sLeft1 - sLeft0Today };
   return {
     period: pvw.headline.period ?? '', cpi: cpi!, wpi: wpi!, food: food!, fuel: fuel!, ins: ins!, rents: rents!, motor: MOTOR_SINCE_2022,
     loan: LOAN, rate0, rate1, rateMonth: m1[0], lift, weekly0: MEDIAN_WEEKLY_2022, weekly1: (pay1 / 2) / 52, taxLabel: now.label,
     rentWeek0: rent0 / 52, rentWeek1: rent1 / 52, rentGrowth,
     owner: variant({ l: 'Mortgage repayments', a: -mort0, b: -mort1, n: `$${(LOAN / 1000).toFixed(0)}k average loan, 30 years, ${rate0.toFixed(2)}% then, ${rate1.toFixed(2)}% now` }),
+    single,
     renter: variant({ l: 'Rent', a: -rent0, b: -rent1, n: `Median market rent, about $${Math.round(rent0 / 52)} a week then, $${Math.round(rent1 / 52)} now (+${rentGrowth.toFixed(1)}%)` }),
   };
 }

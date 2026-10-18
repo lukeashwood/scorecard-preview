@@ -106,23 +106,25 @@ const jsonld = [
         <p class="eyebrow">What it means for you</p>
         <fieldset class="wallet-toggle mt-4">
           <legend class="sr-only">Household type</legend>
-          <input type="radio" name="wallet" id="w-own" class="sr-only" checked /><label for="w-own">With a mortgage</label>
-          <input type="radio" name="wallet" id="w-rent" class="sr-only" /><label for="w-rent">Renting</label>
+          <input type="radio" name="wallet" id="w-own" class="sr-only" checked /><label for="w-own">Couple, mortgage</label>
+          <input type="radio" name="wallet" id="w-rent" class="sr-only" /><label for="w-rent">Couple, renting</label>
+          <input type="radio" name="wallet" id="w-single" class="sr-only" /><label for="w-single">Single, renting</label>
         </fieldset>
-        {([['w-own-panel', TH.owner.diff], ['w-rent-panel', TH.renter.diff]] as const).map(([cls, d]) => (
+        {([['w-own-panel', TH.owner.diff, 'A couple on the median wage is', `2 median earners, the average new mortgage ($${Math.round(TH.loan / 1000)}k), a car and a weekly shop.`], ['w-rent-panel', TH.renter.diff, 'A couple on the median wage is', `2 median earners paying the median market rent (a new lease), a car and a weekly shop.`], ['w-single-panel', TH.single.diff, 'A single renter on the median wage is', `1 median earner paying the median market rent (a new lease), a car and half the household shop.`]] as const).map(([cls, d, lead, who]) => (
           <div class:list={['mt-6', cls]} aria-live="polite">
-            <p class="font-display text-[clamp(26px,3.4vw,36px)] leading-tight">A typical household is</p>
+            <p class="font-display text-[clamp(26px,3.4vw,36px)] leading-tight">{lead}</p>
             <p class="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
               <span class="num font-display text-[clamp(76px,12vw,132px)] font-semibold leading-[0.9] tracking-tight text-brand">{$(Math.abs(d) / 52)}</span>
               <span class="font-display text-[clamp(22px,2.8vw,32px)] leading-tight">a week<br />{d >= 0 ? 'better off' : 'worse off'}</span>
             </p>
             <p class="lede mt-4">than in June 2022. That adds up to <b class="text-ink">{$(Math.abs(d))} a year</b>.</p>
+            <p class="meta mt-3 max-w-[60ch]">{who} After tax and inflation, against June 2022. Official figures throughout; it measures what changed, not who caused it.</p>
           </div>
         ))}
       </div>
       <div class="card card-pad shadow-card">
         <p class="eyebrow">How this is worked out</p>
-        <p class="mt-2 text-[15.5px] text-ink-2">A couple on the median wage, with a car and a weekly shop. Their pay after tax, compared with groceries, petrol, car costs and either a mortgage or rent, against June 2022 and adjusted for inflation. Every input is an official figure.</p>
+        <p class="mt-2 text-[15.5px] text-ink-2">3 example households on the median wage, each with a car and a weekly shop. Pay after tax, compared with groceries, petrol, car costs and a new mortgage or a new lease, against June 2022 and adjusted for inflation. Every input is an official figure, and the full working is on the calculator page.</p>
         <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
           <a class="btn btn-primary" href={url('calculator/')}>Work out your own number <Icon name="arrow" /></a>
           <a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url('calculator/#typical')}>See the working <Icon name="arrow" size={15} /></a>
@@ -237,12 +239,13 @@ const jsonld = [
 
   /* Household type switch: plain radio buttons, so it works without JavaScript. */
   .wallet-toggle { display: inline-flex; gap: 4px; padding: 4px; border: 0; margin: 0; border-radius: 999px; background: var(--panel); }
-  .wallet-toggle label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; font-weight: 700; font-size: 15px; color: var(--ink-2); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+  .wallet-toggle label { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; white-space: nowrap; border-radius: 999px; font-weight: 700; font-size: 15px; color: var(--ink-2); cursor: pointer; transition: background-color 160ms ease, color 160ms ease; }
+  @media (max-width: 420px) { .wallet-toggle label { padding: 0 10px; font-size: 13.5px; } }
   .wallet-toggle input:checked + label { background: var(--brand); color: var(--on-brand); }
   .wallet-toggle input:focus-visible + label { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .w-rent-panel { display: none; }
-  .wallet:has(#w-rent:checked) .w-rent-panel { display: block; }
-  .wallet:has(#w-rent:checked) .w-own-panel { display: none; }
+  .w-rent-panel, .w-single-panel { display: none; }
+  .wallet:has(#w-rent:checked) .w-rent-panel, .wallet:has(#w-single:checked) .w-single-panel { display: block; }
+  .wallet:has(#w-rent:checked) .w-own-panel, .wallet:has(#w-single:checked) .w-own-panel { display: none; }
 
   /* Key figures: a swipeable row on phones, a grid on wider screens. */
   .tn-row { display: grid; gap: 16px; grid-auto-flow: column; grid-auto-columns: minmax(270px, 84%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
