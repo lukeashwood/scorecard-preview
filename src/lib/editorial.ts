@@ -1,4 +1,4 @@
-/* Rating rules v2.0. This file is the whole editorial layer: it decides what is a TARGET (someone in authority made a
+/* Rating rules (version: SITE.rulesVersion in config/site.ts). This file is the whole editorial layer: it decides what is a TARGET (someone in authority made a
    measurable commitment, so it gets a verdict), what is a CONDITION (a fact about the country, shown with its direction and
    no verdict), and how much the federal government actually controls each one. The methodology page is generated from it,
    so what readers are told is exactly what the code does. Change a rule here => bump SITE.rulesVersion and log it. */
