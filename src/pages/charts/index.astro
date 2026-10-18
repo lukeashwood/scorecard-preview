@@ -2,6 +2,7 @@
 /* Every chart on one page, like the original Scorecard. Built from the raw data feed, so any chart the pipeline adds
    shows up here automatically, even before it has an editorial entry. Visitors pick which charts they see; the choice
    is kept in their browser for now. When the paid tier starts, this picker is where the free/paid limit will sit. */
+import { decideLine } from '../../lib/headlines';
 import Base from '../../layouts/Base.astro';
 import Chart from '../../islands/Chart.tsx';
 import VerdictPill from '../../components/VerdictPill.astro';
@@ -83,6 +84,7 @@ const groups = [
               <div class="mt-4">
                 <Chart client:visible spec={i.chart} title={i.title} unitOverride={i.unitOverride} useExtra={i.useExtra} elections={[...SITE.government.elections]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${i.id}-${GENERATED_AT.slice(0, 10)}`} height={300} g20={g20For(i.id)} />
               </div>
+              {i.hasPage && measure[i.id] && <p class="decide mt-4">{decideLine(measure[i.id])}</p>}
               {i.hasPage && <div class="no-print mt-4 flex flex-wrap items-center justify-between gap-2"><a class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline" href={url(`measures/${i.id}/`)}>Sources and explanation →</a><ShareButton text={shareText(measure[i.id])} href={new URL(url(`measures/${i.id}/`), Astro.site).href} /></div>}
             </article>
           ))}

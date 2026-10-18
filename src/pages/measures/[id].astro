@@ -24,7 +24,7 @@ import { INFLUENCE_MEANING, VERDICT_MEANING } from '../../lib/editorial';
 import { fmtDate, fmtMonth, fmtPeriod, fmtStamp, headlineText, withUnit } from '../../lib/format';
 import type { Measure } from '../../lib/types';
 import { MEASURE_SEO, clip } from '../../lib/seo';
-import { factualHeadline, recordLine } from '../../lib/headlines';
+import { decideLine, factualHeadline, recordLine } from '../../lib/headlines';
 
 export function getStaticPaths() { return MEASURES.map((m) => ({ params: { id: m.id }, props: { m } })); }
 const { m } = Astro.props as { m: Measure };
@@ -105,12 +105,14 @@ const jsonld = {
       <section class="card card-pad mt-6" aria-label="Progress towards 1.2 million homes">
         <h2 class="h3 mb-4">Where the 1.2 million homes are up to</h2>
         <HousesGrid />
+        <p class="decide mt-4">{decideLine(m)}</p>
       </section>
     )}
     {PICTURES[m.id] && (
       <section class="card card-pad mt-6" aria-label={PICTURES[m.id].h}>
         <h2 class="h3 mb-4">{PICTURES[m.id].h}</h2>
         <Picture kind={PICTURES[m.id].kind} />
+        <p class="decide mt-4">{decideLine(m)}</p>
       </section>
     )}
     <section class="card card-pad mt-6" aria-label="Chart">
@@ -120,6 +122,7 @@ const jsonld = {
       </div>
       <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} howToHref={url('make-your-own-chart/')} csvHeader={[m.title, `Unit: ${m.ed.unitOverride ?? m.chart.unit}`, ...m.sources.map((s) => `Source: ${s.publisher}, ${s.title}, ${s.url}`), `Downloaded from ${SITE.name}, ${pageUrl}, ${GENERATED_AT.slice(0, 10)}. Credit the sources above and ${SITE.name}.`]} g20={g20For(m.id)} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
+      <p class="decide mt-4">{decideLine(m)}</p>
       <p class="meta mt-3">Want this chart in your own newsletter, report or classroom? <a href={url('make-your-own-chart/')}>Download the data and make your own</a>, with the source line ready to paste.</p>
     </section>
 
