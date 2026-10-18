@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import FavButton from '../../components/FavButton.astro';
+import ShareButton from '../../components/ShareButton.astro';
+import { SITE, url } from '../../config/site';
+import { fmtDate } from '../../lib/format';
+import { pairFor } from '../../lib/controversy-questions';
+import { CONTROVERSIES, STATUS_LABEL, TYPE_LABEL, STANDING_LABEL, type Controversy } from '../../lib/controversies';
+import { controversyTitle, controversyDescription, shortLabel } from '../../lib/controversy-seo';
+
+export function getStaticPaths() { return CONTROVERSIES.map((c) => ({ params: { id: c.id }, props: { c } })); }
+const { c } = Astro.props as { c: Controversy };
+const pair = pairFor(c.id, c.type);
+const idx = CONTROVERSIES.findIndex((x) => x.id === c.id);
+const prev = CONTROVERSIES[(idx - 1 + CONTROVERSIES.length) % CONTROVERSIES.length], next = CONTROVERSIES[(idx + 1) % CONTROVERSIES.length];
+const sameMinister = CONTROVERSIES.filter((x) => x.id !== c.id && x.minister === c.minister).slice(0, 4);
+const sameCategory = CONTROVERSIES.filter((x) => x.id !== c.id && x.minister !== c.minister && x.category === c.category).slice(0, 4 - sameMinister.length);
+const related = [...sameMinister, ...sameCategory];
+const pageUrl = new URL(url(`controversies/${c.id}/`), Astro.site).href;
+const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 'pill-bad', position: 'pill-brand' } as const;
+const title = controversyTitle(c), description = controversyDescription(c);
+const jsonld = [
+  { '@context': 'https://schema.org', '@type': 'Article', headline: c.title, alternativeHeadline: pair.critical, description, url: pageUrl, mainEntityOfPage: pageUrl,
+    datePublished: c.date, dateModified: c.verified_on, inLanguage: 'en-AU', articleSection: 'Controversies', about: { '@type': 'Person', name: c.minister, jobTitle: c.portfolio },
+    author: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href }, publisher: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href },
+    citation: c.sources.map((s) => s.url) },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Controversies', item: new URL(url('controversies/'), Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: c.title, item: pageUrl }] },
+];
+---
+<Base title={title} description={description} section="controversies/" jsonld={jsonld} ogType="article">
+  <article class="wrap-narrow pt-10 md:pt-14">
+    <p class="eyebrow"><a href={url('controversies/')}>Controversies</a> / {c.category}</p>
+    <div class="mt-3 flex flex-wrap items-center gap-2">
+      {c.featured && <span class="pill pill-brand">In depth</span>}
+      <span class:list={['pill', c.type === 'policy' && !c.featured ? 'pill-brand' : 'pill-neutral']}>{TYPE_LABEL[c.type]}</span>
+      <span class="pill pill-neutral !font-semibold">{STATUS_LABEL[c.status]}</span>
+      <span class="meta mono">{fmtDate(c.date)}</span>
+    </div>
+    <h1 class="display mt-4 text-[clamp(28px,4vw,44px)] leading-tight"><span class="block">{pair.critical}</span><span class="block text-ink-2">{pair.benign}</span></h1>
+    <p class="mt-4 text-[17px] font-semibold text-ink">{c.title}</p>
+    <p class="meta mt-1">{c.minister}, {c.portfolio} · {c.category}</p>
+    <div class="no-print mt-4 flex flex-wrap items-center gap-2">
+      <FavButton type="controversy" id={c.id} small />
+      <ShareButton text={`${pair.critical} ${pair.benign} The record, sourced: ${c.title}`} href={pageUrl} label="Share" />
+    </div>
+
+    <h2 class="h2 mt-10">What happened</h2>
+    <p class="lede mt-3">{c.summary}</p>
+
+    {c.figures && <dl class="mt-8 grid gap-px overflow-hidden rounded-xl border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-4">{c.figures.map((f) => <div class="bg-surface p-4"><dt class="eyebrow">{f.label}</dt><dd class="num mt-1 font-display text-[24px] font-semibold leading-tight">{f.value}</dd><dd class="meta mt-1">{f.note}</dd></div>)}</dl>}
+
+    {c.points && (
+      <section class="mt-10">
+        <h2 class="h2">The claims, tested</h2>
+        <p class="mt-2 text-[14.5px] text-ink-2">Each strand of the dispute is marked <b>Established</b> (official figures or records show it), <b>Contested</b> (credible sources disagree), <b>Not supported by the record</b> (the claim goes further than the evidence) or <b>Stated position</b> (what one side says, quoted, not tested).</p>
+        <div class="mt-5 grid gap-4">{c.points.map((p) => (
+          <section class="rounded-xl border border-rule p-4 md:p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="h3">{p.heading}</h3><span class:list={['pill', tone[p.standing]]}>{STANDING_LABEL[p.standing]}</span></div>
+            <p class="mt-2 max-w-[85ch] text-[15.5px] text-ink-2">{p.body}</p>
+            <ul class="meta mt-3 grid gap-1">{p.sources.map((s) => <li><a href={s.url} rel="noopener">{s.title} <Icon name="ext" size={12} class="inline" /></a></li>)}</ul>
+          </section>))}</div>
+      </section>
+    )}
+
+    <div class="mt-10 grid gap-4 md:grid-cols-2">
+      <div class="rounded-xl bg-panel p-5"><h2 class="eyebrow">The government’s response</h2><p class="mt-2 text-[15.5px] text-ink-2">{c.response}</p></div>
+      <div class="rounded-xl bg-panel p-5"><h2 class="eyebrow">Outcome so far</h2><p class="mt-2 text-[15.5px] text-ink-2">{c.outcome}</p></div>
+    </div>
+
+    <p class="decide mt-10 text-[18px]">{pair.critical} {pair.benign} <b>You decide.</b></p>
+
+    <section class="mt-10">
+      <h2 class="h3">Sources</h2>
+      <p class="meta mt-1">Checked {fmtDate(c.verified_on)}. Being listed on this site is not a finding of wrongdoing; “No inquiry or finding” means no official body has examined the matter.</p>
+      <ul class="meta mt-3 grid gap-1.5">{c.sources.map((s) => <li><a href={s.url} rel="noopener">{s.title} <Icon name="ext" size={12} class="inline" /></a></li>)}</ul>
+    </section>
+
+    {related.length > 0 && (
+      <section class="mt-12">
+        <h2 class="h3">Related</h2>
+        <ul class="mt-3 grid gap-2">{related.map((r) => <li><a href={url(`controversies/${r.id}/`)} class="font-semibold">{pairFor(r.id, r.type).critical}</a> <span class="meta">{r.minister} · {fmtDate(r.date)}</span></li>)}</ul>
+      </section>
+    )}
+
+    <nav class="mt-12 flex flex-wrap justify-between gap-3 border-t border-rule pt-5 text-[14.5px] font-bold" aria-label="Other controversies">
+      <a href={url(`controversies/${prev.id}/`)} class="no-underline hover:underline">← {shortLabel(prev)}</a>
+      <a href={url(`controversies/${next.id}/`)} class="no-underline hover:underline">{shortLabel(next)} →</a>
+    </nav>
+    <p class="meta mt-6"><a href={url('controversies/')}>All controversies</a> · Think this entry is missing something or unfair? <a href={url('corrections/#report')}>Tell us</a>. Ministers’ offices have the same right of reply.</p>
+  </article>
+</Base>
