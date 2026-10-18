@@ -11,7 +11,8 @@ import DisplayMenu from '../components/DisplayMenu.astro';
 interface Props { title?: string; fullTitle?: string; description?: string; section?: string; jsonld?: Record<string, unknown> | Record<string, unknown>[]; bodyClass?: string; forceDark?: boolean; ogType?: string; ogImage?: string }
 const { title, fullTitle: fullTitleProp, description: descRaw = SITE.description, section = '', jsonld, bodyClass, forceDark = false, ogType = 'website', ogImage } = Astro.props;
 const ogImg = new URL(ogImage ?? url('og.png'), Astro.site).href;
-const fullTitle = fullTitleProp ?? (title ? (title.length > 49 ? title : `${title} | ${SITE.name}`) : `${SITE.name} | ${SITE.tagline}`);
+// " | Gov Score" is 12 characters; adding it to a title of 49 or more would pass the 60 that Google shows in full.
+const fullTitle = fullTitleProp ?? (title ? (title.length > 48 ? title : `${title} | ${SITE.name}`) : `${SITE.name} | ${SITE.tagline}`);
 const description = clip(descRaw, 160);
 const ldList = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
