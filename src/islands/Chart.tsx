@@ -19,6 +19,8 @@ interface Props {
   csvName?: string;
   /** Header lines written at the top of the CSV download: title, unit, sources and credit. */
   csvHeader?: string[];
+  /** Link to the how-to page for redrawing the chart in a spreadsheet. */
+  howToHref?: string;
   height?: number;
   /** G20 comparisons that fit this measure (empty when there is no like-for-like international series). */
   g20?: G20Ind[];
@@ -39,7 +41,7 @@ function useWidth<T extends HTMLElement>() {
   return [ref, w] as const;
 }
 
-export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', csvHeader = [], height = 340, g20 = [] }: Props) {
+export default function Chart({ spec, title, unitOverride, elections = [], term, useExtra, csvName = 'data', csvHeader = [], howToHref, height = 340, g20 = [] }: Props) {
   const unit = unitOverride ?? (useExtra != null ? spec.extra![useExtra].unit : spec.unit);
   const decimals = useExtra != null ? spec.extra![useExtra].decimals : spec.decimals;
   const series = useMemo(() => {
@@ -104,6 +106,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
         {mode === 'time' && <div className="flex gap-1">
           <button type="button" className="btn btn-sm btn-ghost" aria-pressed={view === 'table'} onClick={() => setView(view === 'chart' ? 'table' : 'chart')}>{view === 'chart' ? 'Show as table' : 'Show as chart'}</button>
           <button type="button" className="btn btn-sm btn-ghost hidden sm:inline-flex" onClick={downloadCsv}>Download CSV</button>
+          {howToHref && <a className="btn btn-sm btn-ghost hidden sm:inline-flex" href={howToHref} title="Download the data and redraw this chart in a spreadsheet">Make your own chart</a>}
         </div>}
       </div>
       {mode === 'g20' ? <G20Panel indicators={g20} csvName={csvName} /> : <>

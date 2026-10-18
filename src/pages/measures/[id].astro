@@ -111,8 +111,9 @@ const jsonld = {
         <h2 class="h3">{m.ed.chartTitle ?? ((m.chart.series?.length ?? 0) > 1 ? m.title : rs?.name ?? m.title)}</h2>
         <ul class="flex flex-wrap gap-1.5">{m.ed.labels.map((l) => <li class="pill pill-neutral !font-semibold">{l}</li>)}</ul>
       </div>
-      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} csvHeader={[m.title, `Unit: ${m.ed.unitOverride ?? m.chart.unit}`, ...m.sources.map((s) => `Source: ${s.publisher}, ${s.title}, ${s.url}`), `Downloaded from ${SITE.name}, ${pageUrl}, ${GENERATED_AT.slice(0, 10)}. Credit the sources above and ${SITE.name}.`]} g20={g20For(m.id)} />
+      <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} howToHref={url('make-your-own-chart/')} csvHeader={[m.title, `Unit: ${m.ed.unitOverride ?? m.chart.unit}`, ...m.sources.map((s) => `Source: ${s.publisher}, ${s.title}, ${s.url}`), `Downloaded from ${SITE.name}, ${pageUrl}, ${GENERATED_AT.slice(0, 10)}. Credit the sources above and ${SITE.name}.`]} g20={g20For(m.id)} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
+      <p class="meta mt-3">Want this chart in your own newsletter, report or classroom? <a href={url('make-your-own-chart/')}>Download the data and make your own</a>, with the source line ready to paste.</p>
     </section>
 
     <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
