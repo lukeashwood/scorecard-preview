@@ -2,6 +2,15 @@
 import Base from '../../layouts/Base.astro';
 import Chart from '../../islands/Chart.tsx';
 import HousesGrid from '../../components/HousesGrid.astro';
+import Picture from '../../components/Picture.astro';
+const PICTURES: Record<string, { kind: 'power' | 'wages' | 'mortgage' | 'ndis' | 'crowd' | 'budget'; h: string }> = {
+  power_bills: { kind: 'power', h: 'The promise against the bill' },
+  real_wages: { kind: 'wages', h: 'What $100 of pay buys now' },
+  mortgage: { kind: 'mortgage', h: 'The rate rises, in days of pay' },
+  ndis: { kind: 'ndis', h: 'NDIS costs, in $2 billion coins' },
+  employment: { kind: 'crowd', h: 'For every 100 people in work in May 2022' },
+  budget_balance: { kind: 'budget', h: 'Above and below the waterline' },
+};
 import VerdictPill from '../../components/VerdictPill.astro';
 import DirectionBadge from '../../components/DirectionBadge.astro';
 import InfluenceChip from '../../components/InfluenceChip.astro';
@@ -89,6 +98,12 @@ const jsonld = {
       <section class="card card-pad mt-6" aria-label="Progress towards 1.2 million homes">
         <h2 class="h3 mb-4">Where the 1.2 million homes are up to</h2>
         <HousesGrid />
+      </section>
+    )}
+    {PICTURES[m.id] && (
+      <section class="card card-pad mt-6" aria-label={PICTURES[m.id].h}>
+        <h2 class="h3 mb-4">{PICTURES[m.id].h}</h2>
+        <Picture kind={PICTURES[m.id].kind} />
       </section>
     )}
     <section class="card card-pad mt-6" aria-label="Chart">

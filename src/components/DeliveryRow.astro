@@ -1,6 +1,7 @@
 ---
 import VerdictPill from './VerdictPill.astro';
 import Icon from './Icon.astro';
+import Picture from './Picture.astro';
 import { fmtMonth, fmtDate } from '../lib/format';
 import { DELIVERIES_VERIFIED } from '../lib/measures';
 import { url } from '../config/site';
@@ -14,6 +15,7 @@ const { d, i = 0 } = Astro.props;
     <h3 class="mt-1.5 font-display text-[21px] font-semibold leading-snug">{d.commitment}</h3>
     <p class="mt-2 text-[14.5px] text-ink-2">{d.reason}</p>
     {d.revised && <p class="mt-2 rounded-lg bg-warn-tint px-3 py-2 text-[14px] text-ink-2"><b class="text-warn">Commitment changed {fmtMonth(d.revised.date)}:</b> {d.revised.text} Gov Score still judges the original commitment. <a href={d.revised.sourceUrl} rel="noopener">{d.revised.sourceLabel}</a></p>}
+    {d.id === 'renewables-82' && <div class="mt-4 max-w-[420px]"><Picture kind="renewables" /></div>}
     <details class="group mt-3 rounded-lg border border-rule bg-panel/60">
       <summary class="flex cursor-pointer list-none items-center gap-2 px-3.5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden"><span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> Show the evidence</summary>
       <dl class="grid gap-x-5 gap-y-2.5 border-t border-rule px-3.5 py-3.5 text-[14px] sm:grid-cols-[170px_1fr]">

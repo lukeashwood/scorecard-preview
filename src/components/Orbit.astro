@@ -8,17 +8,27 @@ import { url } from '../config/site';
 import { byId, ratedSeries, TODAY } from '../lib/measures';
 import { headlineText } from '../lib/format';
 import { accordProgress } from '../lib/accord';
+import { powerBills, wageNote, mortgageDays, ndisCoins, workCrowd, renewablesShare, budgetWaterline } from '../lib/pictures';
 import type { Measure, Point } from '../lib/types';
 
-const SET: [string, string][] = [
-  ['inflation', 'line'], ['housing_accord', 'houses'], ['unemployment', 'area'], ['bulk_billing', 'people'],
-  ['mortgage', 'bars'], ['emissions_target', 'goal'], ['gross_debt', 'step'], ['people_per_home', 'pictogram'],
+/* The pool of screens. The ring shows 8 at a time and moves 4 places along the pool each day, so the hero changes
+   daily. The pool alternates measures that have improved with ones that have worsened, so any window of 8 stays a
+   mix rather than leaning one way. */
+const POOL: [string, string][] = [
+  ['inflation', 'line'], ['housing_accord', 'houses'], ['employment', 'crowd'], ['mortgage', 'days'],
+  ['gross_debt', 'step'], ['power_bills', 'arrows'], ['budget_balance', 'waterline'], ['real_wages', 'note'],
+  ['wholesale_gas', 'area'], ['bulk_billing', 'people'], ['gender_pay_gap', 'line'], ['renewables-82', 'sun'],
+  ['unemployment', 'area'], ['ndis', 'coins'], ['womens_participation', 'bars'], ['emissions_target', 'goal'],
 ];
+const day = Math.floor(Date.parse(TODAY) / 864e5);
+const start = (day * 4) % POOL.length;
+const SET = Array.from({ length: 8 }, (_, k) => POOL[(start + k) % POOL.length]);
 /* Picture forms stand on their own figure and need no time series. */
-const PICTURE = ['houses', 'people', 'goal', 'donut', 'gauge', 'pictogram'];
+const PICTURE = ['houses', 'people', 'goal', 'donut', 'gauge', 'pictogram', 'crowd', 'days', 'arrows', 'note', 'coins', 'waterline', 'sun'];
 const accord = accordProgress();
 const emis = byId('emissions_target');
 const emisTarget = emis?.chart.bars?.find((b) => /target/i.test(b.name))?.value ?? 43;
+const pw = powerBills(), wg = wageNote(), md = mortgageDays(), nd = ndisCoins(), cr = workCrowd(), rn = renewablesShare(), bw = budgetWaterline();
 const W = 150, H = 54, pad = 3;
 
 function geometry(m: Measure) {
@@ -42,18 +52,23 @@ function geometry(m: Measure) {
   return { xy, line, step, zero, norm, lo, hi, ex: X(Date.parse('2022-05-23')) };
 }
 
-const cards = SET.map(([id, form]) => ({ m: byId(id)!, form })).filter((c) => c.m).map(({ m, form }) => ({ m, form, g: geometry(m), now: headlineText(m.headline), v: m.headline.value })).filter((c) => c.g || PICTURE.includes(c.form));
+const cards = SET.flatMap(([id, form]) => {
+  if (id === 'renewables-82') return rn ? [{ id, form, href: url('targets/#renewables-82'), title: 'Renewables: 82% by 2030', now: `${rn.share}%`, v: rn.share, g: null }] : [];
+  const m = byId(id); if (!m) return [];
+  const g = geometry(m); if (!g && !PICTURE.includes(form)) return [];
+  return [{ id, form, href: url(`measures/${m.id}/`), title: m.title, now: headlineText(m.headline), v: m.headline.value, g }];
+});
 const arc = (cx: number, cy: number, r: number, a0: number, a1: number) => { const p = (a: number) => [cx + r * Math.cos(a), cy + r * Math.sin(a)]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
 const TAU = Math.PI * 2;
 ---
 <div class="orbit" data-orbit>
   <div class="orbit-sphere" aria-hidden="true"></div>
   <ul class="orbit-ring" aria-label="A selection of measures">
-    {cards.map(({ m, g, form, now, v }, i) => (
+    {cards.map(({ href, title, g, form, now, v }, i) => (
       <li class="orbit-item" style={`--n:${i};--count:${cards.length}`}>
         <span class="orbit-back" aria-hidden="true"></span>
-        <a href={url(`measures/${m.id}/`)} class="orbit-card" aria-label={`${m.title}: now ${now}`}>
-          <span class="orbit-title">{m.title}</span>
+        <a href={href} class="orbit-card" aria-label={`${title}: now ${now}`}>
+          <span class="orbit-title">{title}</span>
           <span class="orbit-now">{now}</span>
           <svg viewBox={`0 0 ${W} ${H}`} class="orbit-chart" aria-hidden="true" preserveAspectRatio={PICTURE.includes(form) ? 'xMidYMid meet' : 'none'}>
             {!PICTURE.includes(form) && !['slope', 'heat', 'radial'].includes(form) && <line x1={g!.ex} x2={g!.ex} y1="0" y2={H} class="orbit-election" />}
@@ -74,6 +89,15 @@ const TAU = Math.PI * 2;
             {form === 'houses' && accord && (() => { const per = 40000, cols = 10, rows = 3, n = cols * rows; const built = Math.round(accord.built / per), pace = Math.round(accord.dueByNow / per); const cw = (W - pad * 2) / cols, ch = (H - pad * 2) / rows; return Array.from({ length: n }, (_, k) => { const c = k % cols, r = Math.floor(k / cols); const cls = k < built ? 'orbit-h-built' : k < pace ? 'orbit-h-gap' : 'orbit-h-todo'; return <path transform={`translate(${(pad + c * cw + 0.5).toFixed(1)} ${(pad + r * ch + 0.5).toFixed(1)}) scale(${((cw - 1) / 32).toFixed(3)})`} d="M5 15 L16 5 L27 15 V27 H5 Z" class={cls} />; }); })()}
             {form === 'people' && Array.from({ length: 10 }, (_, k) => { const f = Math.max(0, Math.min(1, v / 10 - k)); const x = pad + 2 + k * ((W - pad * 2 - 4) / 10); return <g transform={`translate(${x.toFixed(1)} 8)`}><clipPath id={`bb${k}`}><rect x="0" y="0" width={11 * f} height="40" /></clipPath><g class="orbit-person-ghost"><circle cx="5.5" cy="5" r="4" /><path d="M0 34 V16 a5.5 5.5 0 0 1 11 0 V34 Z" /></g><g class="orbit-person" clip-path={`url(#bb${k})`}><circle cx="5.5" cy="5" r="4" /><path d="M0 34 V16 a5.5 5.5 0 0 1 11 0 V34 Z" /></g></g>; })}
             {form === 'goal' && (() => { const x0 = pad + 4, x1 = W - pad - 4, y = H / 2 + 4; const X = (p: number) => x0 + (x1 - x0) * Math.min(1, p / 50); return <><line x1={x0} x2={x1} y1={y} y2={y} class="orbit-goal-track" /><line x1={x0} x2={X(v)} y1={y} y2={y} class="orbit-goal-fill" /><circle cx={X(v)} cy={y} r="4" class="orbit-end" /><line x1={X(emisTarget)} x2={X(emisTarget)} y1={y - 13} y2={y + 9} class="orbit-goal-flag" /><path d={`M${X(emisTarget)} ${y - 13} h11 l-3 4 l3 4 h-11 z`} class="orbit-goal-flagfill" /><text x={X(emisTarget)} y={y + 19} class="orbit-tick" text-anchor="middle">{emisTarget}% by 2030</text><text x={X(v)} y={y - 8} class="orbit-tick" text-anchor="middle">{Math.round(v)}% now</text></>; })()}
+            {form === 'crowd' && cr && Array.from({ length: 11 }, (_, k) => <g transform={`translate(${(pad + 2 + k * 13.2).toFixed(1)} 10)`} class={k < 10 ? 'orbit-pp-then' : 'orbit-pp-new'}><circle cx="5.5" cy="5" r="4" /><path d="M0 34 V16 a5.5 5.5 0 0 1 11 0 V34 Z" /></g>)}
+            {form === 'crowd' && cr && <text x={W / 2} y={H - 1} class="orbit-tick" text-anchor="middle">for every 10 in work in 2022, now 11</text>}
+            {form === 'days' && md && Array.from({ length: 22 }, (_, k) => { const c = k % 11, r = Math.floor(k / 11), f = Math.max(0, Math.min(1, md.days - k)); const x = pad + c * 13.4, y = 6 + r * 19; return <g><rect x={x} y={y} width="11.5" height="16" rx="2" class="orbit-day" />{f > 0 && <rect x={x} y={y} width={11.5 * f} height="16" rx="2" class="orbit-day-on" />}</g>; })}
+            {form === 'days' && md && <text x={W / 2} y={H - 1} class="orbit-tick" text-anchor="middle">{md.days.toFixed(1)} days of pay a month</text>}
+            {form === 'arrows' && pw && (() => { const base = 28, k = 0.066; return <><line x1="6" x2={W - 6} y1={base} y2={base} class="orbit-axis" /><path d={`M36 ${base}h16v${Math.abs(pw.promise) * k - 8}h6l-14 ${8}l-14 -8h6z`} class="orbit-promise" /><path d={`M98 ${base}h16v${-(pw.nsw * k - 8)}h6l-14 -8l-14 8h6z`} class="orbit-actual" /><text x="44" y={base - 6} class="orbit-tick" text-anchor="middle">−$275 promised</text><text x="106" y={base + 13} class="orbit-tick" text-anchor="middle">+${pw.nsw} actual</text></>; })()}
+            {form === 'note' && wg && <><rect x="8" y="6" width={W - 16} height="18" rx="3" class="orbit-note" /><text x="14" y="19" class="orbit-label">$100</text><rect x="8" y="30" width={(W - 16) * wg.value / 100} height="18" rx="3" class="orbit-note" /><rect x={8 + (W - 16) * wg.value / 100} y="30" width={Math.max(2, (W - 16) * wg.lost / 100)} height="18" class="orbit-cut" /><text x="14" y="43" class="orbit-label">${wg.value.toFixed(2)}</text><text x={W - 12} y="19" class="orbit-tick" text-anchor="end">2022</text><text x={W - 14} y="43" class="orbit-tick" text-anchor="end">now</text></>}
+            {form === 'coins' && nd && [{ p: nd.from, x: 50, c: 'orbit-coin-then' }, { p: nd.to, x: 100, c: 'orbit-coin-now' }].map(({ p, x, c }) => { const n = Math.round(p[1] / 4); return <g class={c}>{Array.from({ length: n }, (_, k) => <ellipse cx={x} cy={H - 10 - k * 3.4} rx="14" ry="3.2" />)}<text x={x} y={H - 1} class="orbit-tick" text-anchor="middle">${p[1]}bn</text></g>; })}
+            {form === 'waterline' && bw && (() => { const mx = Math.max(...bw.years.map((y) => Math.abs(y.p[1]))), mid = H / 2, n = bw.years.length, w = (W - 16) / n; return <><line x1="4" x2={W - 4} y1={mid} y2={mid} class="orbit-axis" />{bw.years.map((y, k) => { const h = (Math.abs(y.p[1]) / mx) * (mid - 4); const x = 8 + k * w + w * 0.2; return <rect x={x} y={y.p[1] >= 0 ? mid - h : mid} width={w * 0.6} height={Math.max(1, h)} class={y.estimate ? 'orbit-col-est' : y.p[0] < '2022-07-01' ? 'orbit-col-before' : y.p[1] >= 0 ? 'orbit-col-up' : 'orbit-col-down'} />; })}</>; })()}
+            {form === 'sun' && rn && Array.from({ length: 50 }, (_, k) => { const a = -Math.PI / 2 + (k / 50) * Math.PI * 2, cx = W / 2, cy = H / 2; return <line x1={cx + 13 * Math.cos(a)} y1={cy + 13 * Math.sin(a)} x2={cx + 26 * Math.cos(a)} y2={cy + 26 * Math.sin(a)} class={k * 2 < rn.share ? 'orbit-ray-on' : k * 2 < rn.target ? 'orbit-ray-goal' : 'orbit-ray-off'} />; })}
             {form === 'radial' && g!.norm.filter((_, k) => k % 2 === 0).map((n, k, arr) => { const a = -Math.PI * 0.9 + (k / (arr.length - 1)) * Math.PI * 1.8, r0 = 7, r1 = 7 + 19 * n; return <line x1={W / 2 + r0 * Math.cos(a)} y1={H / 2 + r0 * Math.sin(a)} x2={W / 2 + r1 * Math.cos(a)} y2={H / 2 + r1 * Math.sin(a)} class="orbit-ray" />; })}
           </svg>
         </a>
@@ -130,6 +154,21 @@ const TAU = Math.PI * 2;
   .orbit-goal-fill { stroke: var(--aurora-1); stroke-width: 6; stroke-linecap: round; }
   .orbit-goal-flag { stroke: #fff; stroke-width: 1.2; }
   .orbit-goal-flagfill { fill: var(--aurora-3); }
+  .orbit-pp-then circle, .orbit-pp-then path { fill: rgb(255 255 255 / 0.28); }
+  .orbit-pp-new circle, .orbit-pp-new path { fill: var(--aurora-1); }
+  .orbit-day { fill: rgb(255 255 255 / 0.08); stroke: rgb(255 255 255 / 0.25); stroke-width: 1; }
+  .orbit-day-on { fill: var(--aurora-3); }
+  .orbit-promise { fill: rgb(47 214 207 / 0.15); stroke: var(--aurora-1); stroke-width: 1.4; stroke-dasharray: 3 2; }
+  .orbit-actual { fill: var(--aurora-3); }
+  .orbit-note { fill: rgb(111 92 255 / 0.25); stroke: var(--brand-glow); stroke-width: 1.2; }
+  .orbit-cut { fill: var(--aurora-3); }
+  .orbit-coin-then ellipse { fill: rgb(255 255 255 / 0.12); stroke: rgb(255 255 255 / 0.5); stroke-width: 0.8; }
+  .orbit-coin-now ellipse { fill: rgb(255 190 80 / 0.25); stroke: #ffc565; stroke-width: 0.8; }
+  .orbit-col-up { fill: var(--aurora-1); } .orbit-col-down { fill: var(--aurora-3); } .orbit-col-before { fill: rgb(255 255 255 / 0.25); }
+  .orbit-col-est { fill: none; stroke: var(--aurora-3); stroke-width: 1.2; stroke-dasharray: 2 2; }
+  .orbit-ray-on { stroke: #ffc565; stroke-width: 2.4; stroke-linecap: round; }
+  .orbit-ray-goal { stroke: #ffc565; stroke-width: 1; stroke-dasharray: 1.5 1.5; opacity: 0.7; }
+  .orbit-ray-off { stroke: rgb(255 255 255 / 0.15); stroke-width: 1; }
   .orbit-ray { stroke: var(--aurora-3); stroke-width: 2.2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
   @media (max-width: 640px) { .orbit { --r: clamp(120px, 34vw, 150px); --cw: calc(var(--r) * 0.6); --ch: calc(var(--cw) * 1.2); perspective: calc(var(--r) * 6); } .orbit-now { font-size: 18px; } .orbit-card { padding: 8px 9px 6px; } }
 </style>

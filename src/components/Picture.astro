@@ -1,0 +1,207 @@
+---
+/* Picture charts: one measure each, drawn as an everyday object so the point lands without reading an axis.
+   Every number comes from lib/pictures.ts (official figures already on the site), every picture says its point in
+   words underneath, and each names its source. Colours follow the site's rule: tone is never carried by colour alone. */
+import { powerBills, wageNote, mortgageDays, ndisCoins, workCrowd, renewablesShare, budgetWaterline, fy } from '../lib/pictures';
+import { fmtMonth, fmtPeriod, num } from '../lib/format';
+type Kind = 'power' | 'wages' | 'mortgage' | 'ndis' | 'crowd' | 'renewables' | 'budget';
+interface Props { kind: Kind }
+const { kind } = Astro.props;
+const $ = (v: number, d = 0) => `$${Math.abs(v).toLocaleString('en-AU', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
+const sgn = (v: number) => (v < 0 ? '−' : '+');
+
+const pw = kind === 'power' ? powerBills() : null;
+const wg = kind === 'wages' ? wageNote() : null;
+const md = kind === 'mortgage' ? mortgageDays() : null;
+const nd = kind === 'ndis' ? ndisCoins() : null;
+const cr = kind === 'crowd' ? workCrowd() : null;
+const rn = kind === 'renewables' ? renewablesShare() : null;
+const bw = kind === 'budget' ? budgetWaterline() : null;
+
+// Power: arrows from the 2022 price, scaled to dollars.
+const PS = 0.32;
+// Mortgage: a month of 22 working days, Monday to Friday.
+const MDAYS = 22;
+// NDIS: each coin is $2 billion.
+const COIN = 2;
+// Crowd: each figure is 1% of the people in work in May 2022.
+const crowdN = cr ? Math.round(cr.pct) : 0;
+// Renewables: 100 rays, one per percentage point.
+const rays = Array.from({ length: 100 }, (_, k) => { const a = -Math.PI / 2 + (k / 100) * Math.PI * 2; return { k, x1: 150 + 62 * Math.cos(a), y1: 150 + 62 * Math.sin(a), x2: 150 + 112 * Math.cos(a), y2: 150 + 112 * Math.sin(a) }; });
+// Budget: columns either side of a zero waterline.
+const bMax = bw ? Math.max(...bw.years.map((y) => Math.abs(y.p[1]))) : 1;
+const BH = 110, BY = 140;
+const PERSON = 'M5.5 0a4 4 0 1 1 0 8a4 4 0 1 1 0-8zM0 30V15a5.5 5.5 0 0 1 11 0v15z';
+---
+<figure class="pic">
+  {pw && (
+    <>
+      <svg viewBox="0 0 640 360" class="pic-svg" role="img" aria-label={`Promised: power bills ${$(pw.promise)} a year lower. Actual: the NSW default price rose ${$(pw.nsw)} a year.`}>
+        <line x1="40" x2="600" y1="190" y2="190" class="pic-base" />
+        <text x="40" y="182" class="pic-small">2022 power price</text>
+        <g transform="translate(200 190)">
+          <path d={`M-34 0H34V${Math.abs(pw.promise) * PS - 26}H52L0 ${Math.abs(pw.promise) * PS}L-52 ${Math.abs(pw.promise) * PS - 26}H-34Z`} class="pic-promise" />
+          <text y={Math.abs(pw.promise) * PS + 26} text-anchor="middle" class="pic-big pic-good-tx">{sgn(pw.promise)}{$(pw.promise)}</text>
+          <text y={Math.abs(pw.promise) * PS + 46} text-anchor="middle" class="pic-small">promised, a year</text>
+        </g>
+        <g transform="translate(440 190)">
+          <path d={`M-34 0H34V${-(pw.nsw * PS - 26)}H52L0 ${-pw.nsw * PS}L-52 ${-(pw.nsw * PS - 26)}H-34Z`} class="pic-actual" />
+          <text y={-pw.nsw * PS - 30} text-anchor="middle" class="pic-big pic-bad-tx">{sgn(pw.nsw)}{$(pw.nsw)}</text>
+          <text y={-pw.nsw * PS - 12} text-anchor="middle" class="pic-small">actual, a year (NSW)</text>
+        </g>
+      </svg>
+      <ul class="pic-chips">{pw.regions.map((r) => <li><span>{r.name}</span><b class="num">{sgn(r.value)}{$(r.value)}</b></li>)}</ul>
+      <figcaption class="pic-cap"><b>The promise was a $275 cut. Default prices rose instead, by {$(Math.min(...pw.regions.map((r) => r.value)))} to {$(Math.max(...pw.regions.map((r) => r.value)))} a year depending on where you live.</b> Regulated default offers, {pw.period}. Source: AER and ESC default offer determinations.</figcaption>
+    </>
+  )}
+
+  {wg && (
+    <>
+      <div class="pic-notes" role="img" aria-label={`$100 of private-sector pay in June 2022 buys ${$(wg.value, 2)} worth today.`}>
+        {[{ label: 'June 2022', w: 100, amt: '$100' }, { label: `Today · ${fmtPeriod(wg.date, 'q')}`, w: wg.value, amt: $(wg.value, 2) }].map((n, k) => (
+          <div class="pic-note-row">
+            <p class="pic-small">{n.label}</p>
+            <div class="pic-note">
+              <div class="pic-note-paper" style={`width:${n.w}%`}><span class="pic-note-amt">{n.amt}</span><span class="pic-note-seal" aria-hidden="true">100</span></div>
+              {k === 1 && <div class="pic-note-cut" style={`width:${(100 - n.w).toFixed(2)}%`}><span>{sgn(-wg.lost)}{$(wg.lost, 2)}</span></div>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <figcaption class="pic-cap"><b>$100 of pay in June 2022 now buys {$(wg.value, 2)} worth of goods and services.</b> Private-sector wages adjusted for inflation (Wage Price Index against CPI). Source: ABS.</figcaption>
+    </>
+  )}
+
+  {md && (
+    <>
+      <div class="pic-cal" role="img" aria-label={`The extra ${$(md.extra)} a month in repayments is about ${md.days.toFixed(1)} days of median pay, out of ${MDAYS} working days.`}>
+        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((d) => <span class="pic-cal-h">{d}</span>)}
+        {Array.from({ length: MDAYS }, (_, k) => { const f = Math.max(0, Math.min(1, md.days - k)); return <span class:list={['pic-cal-day', f >= 0.5 && 'is-on']} style={`--f:${(f * 100).toFixed(0)}%`}><i>{k + 1}</i></span>; })}
+      </div>
+      <figcaption class="pic-cap"><b>The extra {$(md.extra)} a month on a $600,000 mortgage takes about {md.days.toFixed(1)} days of the month’s pay.</b> Repayments at {md.period} rates against May 2022, counted in days of median weekly earnings before tax (about {$(md.weekly)} a week). Sources: RBA, ABS.</figcaption>
+    </>
+  )}
+
+  {nd && (
+    <>
+      <svg viewBox="0 0 640 300" class="pic-svg" role="img" aria-label={`NDIS expenses: ${$(nd.from[1], 1)} billion in ${fy(nd.from[0])}, ${$(nd.to[1], 1)} billion in ${fy(nd.to[0])}. Each coin is $2 billion.`}>
+        {[{ p: nd.from, x: 220, cls: 'pic-coin-then' }, { p: nd.to, x: 420, cls: 'pic-coin-now' }].map(({ p, x, cls }) => { const n = Math.round(p[1] / COIN); return (
+          <g>
+            {Array.from({ length: n }, (_, k) => <g class={cls}><rect x={x - 46} y={262 - k * 9 - 9} width="92" height="9" /><ellipse cx={x} cy={262 - k * 9 - 9} rx="46" ry="9" /></g>)}
+            <text x={x} y={262 - n * 9 - 26} text-anchor="middle" class="pic-big">{$(p[1], 1)}bn</text>
+            <text x={x} y="290" text-anchor="middle" class="pic-small">{fy(p[0])}</text>
+          </g>
+        ); })}
+      </svg>
+      <figcaption class="pic-cap"><b>NDIS costs went from {$(nd.from[1], 1)} billion to {$(nd.to[1], 1)} billion a year, up {Math.round(nd.growth)}%.</b> Each coin is $2 billion. Scheme expenses, {fy(nd.from[0])} to {fy(nd.to[0])}. Source: NDIA annual reports.</figcaption>
+    </>
+  )}
+
+  {cr && (
+    <>
+      <div class="pic-crowd" role="img" aria-label={`100 figures stand for the ${num(cr.from[1], 2)} million people in work in May 2022. ${crowdN} more have been added since.`}>
+        {Array.from({ length: 100 + crowdN }, (_, k) => <svg viewBox="0 0 11 30" class={k < 100 ? 'pic-p-then' : 'pic-p-new'} aria-hidden="true"><path d={PERSON} /></svg>)}
+      </div>
+      <ul class="pic-key"><li><svg viewBox="0 0 11 30" class="pic-p-then"><path d={PERSON} /></svg>In work, May 2022: <b class="num">{num(cr.from[1], 2)}m</b></li><li><svg viewBox="0 0 11 30" class="pic-p-new"><path d={PERSON} /></svg>Added since: <b class="num">{num(cr.added, 2)}m</b></li></ul>
+      <figcaption class="pic-cap"><b>For every 100 people in work in May 2022, there are now about {100 + crowdN}.</b> Each figure is about {num(cr.from[1] * 10, 0)},000 people. Seasonally adjusted, {fmtMonth(cr.from[0])} to {fmtMonth(cr.to[0])}. Source: ABS Labour Force.</figcaption>
+    </>
+  )}
+
+  {rn && (
+    <>
+      <svg viewBox="0 0 300 300" class="pic-svg pic-sun" role="img" aria-label={`Renewables supplied ${rn.share}% of electricity in ${rn.year}. The target is 82% by 2030. Each ray is one percentage point.`}>
+        {rays.map((r) => <line x1={r.x1.toFixed(1)} y1={r.y1.toFixed(1)} x2={r.x2.toFixed(1)} y2={r.y2.toFixed(1)} class={r.k < Math.round(rn.share) ? 'pic-ray-on' : r.k < rn.target ? 'pic-ray-goal' : 'pic-ray-off'} />)}
+        <circle cx="150" cy="150" r="56" class="pic-sun-core" />
+        <text x="150" y="146" text-anchor="middle" class="pic-big">{rn.share}%</text>
+        <text x="150" y="166" text-anchor="middle" class="pic-small">now</text>
+        <text x="150" y="182" text-anchor="middle" class="pic-small">82% by 2030</text>
+      </svg>
+      <ul class="pic-key pic-key-c"><li><i class="pic-sw pic-sw-on"></i>Renewable share, {rn.year}</li><li><i class="pic-sw pic-sw-goal"></i>Still needed for 82%</li></ul>
+      <figcaption class="pic-cap"><b>Renewables supplied {rn.share}% of electricity in {rn.year}. The 2030 target is 82%, so the share would need to roughly double.</b> Each ray is 1 percentage point. Source: Department of Climate Change, Energy, the Environment and Water.</figcaption>
+    </>
+  )}
+
+  {bw && (
+    <>
+      <svg viewBox={`0 0 640 ${BY * 2 + 34}`} class="pic-svg" role="img" aria-label={`Budget balance by year: ${bw.years.map((y) => `${fy(y.p[0])} ${sgn(y.p[1])}$${Math.abs(y.p[1])} billion${y.estimate ? ' (Budget estimate)' : ''}`).join(', ')}.`}>
+        <rect x="0" y={BY} width="640" height={BY} class="pic-water" />
+        <line x1="20" x2="620" y1={BY} y2={BY} class="pic-base" />
+        <text x="4" y={BY - 8} class="pic-small">Surplus</text>
+        <text x="4" y={BY + 22} class="pic-small">Deficit</text>
+        {bw.years.map((y, k) => { const n = bw.years.length, w = 520 / n, x = 100 + k * w + w * 0.18, h = (Math.abs(y.p[1]) / bMax) * BH, up = y.p[1] >= 0; return (
+          <g>
+            <rect x={x} y={up ? BY - h : BY} width={w * 0.64} height={Math.max(2, h)} class={y.estimate ? 'pic-col-est' : y.p[0] < '2022-07-01' ? 'pic-col-before' : up ? 'pic-col-up' : 'pic-col-down'} />
+            <text x={x + w * 0.32} y={up ? BY - h - 8 : BY + h + 18} text-anchor="middle" class="pic-mid">{sgn(y.p[1])}${Math.abs(y.p[1])}bn</text>
+            <text x={x + w * 0.32} y={BY * 2 + 22} text-anchor="middle" class="pic-small pic-fy-long">{fy(y.p[0])}{y.estimate ? '*' : ''}</text>
+            <text x={x + w * 0.32} y={BY * 2 + 22} text-anchor="middle" class="pic-small pic-fy-short">’{fy(y.p[0]).slice(-2)}{y.estimate ? '*' : ''}</text>
+          </g>
+        ); })}
+      </svg>
+      <figcaption class="pic-cap"><b>2 surpluses, then back into deficit.</b> The grey year, 2021-22, was mostly before the government took office in May 2022. Underlying cash balance, {fy(bw.years[0].p[0])} to {fy(bw.years[bw.years.length - 1].p[0])}. *Budget estimate, not yet a result. Source: Final Budget Outcomes and the 2026-27 Budget.</figcaption>
+    </>
+  )}
+</figure>
+
+<style>
+  .pic-svg { display: block; width: 100%; height: auto; max-height: 340px; }
+  .pic-sun { max-width: 300px; margin-inline: auto; }
+  .pic-base { stroke: var(--ink-3); stroke-width: 1.5; }
+  .pic-small { font-family: var(--font-sans); font-size: 13px; fill: var(--ink-3); color: var(--ink-3); font-size: 13px; margin: 0; }
+  .pic-mid { font-family: var(--font-sans); font-size: 13px; font-weight: 700; fill: var(--ink); }
+  .pic-big { font-family: var(--font-display); font-size: 26px; font-weight: 600; fill: var(--ink); }
+  .pic-good-tx { fill: var(--good); } .pic-bad-tx { fill: var(--bad); }
+  .pic-promise { fill: var(--good-tint); stroke: var(--good); stroke-width: 2.5; stroke-dasharray: 7 5; }
+  .pic-actual { fill: var(--bad); }
+  .pic-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; }
+  .pic-chips li { display: inline-flex; gap: 8px; align-items: baseline; background: var(--panel); border-radius: 999px; padding: 6px 12px; font-size: 14px; color: var(--ink-2); }
+  .pic-chips b { color: var(--bad); }
+  .pic-cap { margin-top: 14px; font-size: 13.5px; color: var(--ink-3); line-height: 1.5; }
+  .pic-cap b { display: block; font-size: 16px; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+
+  .pic-notes { display: grid; gap: 18px; padding-bottom: 26px; }
+  .pic-note-row { display: grid; gap: 6px; }
+  .pic-note { display: flex; height: clamp(72px, 12vw, 110px); }
+  .pic-note-paper { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(14px, 3vw, 28px); border-radius: 8px; background: linear-gradient(135deg, var(--brand-tint), var(--surface) 60%, var(--brand-tint)); border: 2px solid var(--brand); overflow: hidden; }
+  .pic-note-paper::before { content: ''; position: absolute; inset: 7px; border: 1px dashed var(--brand); border-radius: 4px; opacity: 0.5; }
+  .pic-note-amt { position: relative; font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 5vw, 48px); color: var(--brand); font-variant-numeric: tabular-nums; }
+  .pic-note-seal { position: relative; display: grid; place-items: center; width: clamp(44px, 7vw, 64px); aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--brand); font-family: var(--font-display); font-weight: 600; color: var(--brand); opacity: 0.6; }
+  .pic-note-cut { position: relative; min-width: 6px; border: 2px dashed var(--bad); border-left: 0; border-radius: 0 8px 8px 0; background: repeating-linear-gradient(135deg, var(--bad-tint) 0 4px, transparent 4px 8px); }
+  .pic-note-cut span { position: absolute; right: 0; top: calc(100% + 6px); white-space: nowrap; font-weight: 700; font-size: 14px; color: var(--bad); }
+
+  .pic-cal { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-width: 520px; }
+  .pic-cal-h { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; color: var(--ink-3); text-align: center; }
+  .pic-cal-day { position: relative; aspect-ratio: 1.5; border-radius: 8px; border: 1px solid var(--rule-strong); overflow: hidden; background: linear-gradient(90deg, var(--bad) var(--f), var(--surface) var(--f)); }
+  .pic-cal-day i { position: absolute; top: 5px; left: 7px; font-style: normal; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+  .pic-cal-day.is-on i { color: #fff; }
+
+  .pic-coin-then rect, .pic-coin-then ellipse { fill: var(--panel); stroke: var(--ink-3); stroke-width: 1.5; }
+  .pic-coin-now rect, .pic-coin-now ellipse { fill: var(--gold-tint); stroke: var(--gold); stroke-width: 1.5; }
+
+  .pic-crowd { display: grid; grid-template-columns: repeat(22, minmax(0, 1fr)); gap: 4px 3px; max-width: 640px; }
+  @media (max-width: 520px) { .pic-crowd { grid-template-columns: repeat(15, minmax(0, 1fr)); } }
+  .pic-crowd svg, .pic-key svg { width: 100%; height: auto; display: block; }
+  .pic-p-then path { fill: var(--rule-strong); }
+  .pic-p-new path { fill: var(--brand); }
+  .pic-key { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 14px 0 0; padding: 0; list-style: none; font-size: 14.5px; color: var(--ink-2); }
+  .pic-key li { display: inline-flex; align-items: center; gap: 8px; } .pic-key svg { width: 10px; flex: none; } .pic-key b { color: var(--ink); }
+  .pic-key-c { justify-content: center; }
+  .pic-ray-on { stroke: var(--gold); stroke-width: 4; stroke-linecap: round; }
+  .pic-ray-goal { stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 3 3; opacity: 0.8; }
+  .pic-ray-off { stroke: var(--rule); stroke-width: 1.5; }
+  .pic-sun-core { fill: var(--gold-tint); stroke: var(--gold); stroke-width: 2; }
+  .pic-sw { display: inline-block; width: 18px; height: 4px; border-radius: 2px; }
+  .pic-sw-on { background: var(--gold); } .pic-sw-goal { background: repeating-linear-gradient(90deg, var(--gold) 0 3px, transparent 3px 6px); }
+
+  @media (max-width: 560px) {
+    svg.pic-svg:not(.pic-sun) .pic-small { font-size: 22px; }
+    svg.pic-svg:not(.pic-sun) .pic-mid { font-size: 21px; }
+    svg.pic-svg:not(.pic-sun) .pic-big { font-size: 40px; }
+  }
+  .pic-fy-short { display: none; }
+  @media (max-width: 560px) { .pic-fy-long { display: none; } .pic-fy-short { display: inline; } }
+  .pic-water { fill: var(--bad-tint); opacity: 0.5; }
+  .pic-col-up { fill: var(--brand); }
+  .pic-col-before { fill: var(--rule-strong); }
+  .pic-col-down { fill: var(--bad); }
+  .pic-col-est { fill: none; stroke: var(--bad); stroke-width: 2; stroke-dasharray: 5 4; }
+</style>
