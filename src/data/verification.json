@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-19T08:04:26+00:00",
- "checks_total": 512,
- "checks_passed": 432,
- "checks_warn": 65,
- "checks_failed": 15,
+ "generated_at": "2026-10-21T07:59:10+00:00",
+ "checks_total": 510,
+ "checks_passed": 412,
+ "checks_warn": 67,
+ "checks_failed": 31,
  "checks": [
   {
    "metric": "inflation",
@@ -24,7 +24,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (49 days old)"
+   "detail": "latest observation 2026-08-31 (51 days old)"
   },
   {
    "metric": "inflation",
@@ -45,7 +45,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "prices_vs_wages",
@@ -115,7 +115,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "real_wages",
@@ -150,7 +150,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "electricity",
@@ -164,7 +164,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (49 days old)"
+   "detail": "latest observation 2026-08-31 (51 days old)"
   },
   {
    "metric": "mortgage",
@@ -206,7 +206,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (19 days old)"
+   "detail": "latest observation 2026-09-30 (21 days old)"
   },
   {
    "metric": "unemployment",
@@ -227,7 +227,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "public_private_jobs",
@@ -255,7 +255,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "jobs_by_sector",
@@ -276,7 +276,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "productivity",
@@ -290,7 +290,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "gdp_per_capita",
@@ -318,7 +318,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (202 days old)"
+   "detail": "latest observation 2026-03-31 (204 days old)"
   },
   {
    "metric": "household_income",
@@ -332,7 +332,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "government_size",
@@ -346,7 +346,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "housing_accord",
@@ -360,7 +360,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "home_prices",
@@ -374,7 +374,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (202 days old)"
+   "detail": "latest observation 2026-03-31 (204 days old)"
   },
   {
    "metric": "migration",
@@ -385,31 +385,17 @@
   },
   {
    "metric": "household_payments",
-   "check": "freshness",
-   "status": "pass",
-   "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
-  },
-  {
-   "metric": "household_payments",
-   "check": "plausible range: mortgage interest share of gross income (%)",
-   "status": "pass",
-   "critical": false,
-   "detail": "5.39 within [1, 20]"
-  },
-  {
-   "metric": "household_payments",
-   "check": "plausible range: income tax share of gross income (%)",
-   "status": "pass",
-   "critical": false,
-   "detail": "15.66 within [5, 30]"
+   "check": "metric build",
+   "status": "fail",
+   "critical": true,
+   "detail": "RuntimeError: download failed for https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release: HTTP Error 503: Service Temporarily Unavailable"
   },
   {
    "metric": "people_per_home",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (202 days old)"
+   "detail": "latest observation 2026-03-31 (204 days old)"
   },
   {
    "metric": "people_per_home",
@@ -423,7 +409,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "rents_vs_wages",
@@ -437,7 +423,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (49 days old)"
+   "detail": "latest observation 2026-08-31 (51 days old)"
   },
   {
    "metric": "fuel_prices",
@@ -451,7 +437,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "price_to_earnings",
@@ -472,7 +458,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (111 days old)"
+   "detail": "latest observation 2026-06-30 (113 days old)"
   },
   {
    "metric": "living_standards_decades",
@@ -486,7 +472,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (19 days old)"
+   "detail": "latest observation 2026-09-30 (21 days old)"
   },
   {
    "metric": "employment",
@@ -500,7 +486,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (19 days old)"
+   "detail": "latest observation 2026-09-30 (21 days old)"
   },
   {
    "metric": "womens_participation",
@@ -514,7 +500,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-05-31 (141 days old)"
+   "detail": "latest observation 2026-05-31 (143 days old)"
   },
   {
    "metric": "gender_pay_gap",
@@ -967,16 +953,16 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://data.gov.au/data/dataset/25e81c18-2083-4abe-81b6-0f530053c63f/resource/38a7cded-b3d6-41ec-bf33-b320801331e5/download/variables-in-2013-14-sample-file.xlsx"
+   "detail": "https://data.gov.au/data/dataset/25e81c18-2083-4abe-81b6-0f530053c63f/resource/38a7cded-b3d6-41ec-bf33-b320801331e5/download/variables-in-2013-14-sample-file.xlsx returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://data.gov.au/data/dataset/taxation-statistics-2023-24"
+   "detail": "https://data.gov.au/data/dataset/taxation-statistics-2023-24 returned 503"
   },
   {
    "metric": "sources",
@@ -1002,9 +988,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "fail",
+   "status": "pass",
    "critical": false,
-   "detail": "https://go8.edu.au/go8-submission-to-senate-inquiry-into-the-universities-accord-opening-the-doors-of-opportunity-bill-2026 returned <urlopen error [Errno 101] Network is unreachable>"
+   "detail": "https://go8.edu.au/go8-submission-to-senate-inquiry-into-the-universities-accord-opening-the-doors-of-opportunity-bill-2026"
   },
   {
    "metric": "sources",
@@ -2115,100 +2101,100 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/media-centre/media-releases/australian-economy-grew-06-cent-december-quarter"
+   "detail": "https://www.abs.gov.au/media-centre/media-releases/australian-economy-grew-06-cent-december-quarter returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/may-2026"
+   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/may-2026 returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/total-value-dwellings/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/total-value-dwellings/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/industry/building-and-construction/building-activity-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/industry/building-and-construction/building-activity-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/labour/earnings-and-working-conditions/average-weekly-earnings-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/labour/earnings-and-working-conditions/average-weekly-earnings-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-status-families/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-status-families/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/labour/labour-accounts/labour-account-australia/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/labour/labour-accounts/labour-account-australia/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/people/people-and-communities/migrant-settlement-outcomes/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/people/people-and-communities/migrant-settlement-outcomes/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release returned 503"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.abs.gov.au/statistics/people/population/overseas-migration/latest-release"
+   "detail": "https://www.abs.gov.au/statistics/people/population/overseas-migration/latest-release returned 503"
   },
   {
    "metric": "sources",
@@ -2997,16 +2983,16 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://www.hrw.org/news/2024/11/28/australia-passes-harsh-new-anti-migration-laws"
+   "detail": "https://www.hrw.org/news/2024/11/28/australia-passes-harsh-new-anti-migration-laws returned 403 to automated check (site blocks bots). Verify manually"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://www.hrw.org/news/2026/03/12/australias-cynical-and-cruel-bill-to-suspend-temporary-visas-0"
+   "detail": "https://www.hrw.org/news/2026/03/12/australias-cynical-and-cruel-bill-to-suspend-temporary-visas-0 returned 403 to automated check (site blocks bots). Verify manually"
   },
   {
    "metric": "sources",
@@ -3591,6 +3577,13 @@
   }
  ],
  "history": [
+  {
+   "generated_at": "2026-10-21T07:59:10+00:00",
+   "checks_total": 510,
+   "checks_passed": 412,
+   "checks_warn": 67,
+   "checks_failed": 31
+  },
   {
    "generated_at": "2026-10-19T08:04:26+00:00",
    "checks_total": 512,
