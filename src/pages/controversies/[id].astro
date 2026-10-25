@@ -25,6 +25,8 @@ const title = controversyTitle(c), description = controversyDescription(c);
 const jsonld = [
   { '@context': 'https://schema.org', '@type': 'Article', headline: c.title, alternativeHeadline: pair.critical, description, url: pageUrl, mainEntityOfPage: pageUrl,
     datePublished: c.date, dateModified: c.verified_on, inLanguage: 'en-AU', articleSection: 'Controversies', about: { '@type': 'Person', name: c.minister, jobTitle: c.portfolio },
+    // Search engines only show an article in rich results when the schema names an image; the site's share image is the one every page already uses.
+    image: { '@type': 'ImageObject', url: new URL(url('og.png'), Astro.site).href, width: 1200, height: 630 },
     author: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href }, publisher: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href },
     citation: c.sources.map((s) => s.url) },
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
