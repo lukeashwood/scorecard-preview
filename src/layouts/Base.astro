@@ -74,6 +74,8 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <link rel="sitemap" href={url('sitemap-index.xml')} />
   <link rel="alternate" type="application/rss+xml" title={`${SITE.name}: latest figures`} href={url('feed.xml')} />
   {ldList.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
+  <script is:inline>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script is:inline defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class={bodyClass}>
   <a class="skip" href="#main">Skip to content</a>
