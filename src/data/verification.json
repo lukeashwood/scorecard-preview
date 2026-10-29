@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-26T08:06:17+00:00",
+ "generated_at": "2026-10-29T08:53:53+00:00",
  "checks_total": 512,
- "checks_passed": 437,
- "checks_warn": 65,
- "checks_failed": 10,
+ "checks_passed": 433,
+ "checks_warn": 67,
+ "checks_failed": 12,
  "checks": [
   {
    "metric": "inflation",
@@ -17,35 +17,35 @@
    "check": "cross-source check: quarterly year-ended CPI",
    "status": "pass",
    "critical": false,
-   "detail": "RBA G1 = 3.90, ABS quarterly CPI index (recomputed) = 3.94 (difference 0.04, tolerance 0.15)"
+   "detail": "RBA G1 = 3.90, ABS quarterly CPI index (recomputed) = 3.92 (difference 0.02, tolerance 0.15)"
   },
   {
    "metric": "inflation",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (56 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "inflation",
    "check": "plausible range: monthly headline CPI y/y",
    "status": "pass",
    "critical": false,
-   "detail": "4.0 within [-5, 20]"
+   "detail": "4.3 within [-5, 20]"
   },
   {
    "metric": "inflation",
    "check": "cross-source check: monthly year-ended CPI",
    "status": "pass",
    "critical": false,
-   "detail": "ABS published = 4.00, ABS monthly index (recomputed) = 3.97 (difference 0.03, tolerance 0.1)"
+   "detail": "ABS published = 4.30, ABS monthly index (recomputed) = 4.34 (difference 0.04, tolerance 0.1)"
   },
   {
    "metric": "prices_vs_wages",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "prices_vs_wages",
@@ -115,7 +115,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "real_wages",
@@ -150,21 +150,21 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "electricity",
    "check": "plausible range: electricity change",
    "status": "pass",
    "critical": false,
-   "detail": "37.47999999999999 within [-60, 200]"
+   "detail": "35.889999999999986 within [-60, 200]"
   },
   {
    "metric": "mortgage",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (56 days old)"
+   "detail": "latest observation 2026-08-31 (59 days old)"
   },
   {
    "metric": "mortgage",
@@ -206,7 +206,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (26 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "unemployment",
@@ -227,7 +227,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "public_private_jobs",
@@ -255,7 +255,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "jobs_by_sector",
@@ -276,7 +276,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "productivity",
@@ -290,7 +290,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "gdp_per_capita",
@@ -318,7 +318,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (209 days old)"
+   "detail": "latest observation 2026-03-31 (212 days old)"
   },
   {
    "metric": "household_income",
@@ -332,7 +332,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "government_size",
@@ -346,7 +346,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "housing_accord",
@@ -360,7 +360,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "home_prices",
@@ -374,7 +374,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (209 days old)"
+   "detail": "latest observation 2026-03-31 (212 days old)"
   },
   {
    "metric": "migration",
@@ -388,7 +388,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "household_payments",
@@ -409,7 +409,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (209 days old)"
+   "detail": "latest observation 2026-03-31 (212 days old)"
   },
   {
    "metric": "people_per_home",
@@ -423,7 +423,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "rents_vs_wages",
@@ -437,21 +437,21 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-08-31 (56 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "fuel_prices",
    "check": "plausible range: annual change in fuel prices (%)",
    "status": "pass",
    "critical": false,
-   "detail": "13.528997889235118 within [-60, 100]"
+   "detail": "23.580000000000002 within [-60, 100]"
   },
   {
    "metric": "price_to_earnings",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "price_to_earnings",
@@ -472,7 +472,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (118 days old)"
+   "detail": "latest observation 2026-06-30 (121 days old)"
   },
   {
    "metric": "living_standards_decades",
@@ -486,7 +486,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (26 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "employment",
@@ -500,7 +500,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (26 days old)"
+   "detail": "latest observation 2026-09-30 (29 days old)"
   },
   {
    "metric": "womens_participation",
@@ -514,7 +514,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-05-31 (148 days old)"
+   "detail": "latest observation 2026-05-31 (151 days old)"
   },
   {
    "metric": "gender_pay_gap",
@@ -981,9 +981,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://demosau.com/news/superannuation-tax-changes/"
+   "detail": "https://demosau.com/news/superannuation-tax-changes/ returned 202"
   },
   {
    "metric": "sources",
@@ -1114,9 +1114,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://libertyvictoria.org.au/joint-media-statement-federal-governments-approach-to-building-community-harmony-will-do-real-harm-nsw-council-for-civil-liberties-liberty-victoria-and-queensland-council-for-civil-libert/"
+   "detail": "https://libertyvictoria.org.au/joint-media-statement-federal-governments-approach-to-building-community-harmony-will-do-real-harm-nsw-council-for-civil-liberties-liberty-victoria-and-queensland-council-for-civil-libert/ returned 202"
   },
   {
    "metric": "sources",
@@ -1408,16 +1408,16 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://transparency.org.au/joint-statement-on-the-national-anti-corruption-commission-bill-2022/"
+   "detail": "https://transparency.org.au/joint-statement-on-the-national-anti-corruption-commission-bill-2022/ returned 403 to automated check (site blocks bots). Verify manually"
   },
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://transparency.org.au/joint-submission-whistle-blower-protections/"
+   "detail": "https://transparency.org.au/joint-submission-whistle-blower-protections/ returned 403 to automated check (site blocks bots). Verify manually"
   },
   {
    "metric": "sources",
@@ -2934,9 +2934,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "fail",
+   "status": "pass",
    "critical": false,
-   "detail": "https://www.esc.vic.gov.au/sites/default/files/documents/Victorian%20Default%20Offer%202022-23%20-%20Final%20decision_0.pdf returned 406"
+   "detail": "https://www.esc.vic.gov.au/sites/default/files/documents/Victorian%20Default%20Offer%202022-23%20-%20Final%20decision_0.pdf"
   },
   {
    "metric": "sources",
@@ -3368,9 +3368,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "fail",
    "critical": false,
-   "detail": "https://www.refugeecouncil.org.au/new-bill-search-and-seizure-powers-immigration-detention/"
+   "detail": "https://www.refugeecouncil.org.au/new-bill-search-and-seizure-powers-immigration-detention/ returned 202"
   },
   {
    "metric": "sources",
@@ -3538,7 +3538,7 @@
    "check": "inflation: G20 comparison",
    "status": "pass",
    "critical": false,
-   "detail": "19 countries, latest year 2025"
+   "detail": "19 countries, newest month 2026-09"
   },
   {
    "metric": "g20",
@@ -3591,6 +3591,13 @@
   }
  ],
  "history": [
+  {
+   "generated_at": "2026-10-29T08:53:53+00:00",
+   "checks_total": 512,
+   "checks_passed": 433,
+   "checks_warn": 67,
+   "checks_failed": 12
+  },
   {
    "generated_at": "2026-10-26T08:06:17+00:00",
    "checks_total": 512,
