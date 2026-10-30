@@ -103,6 +103,9 @@ export interface Editorial {
   changeAs?: 'fromTo';
   /** Hide the "past year" comparison when the headline already is a past-year change on a different basis. */
   noPastYear?: boolean;
+  /** What to say in the since-office and past-year boxes when those comparisons don't apply (e.g. a count per year). */
+  sinceNote?: string | ((m: RawMetric) => string);
+  pastYearNote?: string | ((m: RawMetric) => string);
   /** A shorter display title than the one in the data feed. */
   title?: string;
   /** Lead with the latest point of the series the verdict is judged on, so the headline and the verdict are the same number. */

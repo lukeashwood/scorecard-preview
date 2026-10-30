@@ -8,6 +8,8 @@ export interface G20Ind {
   /** Annual series: calendar years. Monthly series (freq "M"): YYYYMM integers, e.g. 202609. */
   latest_year: number; points: Record<string, [number, number][]>; countries: Record<string, string>;
   freq?: 'M'; before?: number; latest_window?: number;
+  /** The latest year is the current year so far (a running count), not a finished year. */
+  partial?: boolean;
   source: { publisher: string; url: string; retrieved_at?: string };
 }
 
@@ -19,7 +21,7 @@ const median = (xs: number[]) => { const a = [...xs].sort((x, y) => x - y); cons
 const monthly = (ind: G20Ind) => ind.freq === 'M';
 /** Period as a label: "2021" for annual series, "September 2026" for monthly ones. */
 function periodLabel(ind: G20Ind, p: number, short = false) {
-  if (!monthly(ind)) return String(p);
+  if (!monthly(ind)) return ind.partial && p === ind.latest_year ? `${p} so far` : String(p);
   const m = MONTHS[(p % 100) - 1] ?? '';
   return `${short ? m.slice(0, 3) : m} ${Math.floor(p / 100)}`;
 }
@@ -49,9 +51,11 @@ function ranking(ind: G20Ind, period: number) {
   }).filter((r) => r.v != null) as { c: string; name: string; v: number; p: number }[];
   // Best first where there is an agreed better direction; otherwise highest first.
   rows.sort((a, b) => (ind.better === 'lower' ? a.v - b.v : b.v - a.v));
-  const pos = rows.findIndex((r) => r.c === 'AUS') + 1;
   const aus = rows.find((r) => r.c === 'AUS');
-  return { rows, pos, n: rows.length, med: rows.length ? median(rows.map((r) => r.v)) : NaN, aus };
+  // Ties share a place: with 4 rises and 3 countries on more, Australia is "equal 4th", not whichever of the tied slots it sorted into.
+  const pos = aus ? rows.filter((r) => (ind.better === 'lower' ? r.v < aus.v : r.v > aus.v)).length + 1 : 0;
+  const tied = aus ? rows.filter((r) => r.v === aus.v).length > 1 : false;
+  return { rows, pos, tied, n: rows.length, med: rows.length ? median(rows.map((r) => r.v)) : NaN, aus };
 }
 
 export default function G20Panel({ indicators, csvName }: { indicators: G20Ind[]; csvName: string }) {
@@ -93,12 +97,12 @@ export default function G20Panel({ indicators, csvName }: { indicators: G20Ind[]
 
       <p className="text-[15px] font-semibold">{ind.title}</p>
       {r.pos > 0 && r.aus && <p className="mt-1 text-[15px] text-ink-2">
-        Australia: <b className="text-ink">{f(r.aus.v)}</b> in {periodLabel(ind, r.aus.p)}, <b className="text-ink">{r.pos === 1 ? `the ${word}` : `${ORD(r.pos)} ${word}`}</b> of {r.n} G20 countries (G20 median {f(r.med)}{mixedMonths ? ', each country at its latest month' : ''}).
-        {yr !== before && then.pos > 0 && <> In {periodLabel(ind, before)}, before this government, it was {ORD(then.pos)} of {then.n}.</>}
+        Australia: <b className="text-ink">{f(r.aus.v)}</b> in {periodLabel(ind, r.aus.p)}, <b className="text-ink">{r.tied ? `equal ${ORD(r.pos)} ${word}` : r.pos === 1 ? `the ${word}` : `${ORD(r.pos)} ${word}`}</b> of {r.n} G20 countries (G20 median {f(r.med)}{mixedMonths ? ', each country at its latest month' : ''}).
+        {yr !== before && then.pos > 0 && <> In {periodLabel(ind, before)}, before this government, it was {then.tied ? 'equal ' : ''}{ORD(then.pos)} of {then.n}.</>}
       </p>}
 
       {view === 'rank' ? <>
-        {periods.length > 1 && <div className="mt-3 flex gap-1" role="group" aria-label={monthly(ind) ? 'Month' : 'Year'}>{periods.map((p) => <button key={p} type="button" className="btn btn-sm btn-quiet" aria-pressed={p === yr} onClick={() => setPeriod(p)} style={p === yr ? on : undefined}>{p === before ? `${periodLabel(ind, p)} (before this government)` : monthly(ind) ? 'Latest' : `${p} (latest)`}</button>)}</div>}
+        {periods.length > 1 && <div className="mt-3 flex gap-1" role="group" aria-label={monthly(ind) ? 'Month' : 'Year'}>{periods.map((p) => <button key={p} type="button" className="btn btn-sm btn-quiet" aria-pressed={p === yr} onClick={() => setPeriod(p)} style={p === yr ? on : undefined}>{p === before ? `${periodLabel(ind, p)} (before this government)` : monthly(ind) ? 'Latest' : `${periodLabel(ind, p)} (latest)`}</button>)}</div>}
         <Bars ind={ind} rows={r.rows} med={r.med} f={f} showMonth={mixedMonths} />
       </> : <Trend ind={ind} f={f} />}
 

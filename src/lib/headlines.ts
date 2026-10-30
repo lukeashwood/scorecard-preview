@@ -36,6 +36,12 @@ export function factualHeadline(m: Measure): string {
   }
   const d = m.direction;
   if (d && rs) return `${lead(`${d.changeLabel} over the past year`)}.`;
+  // Yearly counts with no comparison boxes: "4 so far in 2026, 0 in 2025".
+  const pts = actualPoints(m);
+  if (rs && m.chart.freq === 'y' && pts.length >= 2) {
+    const [prev, last] = pts.slice(-2); const partial = !last[0].endsWith('-12-31');
+    return `${lead(`${val(last[1])}${partial ? ' so far' : ''} in ${last[0].slice(0, 4)}, ${val(prev[1])} in ${prev[0].slice(0, 4)}`)}.`;
+  }
   return `${m.title}.`;
 }
 
@@ -69,8 +75,10 @@ export function recordLine(m: Measure): string | null {
   const name = (rs.unit === '%' || rs.unit === '$bn' || rs.unit === '$' || rs.unit === "$'000" ? 'level' : 'figure') + (m.ed.useExtra != null ? ` as a ${rs.name.replace(/^% of/i, 'share of')}` : '');
   for (const [kind, cmp] of [['highest', (v: number) => v > lv], ['lowest', (v: number) => v < lv]] as const) {
     const prev = [...earlier].reverse().find((p) => cmp(p[1]));
-    if (!prev) { if (span >= 8) return `The ${kind} ${name} in figures back to ${pts[0][0].slice(0, 4)}.`; continue; }
-    if (yrs(prev[0], ld) >= 3) return `The ${kind} ${name} since ${fmtPeriod(prev[0], fq)}.`;
+    // A value matched earlier in the run (a second year with no rate rises, say) makes it "equal" highest or lowest, not a record.
+    const tiedSince = earlier.filter((p) => p[1] === lv && (!prev || p[0] > prev[0])).length > 0;
+    if (!prev) { if (span >= 8 && !tiedSince) return `The ${kind} ${name} in figures back to ${pts[0][0].slice(0, 4)}.`; continue; }
+    if (yrs(prev[0], ld) >= 3) return `The ${tiedSince ? 'equal ' : ''}${kind} ${name} since ${fmtPeriod(prev[0], fq)}.`;
   }
   return null;
 }

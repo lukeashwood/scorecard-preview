@@ -6,6 +6,7 @@ export const MEASURE_SEO: Record<string, string> = {
   inflation: 'Inflation rate Australia: CPI tracker since 2022',
   unemployment: 'Unemployment rate Australia: latest and trend',
   interest_rates: 'RBA cash rate: every rise and cut since 2022',
+  rate_rises: 'Interest rate rises per year: RBA since 1990, vs G20',
   mortgage: 'Mortgage repayments since 2022: what rates added',
   electricity: 'Electricity prices in Australia since 2022',
   power_bills: 'The $275 power bill promise: was it kept?',
