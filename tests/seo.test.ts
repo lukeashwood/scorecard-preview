@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { MEASURE_SEO, clip } from '../src/lib/seo';
 import { CONTROVERSIES } from '../src/lib/controversies';
 import { controversyTitle, controversyDescription } from '../src/lib/controversy-seo';
+import { pairFor } from '../src/lib/controversy-questions';
 
 /* Standing SEO rule: a search title is shown in full up to about 60 characters. Base.astro adds " | Gov Score" (12 characters)
    to any title of 48 or fewer, so a measure title must stay at 48 or under, and a controversy title at 60 or under either way. */
@@ -20,6 +21,11 @@ describe('search titles and descriptions', () => {
   test('every controversy description is between 70 and 160 characters', () => {
     const bad = CONTROVERSIES.filter((c) => { const n = controversyDescription(c).length; return n < 70 || n > 160; }).map((c) => `${c.id} (${controversyDescription(c).length})`);
     expect(bad, `Descriptions outside 70 to 160 characters:\n${bad.join('\n')}`).toEqual([]);
+  });
+  test('every controversy question pair fits its link preview image without being cut', () => {
+    // controversySvg wraps the critical question at 50 characters over 3 lines and the benign one at 64 over 2 lines.
+    const long = CONTROVERSIES.map((c) => ({ c, p: pairFor(c.id, c.type) })).filter(({ p }) => p.critical.length > 140 || p.benign.length > 120).map(({ c }) => c.id);
+    expect(long, `Question pairs too long for the share image:\n${long.join('\n')}`).toEqual([]);
   });
   test('clip cuts at a word and never passes the limit', () => {
     const s = 'word '.repeat(60).trim();

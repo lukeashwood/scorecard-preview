@@ -4,9 +4,11 @@
    quiet footer so every copy that travels carries it, without shouting. */
 import { join } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
-import { fmtPeriod, headlineText, inferFreq, parseDate, withUnit } from './format';
+import { fmtDate, fmtPeriod, headlineText, inferFreq, parseDate, withUnit } from './format';
 import { ratedSeries } from './measures';
 import { factualHeadline, recordLine } from './headlines';
+import { STATUS_LABEL, type Controversy } from './controversies';
+import { pairFor } from './controversy-questions';
 import type { Measure, Point } from './types';
 
 const C = { bg: '#ffffff', ink: '#1d1640', ink2: '#4a4466', ink3: '#7a7590', rule: '#e7e3f1', brand: '#5438e6', brandTint: '#f3f0fb', muted: '#c9c3da', est: '#9a8fc4' };
@@ -233,6 +235,38 @@ export function tallSvg(m: Measure): string {
   if (rec) { s += textLines(wrap(rec, 52, 2), P, y + 6, 36, `font-family="${SANS}" font-weight="600" font-size="28" fill="${C.brand}"`); y += 70; }
   s += chartSvg(m, { x: P - 6, y: y + 20, w: W - 2 * P + 6, h: H - y - 20 - 150 }, { labelSize: 24 });
   s += footer(m, W, H, P, 24);
+  return frame(W, H, s);
+}
+
+/** Link preview for a controversy page (1200x630): the 2 questions that head the page, the entry's title, who and when,
+    and its status. Wording is lifted from the page as it stands; nothing is added, so the image says no more than the page. */
+export function controversySvg(c: Controversy): string {
+  const W = 1200, H = 630, P = 56;
+  const pair = pairFor(c.id, c.type);
+  const crit = wrap(pair.critical, 50, 3);
+  const ben = wrap(pair.benign, 64, 2);
+  let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="17" fill="${C.brand}" letter-spacing="1.6">${esc(`AUSTRALIA · CONTROVERSIES · ${c.category.toUpperCase()}`)}</text>`;
+  let y = P + 52;
+  s += textLines(crit, P, y, 48, `font-family="${SANS}" font-weight="600" font-size="40" fill="${C.ink}"`);
+  y += crit.length * 48 + 2;
+  s += textLines(ben, P, y, 38, `font-family="${SANS}" font-weight="600" font-size="30" fill="${C.ink2}"`);
+  y += ben.length * 38 + 30;
+  // The entry itself, below a rule, with who it concerns and when
+  s += `<line x1="${P}" x2="${W - P}" y1="${y - 14}" y2="${y - 14}" stroke="${C.rule}" stroke-width="1.5"/>`;
+  const title = wrap(c.title, 86, 2);
+  s += textLines(title, P, y + 18, 30, `font-family="${SANS}" font-weight="600" font-size="23" fill="${C.ink}"`);
+  y += 18 + title.length * 30;
+  const meta = wrap(`${c.minister}, ${c.portfolio} · ${fmtDate(c.date)} · ${STATUS_LABEL[c.status]}`, 100, 1);
+  s += textLines(meta, P, y + 4, 24, `font-family="${SANS}" font-size="19" fill="${C.ink3}"`);
+  y += 4 + 24 + 24;
+  // What happened, as far as the room above the footer allows (up to 3 lines)
+  const room = Math.min(3, Math.floor((H - P * 1.25 - 16 - y) / 30));
+  if (room > 0) s += textLines(wrap(c.summary, 92, room), P, y + 8, 30, `font-family="${SANS}" font-size="21" fill="${C.ink2}"`);
+  // Footer: when the sources were last checked, and the address
+  const fy = H - P * 0.62;
+  s += `<line x1="${P}" x2="${W - P}" y1="${H - P * 1.25}" y2="${H - P * 1.25}" stroke="${C.rule}" stroke-width="1.5"/>
+    <text x="${P}" y="${fy}" font-family="${SANS}" font-size="17" fill="${C.ink3}">${esc(`${c.sources.length} sources, checked ${fmtDate(c.verified_on)} · Being listed is not a finding of wrongdoing`)}</text>
+    ${brandFooter(W - P, fy, 17 * 1.15)}`;
   return frame(W, H, s);
 }
 
