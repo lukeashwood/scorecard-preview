@@ -62,7 +62,7 @@ const jsonld = {
   creator: { '@type': 'Organization', name: SITE.name }, temporalCoverage: rs?.points.length ? `${rs.points[0][0]}/${rs.points[rs.points.length - 1][0]}` : undefined,
 };
 ---
-<Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]} ogImage={url(`share/wide/${m.id}.png`)}>
+<Base title={seoTitle} description={seoDesc} section="measures/" jsonld={[jsonld, crumbs]} ogImage={url(`share/wide/${m.id}.png`)} ogImageAlt={`${m.title}, Australia: chart of the official figures with the latest value`}>
   <article class="wrap pt-8 md:pt-12">
     <nav class="meta flex flex-wrap items-center gap-1.5" aria-label="Breadcrumb">
       <a href={url('measures/')} class="text-ink-3">Measures</a><span aria-hidden="true">/</span><span>{m.sectionTitle}</span>

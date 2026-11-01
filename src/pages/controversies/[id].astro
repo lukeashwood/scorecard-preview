@@ -22,11 +22,13 @@ const figures = measuresFor(c);
 const pageUrl = new URL(url(`controversies/${c.id}/`), Astro.site).href;
 const tone = { established: 'pill-neutral', contested: 'pill-warn', unverified: 'pill-bad', position: 'pill-brand' } as const;
 const title = controversyTitle(c), description = controversyDescription(c);
+// Each entry has its own link preview image, drawn at build time from the page's own wording (src/pages/share/controversy/).
+const shareImg = new URL(url(`share/controversy/${c.id}.png`), Astro.site).href;
 const jsonld = [
   { '@context': 'https://schema.org', '@type': 'Article', headline: c.title, alternativeHeadline: pair.critical, description, url: pageUrl, mainEntityOfPage: pageUrl,
     datePublished: c.date, dateModified: c.verified_on, inLanguage: 'en-AU', articleSection: 'Controversies', about: { '@type': 'Person', name: c.minister, jobTitle: c.portfolio },
-    // Search engines only show an article in rich results when the schema names an image; the site's share image is the one every page already uses.
-    image: { '@type': 'ImageObject', url: new URL(url('og.png'), Astro.site).href, width: 1200, height: 630 },
+    // Search engines only show an article in rich results when the schema names an image.
+    image: { '@type': 'ImageObject', url: shareImg, width: 1200, height: 630 },
     author: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href }, publisher: { '@type': 'Organization', name: SITE.name, url: new URL(url(), Astro.site).href },
     citation: c.sources.map((s) => s.url) },
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
@@ -35,7 +37,7 @@ const jsonld = [
     { '@type': 'ListItem', position: 3, name: c.title, item: pageUrl }] },
 ];
 ---
-<Base title={title} description={description} section="controversies/" jsonld={jsonld} ogType="article">
+<Base title={title} description={description} section="controversies/" jsonld={jsonld} ogType="article" ogImage={url(`share/controversy/${c.id}.png`)} ogImageAlt={`${pair.critical} ${pair.benign} ${c.title}`}>
   <article class="wrap-narrow pt-10 md:pt-14">
     <p class="eyebrow"><a href={url('controversies/')}>Controversies</a> / {c.category}</p>
     <div class="mt-3 flex flex-wrap items-center gap-2">

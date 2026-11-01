@@ -10,8 +10,12 @@ import { VERDICT_MEANING } from '../../lib/editorial';
 import type { Verdict } from '../../lib/types';
 const t = tally(); const official = TARGETS.filter((m) => m.ed.target!.owner === 'official');
 const order: Verdict[] = ['met', 'on_track', 'in_progress', 'at_risk', 'off_track', 'not_met'];
+// Search engines read the list of tracked commitments as a list, each pointing at its own page.
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Albanese Government commitments tracked against official figures', url: new URL(url('targets/'), Astro.site).href,
+  numberOfItems: GOV_TARGETS.length, itemListOrder: 'https://schema.org/ItemListUnordered',
+  itemListElement: GOV_TARGETS.map((m, i) => ({ '@type': 'ListItem', position: i + 1, name: m.title, url: new URL(url(`measures/${m.id}/`), Astro.site).href })) };
 ---
-<Base title="Albanese Government promises tracker: kept or broken?" description="Every measurable promise the Albanese Government made, from the $275 power bill cut to 1.2 million homes, judged against official figures under a published rule." section="targets/">
+<Base title="Albanese Government promises tracker: kept or broken?" description="Every measurable promise the Albanese Government made, from the $275 power bill cut to 1.2 million homes, judged against official figures under a published rule." section="targets/" jsonld={jsonld}>
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Promises · what did they promise?</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Is the government doing what it said?</h1>
