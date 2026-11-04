@@ -6,6 +6,7 @@ import { MEASURES } from './measures';
 import type { Measure } from './types';
 
 export const CONTROVERSY_MEASURES: Record<string, string[]> = {
+  'rate-rise-november-2026-government-messages': ['interest_rates', 'mortgage', 'inflation', 'spending_gdp'],
   'spending-inflation-rate-rises': ['spending_gdp', 'inflation', 'interest_rates'],
   'five-percent-deposit-scheme': ['home_prices', 'price_to_earnings'],
   'bowen-275-power-bill-promise-2026': ['power_bills', 'electricity'],

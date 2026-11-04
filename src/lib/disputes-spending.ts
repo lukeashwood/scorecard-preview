@@ -17,10 +17,10 @@ export const SPENDING_INFLATION: Controversy = {
   id: 'spending-inflation-rate-rises', featured: true, date: '2026-09-29', type: 'policy', category: 'Budget and inflation',
   title: 'Is government spending pushing up inflation and interest rates?',
   minister: 'Jim Chalmers and Katy Gallagher', portfolio: 'Treasurer; Minister for Finance',
-  summary: 'The Reserve Bank lifted the cash rate to 4.60% on 29 September 2026, its fourth rise this year and the highest level in 15 years. A number of prominent economists, including former Reserve Bank Governor Philip Lowe, say heavy federal spending is adding to demand and to inflation, and that the budget should be in surplus at full employment. The Final Budget Outcome, released the day before, showed Commonwealth spending at 26.9% of GDP in 2025-26, the highest share in 40 years outside the COVID years. The Treasurer and Finance Minister say the main driver of inflation now is the war in the Middle East and strong private demand, not government spending.',
+  summary: 'The Reserve Bank lifted the cash rate to 4.60% on 29 September 2026, its fourth rise this year and the highest level in 15 years. A number of prominent economists, including former Reserve Bank Governor Philip Lowe, say heavy federal spending is adding to demand and to inflation, and that the budget should be in surplus at full employment. The Final Budget Outcome, released the day before, showed Commonwealth spending at 26.9% of GDP in 2025-26, the highest share in 40 years outside the COVID years. The Treasurer and Finance Minister say the main driver of inflation now is the war in the Middle East and strong private demand, not government spending. On 3 November the Reserve Bank raised the rate again, to 4.85%; that decision and the reaction to it have their own entry.',
   figures: [
-    // The 29 September decision is entered by hand: the RBA's data table can lag its announcement by days.
-    { label: 'Cash rate', value: pct(Math.max(cash?.[1] ?? 0, 4.6), 2), note: 'RBA cash rate target after the 29 September 2026 decision' },
+    // The latest decision is entered by hand as a floor: the RBA's data table can lag its announcement by days.
+    { label: 'Cash rate', value: pct(Math.max(cash?.[1] ?? 0, 4.85), 2), note: 'RBA cash rate target after the 3 November 2026 decision (4.60% after 29 September)' },
     { label: 'Inflation', value: pct(infl?.value), note: `Annual CPI, ${infl?.period ?? 'latest month'}. RBA target is 2 to 3%.` },
     { label: 'Commonwealth spending', value: pct(spend?.value), note: `Share of GDP, ${spend?.period ?? 'latest year'}` },
     { label: 'Public demand, all governments', value: pct(pubDemand?.value), note: `Share of the economy, ${pubDemand?.period ?? 'latest quarter'}` },
@@ -76,5 +76,5 @@ export const SPENDING_INFLATION: Controversy = {
     { title: 'Labor defends economic record following interest rate hike (ABC, 30 September 2026)', url: 'https://www.abc.net.au/news/2026-09-30/labor-defends-spending-amid-high-inflation-rate-rise/107208962' },
     { title: 'Treasurer’s spending slammed by ex-central bank boss (AAP, 30 September 2026)', url: 'https://www.macleayargus.com.au/story/9359843/treasurers-spending-slammed-by-ex-central-bank-boss/' },
   ],
-  verified_on: '2026-10-01',
+  verified_on: '2026-11-04',
 };

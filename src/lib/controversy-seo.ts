@@ -5,6 +5,7 @@ import type { Controversy } from './controversies';
 import { clip } from './seo';
 
 export const CONTROVERSY_SEO: Record<string, string> = {
+  'rate-rise-november-2026-government-messages': 'Rate rise to 4.85%: what Labor and the RBA say',
   'spending-inflation-rate-rises': 'Is government spending driving inflation?',
   'five-percent-deposit-scheme': '5% deposit scheme: is it pushing up prices?',
   'speaker-visas-incite-discord': 'Candace Owens visa and the "incite discord" test',

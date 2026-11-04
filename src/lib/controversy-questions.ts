@@ -58,6 +58,7 @@ export const QUESTIONS: Record<string, Pair> = {
   'five-percent-deposit-scheme': { critical: 'Is the 5% deposit scheme pushing up the prices it was meant to help people pay?', benign: 'Or is it getting first home buyers in sooner, with a small price effect?' },
   'speaker-visas-incite-discord': { critical: 'Is refusing visas to foreign speakers deciding what Australians may hear?', benign: 'Or is it protecting social cohesion, within a law the High Court has upheld?' },
   'spending-inflation-rate-rises': { critical: 'Is government spending pushing up inflation and interest rates?', benign: 'Or are the Reserve Bank’s own statements pointing to other causes?' },
+  'rate-rise-november-2026-government-messages': { critical: 'Are households being given 2 different explanations for the rate rise?', benign: 'Or can the war, strong demand and tighter budgets all be true at once?' },
 };
 
 export const FALLBACK: Record<'policy' | 'conduct', Pair> = {

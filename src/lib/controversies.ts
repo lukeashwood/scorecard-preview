@@ -3,6 +3,7 @@ import disputes from '../data/disputes.json';
 import { FIVE_PERCENT } from './disputes-five-percent';
 import { SPEAKER_VISAS } from './disputes-visas';
 import { SPENDING_INFLATION } from './disputes-spending';
+import { RATE_RISE_NOV } from './disputes-rate-rise-nov';
 
 export interface Src { title: string; url: string }
 /** One strand of a disputed policy: what is claimed, by whom, and what the record shows. */
@@ -25,7 +26,7 @@ const legacy: Controversy[] = (raw.items as any[]).map((x) => ({
   summary: x.summary, response: x.response, outcome: x.outcome, status: x.status, sources: x.sources, verified_on: x.verified_on,
 }));
 
-export const CONTROVERSIES: Controversy[] = [SPENDING_INFLATION, FIVE_PERCENT, SPEAKER_VISAS, ...(disputes.items as Controversy[]), ...legacy].sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || b.date.localeCompare(a.date));
+export const CONTROVERSIES: Controversy[] = [RATE_RISE_NOV, SPENDING_INFLATION, FIVE_PERCENT, SPEAKER_VISAS, ...(disputes.items as Controversy[]), ...legacy].sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || b.date.localeCompare(a.date));
 export const STATUS_LABEL = { ongoing: 'Ongoing', resolved: 'Resolved', 'no-finding': 'No inquiry or finding' } as const;
 export const TYPE_LABEL = { policy: 'Policy or decision in dispute', conduct: 'Ministerial conduct' } as const;
 export const STANDING_LABEL = { established: 'Established', contested: 'Contested', unverified: 'Not supported by the record', position: 'Stated position' } as const;
