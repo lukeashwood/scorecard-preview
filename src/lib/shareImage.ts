@@ -205,6 +205,29 @@ export function wideSvg(m: Measure): string {
   return frame(W, H, s);
 }
 
+/** LinkedIn post image (1080x1080): headline on top, the chart across the full width, then the key figure, its caption
+    and the record line underneath. Same wording as the wide image, laid out for a square feed post. */
+export function postSvg(m: Measure): string {
+  const W = 1080, H = 1080, P = 56;
+  const head = wrap(factualHeadline(m), 40, 2);
+  const rec = recordLine(m);
+  let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="19" fill="${C.brand}" letter-spacing="1.8">${esc(`AUSTRALIA · ${m.sectionTitle.toUpperCase()}`)}</text>`;
+  s += textLines(head, P, P + 56, 54, `font-family="${SERIF}" font-weight="600" font-size="48" fill="${C.ink}"`);
+  const top = P + 56 + head.length * 54 - 20;
+  const chartH = 490;
+  s += chartSvg(m, { x: P, y: top + 20, w: W - 2 * P, h: chartH }, { labelSize: 19 });
+  // Underneath the chart: key figure, what it measures, and the record line
+  let y = top + 20 + chartH + 96;
+  s += `<text x="${P}" y="${y}" font-family="${SANS}" font-weight="700" font-size="72" fill="${C.ink}" letter-spacing="-1.2">${esc(headlineText(m.headline))}</text>`;
+  y += 44;
+  const cap = wrap(`${m.headline.caption}${m.headline.period ? `, ${m.headline.period}` : ''}`.replace(/\u2013/g, '-'), 60, 2);
+  s += textLines(cap, P, y, 31, `font-family="${SANS}" font-size="24" fill="${C.ink2}"`);
+  y += cap.length * 31 + 8;
+  if (rec) s += textLines(wrap(rec, 62, 2), P, y + 6, 30, `font-family="${SANS}" font-weight="600" font-size="22" fill="${C.brand}"`);
+  s += footer(m, W, H, P, 19);
+  return frame(W, H, s);
+}
+
 export function tallSvg(m: Measure): string {
   const W = 1080, H = 1350, P = 72;
   const head = wrap(factualHeadline(m), 30, 3);
