@@ -11,9 +11,9 @@ import { headlineText, fmtStamp } from '../../lib/format';
 import { shareText } from '../../lib/share';
 import { typicalHousehold } from '../../lib/typicalHousehold';
 import type { TaxRules } from '../../lib/personalTax';
+import { IN_60_IDS } from '../../lib/pageShare';
 
-const IDS = ['inflation', 'real_wages', 'unemployment', 'gdp_per_capita', 'household_income', 'mortgage', 'home_prices', 'electricity', 'housing_accord', 'gross_debt', 'spending_gdp', 'migration'];
-const tiles = IDS.map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
+const tiles = IN_60_IDS.map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
 const t = tally();
 const tx = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
 const NOW_RULES: TaxRules | null = tx ? { label: tx.income_year.replace(/[–—]/g, '-'), brackets: tx.brackets, medicareRate: tx.medicare_levy, medicareLow: tx.medicare_low, lito: tx.lito } : null;
@@ -21,7 +21,7 @@ const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
 const pub = (m: (typeof tiles)[number]) => [...new Set(m.sources.map((s) => s.publisher))].slice(0, 2).join(', ');
 ---
-<Base title="Australia since 2022 in 60 seconds: the key figures" description="Inflation, interest rates, wages, rents, debt and more: the figures most people ask about, each with its change since May 2022 and its official source." section="in-60-seconds/">
+<Base title="Australia since 2022 in 60 seconds: the key figures" description="Inflation, interest rates, wages, rents, debt and more: the figures most people ask about, each with its change since May 2022 and its official source." section="in-60-seconds/" ogImage={url('share/page/in-60-seconds.png')} ogImageAlt="Australia since May 2022 in 60 seconds: 8 key official figures and their change since the government took office">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">What happened? · In 60 seconds</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Australia since May 2022, in 60 seconds</h1>

@@ -4,8 +4,10 @@
    quiet footer so every copy that travels carries it, without shouting. */
 import { join } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
-import { fmtDate, fmtPeriod, headlineText, inferFreq, parseDate, withUnit } from './format';
-import { ratedSeries } from './measures';
+import { fmtDate, fmtPeriod, fmtStamp, headlineText, inferFreq, parseDate, withUnit } from './format';
+import { byId, DELIVERIES, GENERATED_AT, GOV_TARGETS, ratedSeries, tally } from './measures';
+import { VERDICT_LABEL, VERDICT_TONE } from './editorial';
+import type { PageShare } from './pageShare';
 import { factualHeadline, recordLine } from './headlines';
 import { STATUS_LABEL, type Controversy } from './controversies';
 import { pairFor } from './controversy-questions';
@@ -273,4 +275,85 @@ export function controversySvg(c: Controversy): string {
 export function toPng(svg: string): Buffer {
   const r = new Resvg(svg, { font: { fontFiles: FONTS, loadSystemFonts: false, defaultFontFamily: SANS }, fitTo: { mode: 'original' } });
   return r.render().asPng();
+}
+
+/* ---------- Pages that are not a measure or a controversy ---------- */
+
+/** Link preview for a static page (1200x630): the page's own heading and opening line, nothing more. */
+export function pageSvg(p: PageShare): string {
+  const W = 1200, H = 630, P = 64;
+  const head = wrap(p.title, 34, 3);
+  const headSize = head.length > 2 ? 54 : 62; const headLh = headSize * 1.12;
+  let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="19" fill="${C.brand}" letter-spacing="1.8">${esc(`AUSTRALIA · ${p.eyebrow.toUpperCase()}`)}</text>`;
+  let y = P + 50 + headSize;
+  s += textLines(head, P, y, headLh, `font-family="${SANS}" font-weight="600" font-size="${headSize}" fill="${C.ink}" letter-spacing="-0.5"`);
+  y += (head.length - 1) * headLh + 60;
+  const room = Math.max(1, Math.min(4, Math.floor((H - P * 1.25 - 20 - y) / 38)));
+  s += textLines(wrap(p.text, 72, room), P, y, 38, `font-family="${SANS}" font-size="27" fill="${C.ink2}"`);
+  s += plainFooter(W, H, P, 'Official Australian figures, sourced and dated. Gov Score gives no score of its own.');
+  return frame(W, H, s);
+}
+
+function plainFooter(w: number, h: number, pad: number, line: string): string {
+  const fs = 17; const y = h - pad * 0.62;
+  return `<line x1="${pad}" x2="${w - pad}" y1="${h - pad * 1.25}" y2="${h - pad * 1.25}" stroke="${C.rule}" stroke-width="1.5"/>
+    <text x="${pad}" y="${y}" font-family="${SANS}" font-size="${fs}" fill="${C.ink3}">${esc(line)}</text>
+    ${brandFooter(w - pad, y, fs * 1.15)}`;
+}
+
+const TONE_FILL = { good: '#1f9d55', warn: '#d97706', bad: '#c0392b', neutral: C.ink3 } as const;
+
+/** Link preview for the promises page (1200x630): the heading, the tally in the page's own words, the tally bar and
+    each commitment judged on the running figures with its verdict, exactly as the page shows them. */
+export function targetsSvg(): string {
+  const W = 1200, H = 630, P = 56;
+  const t = tally();
+  let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="17" fill="${C.brand}" letter-spacing="1.6">AUSTRALIA · PROMISES · WHAT DID THEY PROMISE?</text>`;
+  s += `<text x="${P}" y="${P + 62}" font-family="${SANS}" font-weight="600" font-size="46" fill="${C.ink}" letter-spacing="-0.5">Is the government doing what it said?</text>`;
+  const lede = `${t.total} commitments are tracked: ${t.good} met or on track, ${t.progress} in progress, ${t.risk} at risk and ${t.bad} off track or not met.`;
+  const ledeLines = wrap(lede, 92, 2);
+  s += textLines(ledeLines, P, P + 104, 30, `font-family="${SANS}" font-size="22" fill="${C.ink2}"`);
+  // Tally bar, the same 4 colours and order as the page
+  let x = P; const barW = W - 2 * P; const by = P + 104 + ledeLines.length * 30 - 4;
+  for (const [n, col] of [[t.good, TONE_FILL.good], [t.progress, TONE_FILL.neutral], [t.risk, TONE_FILL.warn], [t.bad, TONE_FILL.bad]] as [number, string][]) {
+    if (!n) continue; const w = (n / t.total) * barW - 3;
+    s += `<rect x="${x}" y="${by}" width="${Math.max(w, 0)}" height="12" rx="4" fill="${col}"/>`; x += w + 3;
+  }
+  // Commitments judged on the running figures: commitment text, verdict pill
+  let y = by + 48; const rowH = 44;
+  const rows = GOV_TARGETS.slice(0, Math.floor((H - P * 1.25 - 16 - y) / rowH));
+  for (const m of rows) {
+    const v = m.verdict!.verdict; const tone = VERDICT_TONE[v]; const label = m.ed.target!.verdictLabels?.[v] ?? VERDICT_LABEL[v];
+    const pillW = label.length * 11 + 30;
+    s += `<rect x="${W - P - pillW}" y="${y - 23}" width="${pillW}" height="32" rx="16" fill="${TONE_FILL[tone]}" opacity="0.14"/>`;
+    s += `
+      <text x="${W - P - pillW / 2}" y="${y}" text-anchor="middle" font-family="${SANS}" font-weight="700" font-size="17" fill="${TONE_FILL[tone]}">${esc(label)}</text>`;
+    s += `<text x="${P}" y="${y}" font-family="${SANS}" font-weight="600" font-size="21" fill="${C.ink}">${esc(wrap(m.ed.target!.commitment, 78, 1)[0])}</text>`;
+    s += `<line x1="${P}" x2="${W - P}" y1="${y + 17}" y2="${y + 17}" stroke="${C.rule}" stroke-width="1"/>`;
+    y += rowH;
+  }
+  const more = GOV_TARGETS.length + DELIVERIES.length - rows.length;
+  s += plainFooter(W, H, P, `${more > 0 ? `${more} more commitments on the page · ` : ''}Judged against official figures under a published rule`);
+  return frame(W, H, s);
+}
+
+/** Link preview for the in-60-seconds page (1200x630): the heading and 8 of the page's tiles, each with its latest
+    figure and its change since the government took office, in the same words the page uses. */
+export function in60Svg(ids: string[]): string {
+  const W = 1200, H = 630, P = 56;
+  const ms = ids.map(byId).filter((m): m is Measure => !!m).slice(0, 8);
+  let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="17" fill="${C.brand}" letter-spacing="1.6">AUSTRALIA · WHAT HAPPENED? · IN 60 SECONDS</text>`;
+  s += `<text x="${P}" y="${P + 62}" font-family="${SANS}" font-weight="600" font-size="46" fill="${C.ink}" letter-spacing="-0.5">Australia since May 2022, in 60 seconds</text>`;
+  const cols = 4, gap = 18; const cw = (W - 2 * P - gap * (cols - 1)) / cols; const ch = 150; const top = P + 100;
+  ms.forEach((m, i) => {
+    const x = P + (i % cols) * (cw + gap); const y = top + Math.floor(i / cols) * (ch + gap);
+    const se = m.sinceElection;
+    s += `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" rx="16" fill="#f6f5f9"/>`;
+    s += textLines(wrap((m.ed.title ?? m.title).toUpperCase(), 24, 2), x + 20, y + 30, 18, `font-family="${SANS}" font-weight="600" font-size="13.5" fill="${C.ink3}" letter-spacing="0.6"`);
+    s += `<text x="${x + 20}" y="${y + 96}" font-family="${SANS}" font-weight="700" font-size="40" fill="${C.ink}" letter-spacing="-1">${esc(wrap(headlineText(m.headline), 12, 1)[0])}</text>`;
+    const sub = se ? `Since May 2022: ${se.label}` : 'No comparable mid-2022 figure';
+    s += textLines(wrap(sub, 30, 1), x + 20, y + 126, 20, `font-family="${SANS}" font-size="15.5" fill="${se ? (se.tone === 'good' ? TONE_FILL.good : se.tone === 'bad' ? TONE_FILL.bad : C.ink2) : C.ink2}"`);
+  });
+  s += plainFooter(W, H, P, `Figures as at ${fmtStamp(GENERATED_AT)} · Official sources, linked on every page`);
+  return frame(W, H, s);
 }
