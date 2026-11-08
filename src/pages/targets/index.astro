@@ -15,7 +15,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'A
   numberOfItems: GOV_TARGETS.length, itemListOrder: 'https://schema.org/ItemListUnordered',
   itemListElement: GOV_TARGETS.map((m, i) => ({ '@type': 'ListItem', position: i + 1, name: m.title, url: new URL(url(`measures/${m.id}/`), Astro.site).href })) };
 ---
-<Base title="Albanese Government promises tracker: kept or broken?" description="Every measurable promise the Albanese Government made, from the $275 power bill cut to 1.2 million homes, judged against official figures under a published rule." section="targets/" jsonld={jsonld}>
+<Base title="Albanese Government promises tracker: kept or broken?" description="Every measurable promise the Albanese Government made, from the $275 power bill cut to 1.2 million homes, judged against official figures under a published rule." section="targets/" jsonld={jsonld} ogImage={url('share/page/targets.png')} ogImageAlt="Albanese Government promises tracker: how many commitments are met, on track, in progress, at risk or off track, with each commitment and its verdict">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Promises · what did they promise?</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Is the government doing what it said?</h1>

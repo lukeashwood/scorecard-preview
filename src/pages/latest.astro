@@ -9,7 +9,7 @@ const rows = MEASURES.filter((m) => m.lastDataDate).sort((a, b) => b.lastDataDat
 const byMonth = new Map<string, typeof rows>();
 for (const m of rows) { const k = m.lastDataDate!.slice(0, 7); byMonth.set(k, [...(byMonth.get(k) ?? []), m]); }
 ---
-<Base title="Latest figures: what landed and when" description="Every measure on Gov Score ordered by the date of its newest official figure, with the verdict where a commitment applies. Also available as an RSS feed." section="latest/">
+<Base title="Latest figures: what landed and when" description="Every measure on Gov Score ordered by the date of its newest official figure, with the verdict where a commitment applies. Also available as an RSS feed." section="latest/" ogImage={url('share/page/latest.png')} ogImageAlt="Latest official Australian figures: what landed and when">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Latest figures</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What landed, and when</h1>

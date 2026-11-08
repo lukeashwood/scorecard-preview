@@ -14,7 +14,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'A
   numberOfItems: CONTROVERSIES.length, itemListOrder: 'https://schema.org/ItemListOrderDescending',
   itemListElement: CONTROVERSIES.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.title, url: new URL(url(`controversies/${c.id}/`), Astro.site).href })) };
 ---
-<Base title="Albanese Government controversies: claims and the record" description="Disputed policies and questions about ministers' conduct: what happened, what the government says, what critics say and what the record shows, all sourced." section="controversies/" jsonld={jsonld}>
+<Base title="Albanese Government controversies: claims and the record" description="Disputed policies and questions about ministers' conduct: what happened, what the government says, what critics say and what the record shows, all sourced." section="controversies/" jsonld={jsonld} ogImage={url('share/page/controversies.png')} ogImageAlt="Albanese Government controversies: the claims, the evidence and where each stands">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Controversies · since May 2022</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Contested decisions and conduct: the claims, the evidence, and where each stands</h1>

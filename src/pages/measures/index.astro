@@ -12,7 +12,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'O
   numberOfItems: MEASURES.length, itemListOrder: 'https://schema.org/ItemListUnordered',
   itemListElement: MEASURES.map((m, i) => ({ '@type': 'ListItem', position: i + 1, name: m.title, url: new URL(url(`measures/${m.id}/`), Astro.site).href })) };
 ---
-<Base title="Australian economic indicators: every figure we track" description="Every official figure the site tracks, by topic, with its latest value, its direction over the past year and how much control the federal government has over it." section="measures/" jsonld={jsonld}>
+<Base title="Australian economic indicators: every figure we track" description="Every official figure the site tracks, by topic, with its latest value, its direction over the past year and how much control the federal government has over it." section="measures/" jsonld={jsonld} ogImage={url('share/page/measures.png')} ogImageAlt="Every official figure Gov Score tracks, grouped by topic">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Measures · what happened?</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every figure we track</h1>

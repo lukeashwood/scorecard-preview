@@ -8,7 +8,7 @@ const glossary = MEASURES.filter((m) => m.explainer).slice(0, 40);
 const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Australian economy explainers', url: new URL(url('learn/'), Astro.site).href, numberOfItems: LESSONS.length,
   itemListElement: LESSONS.map((l, i) => ({ '@type': 'ListItem', position: i + 1, name: l.title, url: new URL(url(`learn/${l.slug}/`), Astro.site).href })) };
 ---
-<Base title="Australian economy explained in plain English" description="Short, interactive explainers on tax, the deficit and debt, inflation and interest rates, in plain English with no jargon. Free, with official figures." section="learn/" jsonld={jsonld}>
+<Base title="Australian economy explained in plain English" description="Short, interactive explainers on tax, the deficit and debt, inflation and interest rates, in plain English with no jargon. Free, with official figures." section="learn/" jsonld={jsonld} ogImage={url('share/page/learn.png')} ogImageAlt="The Australian economy explained in plain English: short interactive explainers from Gov Score">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Learn</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">The economy, without the jargon</h1>
