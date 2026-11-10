@@ -88,7 +88,7 @@ function sinceElection(m: RawMetric) {
   const freq = inferFreq(pts, m.chart.freq);
   const anchor = freq === 'fy' || freq === 'q' ? '2022-06-30' : '2022-05-31';
   const from = nearest(pts, anchor, freq === 'fy' ? 10 : 50);
-  const useNewer = !!latestNewer && latestNewer[0] > pts[pts.length - 1][0];
+  const useNewer = !!latestNewer && latestNewer[0] >= pts[pts.length - 1][0];
   const to = useNewer ? latestNewer! : pts[pts.length - 1];
   const toFreq = useNewer ? newerFreq! : freq;
   if (!from || from[0] === to[0]) return null;
