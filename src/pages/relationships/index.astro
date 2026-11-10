@@ -2,13 +2,21 @@
 /* Pairs of official series shown together. Everything is calculated from the site's own data at build time. */
 import Base from '../../layouts/Base.astro';
 import RelationshipChart, { describe } from '../../islands/RelationshipChart.tsx';
+import DemandChart from '../../islands/DemandChart.tsx';
 import { PAIR_DATA } from '../../lib/relationships';
 import { url } from '../../config/site';
-import { GENERATED_AT } from '../../lib/measures';
+import { GENERATED_AT, ALL_METRICS } from '../../lib/measures';
 import { fmtStamp } from '../../lib/format';
 const TERM = '2022-07-01';
+// Private vs public demand growth, with annual inflation on the same scale. Skipped if the data feed does not have it yet.
+const dg = ALL_METRICS.find((m) => m.id === 'demand_growth');
+const inf = ALL_METRICS.find((m) => m.id === 'inflation');
+const priv = (dg?.chart.series?.[0]?.points ?? []) as [string, number][];
+const pub = (dg?.chart.series?.[1]?.points ?? []) as [string, number][];
+const infl = (inf?.chart.series?.[0]?.points ?? []) as [string, number][];
+const showDemand = priv.length > 8 && pub.length > 8 && infl.length > 8;
 ---
-<Base title="Does government spending cause inflation? See the data" description="Official figures side by side: government spending and inflation, migration and home prices, interest rates and inflation, and more. See how closely they move together." section="relationships/" ogImage={url('share/page/relationships.png')} ogImageAlt="Compare official Australian series side by side: do they move together?">
+<Base title="Does government spending cause inflation? See the data" description="Official figures side by side: private vs public demand and inflation, government spending, migration and home prices, interest rates and more. See how closely they move." section="relationships/" ogImage={url('share/page/relationships.png')} ogImageAlt="Compare official Australian series side by side: do they move together?">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Compare · why did it happen?</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Do these move together?</h1>
@@ -19,9 +27,22 @@ const TERM = '2022-07-01';
     </div>
     <p class="meta mono mt-4">Figures as at {fmtStamp(GENERATED_AT)}</p>
 
-    <nav class="mt-6 flex flex-wrap gap-1.5" aria-label="Jump to">{PAIR_DATA.map((p) => <a class="btn btn-quiet btn-sm" href={`#${p.spec.id}`}>{p.spec.title}</a>)}</nav>
+    <nav class="mt-6 flex flex-wrap gap-1.5" aria-label="Jump to">{showDemand && <a class="btn btn-quiet btn-sm" href="#private-public-demand">Private vs public demand</a>}{PAIR_DATA.map((p) => <a class="btn btn-quiet btn-sm" href={`#${p.spec.id}`}>{p.spec.title}</a>)}</nav>
 
     <div class="mt-10 grid gap-8">
+      {showDemand && (
+        <article class="card card-pad scroll-mt-24" id="private-public-demand">
+          <div class="min-w-0 max-w-[70ch]">
+            <h2 class="h2 !text-[24px]">Private vs public demand, and inflation</h2>
+            <p class="lede mt-1 !text-[17px]">Is government spending growing faster than spending by households and businesses, and what has inflation done alongside?</p>
+          </div>
+          <div class="mt-5"><DemandChart client:visible priv={priv} pub={pub} infl={infl} term={TERM} /></div>
+          <p class="mt-3 text-[15px] font-semibold">Is demand running ahead of what the economy can supply, or is it under control? <span class="text-brand">You decide.</span></p>
+          <h3 class="h3 mt-6">What else is going on</h3>
+          <p class="prose mt-1.5 max-w-[80ch]">When total demand grows faster than the economy can supply, prices tend to rise. The Reserve Bank looks at both parts: what households and businesses spend, and what governments spend. Inflation also moves with world energy prices, the exchange rate, wages and interest rates, so the bars and the line moving together, or apart, does not show cause and effect.</p>
+          <p class="meta mt-3">From the site’s own series: <a href={url('measures/government_size/')}>Size of government in the economy</a> and <a href={url('measures/inflation/')}>Inflation</a>. Private demand is domestic final demand less public final demand; sources are on each measure’s page.</p>
+        </article>
+      )}
       {PAIR_DATA.map((p) => { const best = p.byLag[0]; return (
         <article class="card card-pad scroll-mt-24" id={p.spec.id}>
           <div class="flex flex-wrap items-start justify-between gap-3">
