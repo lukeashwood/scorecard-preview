@@ -6,14 +6,24 @@ import DemandChart from '../../islands/DemandChart.tsx';
 import { PAIR_DATA } from '../../lib/relationships';
 import { url } from '../../config/site';
 import { GENERATED_AT, ALL_METRICS } from '../../lib/measures';
-import { fmtStamp } from '../../lib/format';
+import { fmtStamp, fmtPeriod } from '../../lib/format';
 const TERM = '2022-07-01';
-// Private vs public demand growth, with annual inflation on the same scale. Skipped if the data feed does not have it yet.
+// Private vs public demand, with annual inflation on the same chart. Skipped if the data feed does not have it yet.
 const dg = ALL_METRICS.find((m) => m.id === 'demand_growth');
 const inf = ALL_METRICS.find((m) => m.id === 'inflation');
 const priv = (dg?.chart.series?.[0]?.points ?? []) as [string, number][];
 const pub = (dg?.chart.series?.[1]?.points ?? []) as [string, number][];
-const infl = (inf?.chart.series?.[0]?.points ?? []) as [string, number][];
+// Inflation: the quarterly series up to where the monthly CPI starts, then the monthly series, so the line reaches the latest month.
+const inflQ = (inf?.chart.series?.[0]?.points ?? []) as [string, number][];
+const inflM = (inf?.chart.series?.[1]?.points ?? []) as [string, number][];
+const infl = inflM.length ? [...inflQ.filter((p) => p[0] < inflM[0][0].slice(0, 7) + '-01'), ...inflM] : inflQ;
+const lastQ = inflM.length ? inflQ.filter((p) => p[0] < inflM[0][0].slice(0, 7) + '-01').pop() : null;
+const coverage = priv.length
+  ? `Demand: quarterly figures to ${fmtPeriod(priv[priv.length - 1][0], 'm')}. Inflation: ${lastQ && inflM.length ? `quarterly to ${fmtPeriod(lastQ[0], 'm')}, monthly from ${fmtPeriod(inflM[0][0], 'm')} to ${fmtPeriod(inflM[inflM.length - 1][0], 'm')}` : `quarterly to ${fmtPeriod(inflQ[inflQ.length - 1]?.[0] ?? '', 'm')}`}. Source: Australian Bureau of Statistics, via the Reserve Bank of Australia (Tables H1 and H2). Figures do not establish causation of inflation.`
+  : '';
+// Upcoming ABS release dates, checked against the ABS release calendar. Each drops off by itself once its date has passed.
+const NEXT_RELEASES = [{ date: '2026-11-25', text: 'October 2026 inflation, 25 Nov' }, { date: '2026-12-02', text: 'September quarter 2026 national accounts, 2 Dec' }];
+const next = NEXT_RELEASES.filter((r) => r.date > GENERATED_AT.slice(0, 10)).map((r) => r.text);
 const showDemand = priv.length > 8 && pub.length > 8 && infl.length > 8;
 ---
 <Base title="Does government spending cause inflation? See the data" description="Official figures side by side: private vs public demand and inflation, government spending, migration and home prices, interest rates and more. See how closely they move." section="relationships/" ogImage={url('share/page/relationships.png')} ogImageAlt="Compare official Australian series side by side: do they move together?">
@@ -33,14 +43,14 @@ const showDemand = priv.length > 8 && pub.length > 8 && infl.length > 8;
       {showDemand && (
         <article class="card card-pad scroll-mt-24" id="private-public-demand">
           <div class="min-w-0 max-w-[70ch]">
-            <h2 class="h2 !text-[24px]">Private vs public demand, and inflation</h2>
-            <p class="lede mt-1 !text-[17px]">Is government spending growing faster than spending by households and businesses, and what has inflation done alongside?</p>
+            <h2 class="h2 !text-[24px]">Who is driving Australia’s demand?</h2>
+            <p class="lede mt-1 !text-[17px]">Public and private demand, alongside annual inflation.</p>
           </div>
-          <div class="mt-5"><DemandChart client:visible priv={priv} pub={pub} infl={infl} term={TERM} /></div>
+          <div class="mt-5"><DemandChart client:visible priv={priv} pub={pub} infl={infl} term={TERM} coverage={coverage} next={next} /></div>
           <p class="mt-3 text-[15px] font-semibold">Is demand running ahead of what the economy can supply, or is it under control? <span class="text-brand">You decide.</span></p>
           <h3 class="h3 mt-6">What else is going on</h3>
           <p class="prose mt-1.5 max-w-[80ch]">When total demand grows faster than the economy can supply, prices tend to rise. The Reserve Bank looks at both parts: what households and businesses spend, and what governments spend. Inflation also moves with world energy prices, the exchange rate, wages and interest rates, so the bars and the line moving together, or apart, does not show cause and effect.</p>
-          <p class="meta mt-3">From the site’s own series: <a href={url('measures/government_size/')}>Size of government in the economy</a> and <a href={url('measures/inflation/')}>Inflation</a>. Private demand is domestic final demand less public final demand, and growth is the change on the same quarter a year earlier; sources are on each measure’s page.</p>
+          <p class="meta mt-3">From the site’s own series: <a href={url('measures/government_size/')}>Size of government in the economy</a> and <a href={url('measures/inflation/')}>Inflation</a>. Private demand is domestic final demand less public final demand, and each contribution is its change since the previous quarter as a share of GDP in that quarter; sources are on each measure’s page.</p>
         </article>
       )}
       {PAIR_DATA.map((p) => { const best = p.byLag[0]; return (
