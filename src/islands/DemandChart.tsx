@@ -14,11 +14,10 @@ function useWidth() {
 
 const RANGES = [{ label: 'Last 5 years', q: 20 }, { label: 'Last 10 years', q: 40 }, { label: 'Since 2000', q: 999 }];
 const pct = (v: number) => `${v.toFixed(1)}%`;
-const pts = (v: number) => `${v.toFixed(1)} pts`;
 /** A round tick step (1, 2 or 5 times a power of ten) giving about 5 steps across the range. */
 function niceStep(range: number) { const raw = Math.max(range, 1e-6) / 5, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
 
-/** Grouped bars: how much private and public demand each added to GDP growth over the year to each quarter (left scale), with
+/** Grouped bars: the percentage change in private and public demand on the same quarter a year earlier (left scale), with
     annual inflation as a line over them (right scale). The two scales are built so their zero lines and gridlines match. */
 export default function DemandChart({ priv, pub, infl, term }: Props) {
   const [ri, setRi] = useState(0);
@@ -49,11 +48,11 @@ export default function DemandChart({ priv, pub, infl, term }: Props) {
         {RANGES.map((r, i) => <button key={r.label} type="button" className="btn btn-sm btn-quiet" aria-pressed={i === ri} onClick={() => { setRi(i); setHover(null); }} style={i === ri ? on : undefined}>{r.label}</button>)}
       </div>
       <div ref={ref} className="relative">
-        {W > 0 && <svg width={W} height={H} role="img" aria-label={`Private and public demand contributions to GDP growth (left scale) and inflation (right scale), ${fmtPeriod(rows[0].d, 'q')} to ${fmtPeriod(rows[rows.length - 1].d, 'q')}. Latest quarter: private ${pts(rows[rows.length - 1].priv)}, public ${pts(rows[rows.length - 1].pub)}${rows[rows.length - 1].infl != null ? `, inflation ${pct(rows[rows.length - 1].infl!)}` : ''}.`} className="block" onPointerLeave={() => setHover(null)}>
+        {W > 0 && <svg width={W} height={H} role="img" aria-label={`Percentage change in private and public demand on a year earlier (left scale) and inflation (right scale), ${fmtPeriod(rows[0].d, 'q')} to ${fmtPeriod(rows[rows.length - 1].d, 'q')}. Latest quarter: private ${pct(rows[rows.length - 1].priv)}, public ${pct(rows[rows.length - 1].pub)}${rows[rows.length - 1].infl != null ? `, inflation ${pct(rows[rows.length - 1].infl!)}` : ''}.`} className="block" onPointerLeave={() => setHover(null)}>
           <g transform={`translate(${m.l},${m.t})`}>
             {tx >= 0 && <rect x={(x(rows[tx].d) ?? 0) - x.step() * 0.1} y={0} width={Math.max(0, iw - (x(rows[tx].d) ?? 0) + x.step() * 0.1)} height={ih} fill="var(--brand-tint)" opacity={0.6} />}
             {steps.map((k) => <g key={k}><line x1={0} x2={iw} y1={y(k * sL)} y2={y(k * sL)} stroke={k === 0 ? 'var(--ink-3)' : 'var(--grid)'} /><text x={-8} y={y(k * sL)} dy="0.32em" textAnchor="end" fontSize="12" fill="var(--ink-3)">{+(k * sL).toFixed(2)}%</text><text x={iw + 8} y={yr(k * sR)} dy="0.32em" fontSize="12" fill="var(--ink)">{+(k * sR).toFixed(2)}%</text></g>)}
-            <text transform={`translate(${-44},${ih / 2}) rotate(-90)`} textAnchor="middle" fontSize="12" fontWeight={600} fill="var(--ink-2)">Contribution to GDP growth (% points)</text>
+            <text transform={`translate(${-44},${ih / 2}) rotate(-90)`} textAnchor="middle" fontSize="12" fontWeight={600} fill="var(--ink-2)">Change on a year earlier (%)</text>
             <text transform={`translate(${iw + 46},${ih / 2}) rotate(90)`} textAnchor="middle" fontSize="12" fontWeight={600} fill="var(--ink)">Inflation (annual %)</text>
             {rows.map((r, i) => {
               const x0 = x(r.d) ?? 0;
@@ -68,7 +67,7 @@ export default function DemandChart({ priv, pub, infl, term }: Props) {
             {!dense && rows.map((r) => r.infl != null && <circle key={r.d} cx={(x(r.d) ?? 0) + bw} cy={yr(r.infl)} r={3} fill="var(--ink)" stroke="var(--surface)" strokeWidth={1} pointerEvents="none" />)}
           </g>
         </svg>}
-        {h && <div role="status" className="pointer-events-none absolute right-2 top-2 rounded-lg border border-rule bg-surface p-2 text-[13px] shadow-card"><b>{fmtPeriod(h.d, 'q')}</b><br />Private demand: {pts(h.priv)} of GDP growth<br />Public demand: {pts(h.pub)} of GDP growth<br />{h.infl != null ? `Inflation: ${pct(h.infl)}` : 'Inflation: not yet published'}</div>}
+        {h && <div role="status" className="pointer-events-none absolute right-2 top-2 rounded-lg border border-rule bg-surface p-2 text-[13px] shadow-card"><b>{fmtPeriod(h.d, 'q')}</b><br />Private demand: {pct(h.priv)} on a year earlier<br />Public demand: {pct(h.pub)} on a year earlier<br />{h.infl != null ? `Inflation: ${pct(h.infl)}` : 'Inflation: not yet published'}</div>}
       </div>
       <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-ink-2">
         <li className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-3 w-3 rounded-sm" style={{ background: 'var(--c1)' }} />Private demand (left scale)</li>
@@ -76,7 +75,7 @@ export default function DemandChart({ priv, pub, infl, term }: Props) {
         <li className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-[3px] w-5 rounded" style={{ background: 'var(--ink)' }} />Inflation (right scale)</li>
         <li className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-3 w-5 rounded-sm" style={{ background: 'var(--brand-tint)' }} />This government</li>
       </ul>
-      <p className="meta mt-2">Each bar is the percentage points that part of demand added to GDP growth over the year to that quarter. Inflation is the annual rate. Private demand is household spending plus private investment in homes and business; public demand is federal, state and local government spending and investment together.</p>
+      <p className="meta mt-2">Each bar is the percentage change in spending on the same quarter a year earlier. Inflation is the annual rate. Private demand is household spending plus private investment in homes and business; public demand is federal, state and local government spending and investment together.</p>
     </figure>
   );
 }
