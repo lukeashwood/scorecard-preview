@@ -34,13 +34,13 @@ const showDemand = priv.length > 8 && pub.length > 8 && infl.length > 8;
         <article class="card card-pad scroll-mt-24" id="private-public-demand">
           <div class="min-w-0 max-w-[70ch]">
             <h2 class="h2 !text-[24px]">Private vs public demand, and inflation</h2>
-            <p class="lede mt-1 !text-[17px]">Is government spending growing faster than spending by households and businesses, and what has inflation done alongside?</p>
+            <p class="lede mt-1 !text-[17px]">How much of the economy’s growth comes from government spending, and how much from households and businesses? What has inflation done alongside?</p>
           </div>
           <div class="mt-5"><DemandChart client:visible priv={priv} pub={pub} infl={infl} term={TERM} /></div>
           <p class="mt-3 text-[15px] font-semibold">Is demand running ahead of what the economy can supply, or is it under control? <span class="text-brand">You decide.</span></p>
           <h3 class="h3 mt-6">What else is going on</h3>
           <p class="prose mt-1.5 max-w-[80ch]">When total demand grows faster than the economy can supply, prices tend to rise. The Reserve Bank looks at both parts: what households and businesses spend, and what governments spend. Inflation also moves with world energy prices, the exchange rate, wages and interest rates, so the bars and the line moving together, or apart, does not show cause and effect.</p>
-          <p class="meta mt-3">From the site’s own series: <a href={url('measures/government_size/')}>Size of government in the economy</a> and <a href={url('measures/inflation/')}>Inflation</a>. Private demand is domestic final demand less public final demand; sources are on each measure’s page.</p>
+          <p class="meta mt-3">From the site’s own series: <a href={url('measures/government_size/')}>Size of government in the economy</a> and <a href={url('measures/inflation/')}>Inflation</a>. Private demand is domestic final demand less public final demand, and each contribution is its change over the year as a share of GDP a year earlier; sources are on each measure’s page.</p>
         </article>
       )}
       {PAIR_DATA.map((p) => { const best = p.byLag[0]; return (
