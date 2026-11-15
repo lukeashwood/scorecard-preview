@@ -5,8 +5,15 @@ import Icon from '../../components/Icon.astro';
 import { url } from '../../config/site';
 import { BUDGET } from '../../lib/measures';
 import { fmtDate } from '../../lib/format';
+// Search engines read the explorer's figures as a dataset drawn from the published Budget papers.
+const years = (BUDGET?.years ?? []) as { label: string; year: string; type: string; document: string; url: string; published: string }[];
+const jsonld = { '@context': 'https://schema.org', '@type': 'Dataset', name: 'Australian Government revenue and spending by category', url: new URL(url('budget/'), Astro.site).href,
+  description: `Revenue and expenses of the Australian Government general government sector, category by category, as published in ${years.map((y) => y.document).join(' and ')}. Accrual figures in Australian dollars.`,
+  inLanguage: 'en-AU', spatialCoverage: 'Australia', temporalCoverage: years.map((y) => y.year.replace(/[–—]/g, '-')).sort().join('/'),
+  creator: { '@type': 'GovernmentOrganization', name: 'Commonwealth of Australia' }, publisher: { '@type': 'GovernmentOrganization', name: 'Australian Government, Department of the Treasury', url: 'https://budget.gov.au/' },
+  isBasedOn: years.map((y) => ({ '@type': 'Report', name: y.document, url: y.url, datePublished: y.published })), dateModified: BUDGET?.verified_on, keywords: ['Federal Budget', 'government revenue', 'government spending', 'Australia'] };
 ---
-<Base title="Australian Federal Budget explained: where the money goes" description="Where the Australian Government's money comes from and where it goes, line by line from the Budget papers and the Final Budget Outcome." section="budget/" ogImage={url('share/page/budget.png')} ogImageAlt="The Australian Federal Budget explained: where the money comes from and where it goes">
+<Base title="Australian Federal Budget explained: where the money goes" description="Where the Australian Government's money comes from and where it goes, line by line from the Budget papers and the Final Budget Outcome." section="budget/" jsonld={jsonld} ogImage={url('share/page/budget.png')} ogImageAlt="The Australian Federal Budget explained: where the money comes from and where it goes">
   <div class="wrap pt-10 md:pt-14">
     <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
       <div><p class="eyebrow">The Budget</p><h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Where the money comes from, and where it goes</h1>

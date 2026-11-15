@@ -25,8 +25,14 @@ const coverage = priv.length
 const NEXT_RELEASES = [{ date: '2026-11-25', text: 'October 2026 inflation, 25 Nov' }, { date: '2026-12-02', text: 'September quarter 2026 national accounts, 2 Dec' }];
 const next = NEXT_RELEASES.filter((r) => r.date > GENERATED_AT.slice(0, 10)).map((r) => r.text);
 const showDemand = priv.length > 8 && pub.length > 8 && infl.length > 8;
+// Search engines read the comparisons as a list, each pointing at its place on this page.
+const pageUrl = new URL(url('relationships/'), Astro.site).href;
+const comparisons = [...(showDemand ? [{ id: 'private-public-demand', title: 'Who is driving Australia’s demand?', question: 'Public and private demand, alongside annual inflation.' }] : []), ...PAIR_DATA.map((p) => ({ id: p.spec.id, title: p.spec.title, question: p.spec.question }))];
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Official Australian series compared side by side', url: pageUrl,
+  numberOfItems: comparisons.length, itemListOrder: 'https://schema.org/ItemListUnordered',
+  itemListElement: comparisons.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.title, description: c.question, url: `${pageUrl}#${c.id}` })) };
 ---
-<Base title="Does government spending cause inflation? See the data" description="Official figures side by side: private vs public demand and inflation, government spending, migration and home prices, interest rates and more. See how closely they move." section="relationships/" ogImage={url('share/page/relationships.png')} ogImageAlt="Compare official Australian series side by side: do they move together?">
+<Base title="Does government spending cause inflation? See the data" description="Official figures side by side: private vs public demand and inflation, government spending, migration and home prices, interest rates and more. See how closely they move." section="relationships/" jsonld={jsonld} ogImage={url('share/page/relationships.png')} ogImageAlt="Compare official Australian series side by side: do they move together?">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Compare · why did it happen?</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Do these move together?</h1>
