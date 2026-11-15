@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import { url } from '../../config/site';
 import { fmtDate } from '../../lib/format';
+import { clip } from '../../lib/seo';
 import raw from '../../data/laws.json';
 
 interface Law { id: string; title: string; status: string; status_date: string; status_note: string; parliament_url: string; legislation_url: string | null; summary: string; verified_on: string;
@@ -12,8 +13,19 @@ const laws = (raw.laws as Law[]).map((l) => ({ ...l, sponsor: /private (member|s
 const STATUS: Record<string, { label: string; tone: string }> = { scheduled: { label: 'Introduced', tone: 'neutral' }, debated: { label: 'Before Parliament', tone: 'brand' }, passed: { label: 'Passed', tone: 'good' }, failed: { label: 'Did not pass', tone: 'warn' }, repealed: { label: 'Repealed', tone: 'warn' } };
 const counts = Object.keys(STATUS).map((k) => ({ k, n: laws.filter((l) => l.status === k && l.sponsor === 'government').length }));
 const nPrivate = laws.filter((l) => l.sponsor === 'private').length;
+// Search engines read the government bills shown by default as a list of legislation, each pointing at Parliament's record.
+const FORCE: Record<string, string> = { passed: 'https://schema.org/InForce', failed: 'https://schema.org/NotInForce', repealed: 'https://schema.org/NotInForce' };
+const govLaws = laws.filter((l) => l.sponsor === 'government');
+const pageUrl = new URL(url('laws/'), Astro.site).href;
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Significant bills before the Australian Parliament since May 2022', url: pageUrl,
+  numberOfItems: govLaws.length, itemListOrder: 'https://schema.org/ItemListOrderDescending',
+  itemListElement: govLaws.map((l, i) => ({ '@type': 'ListItem', position: i + 1, item: {
+    '@type': 'Legislation', '@id': `${pageUrl}#${l.id}`, name: l.title, url: `${pageUrl}#${l.id}`, sameAs: l.legislation_url ? [l.parliament_url, l.legislation_url] : l.parliament_url, legislationDate: l.status_date,
+    abstract: clip(l.summary, 300), legislationJurisdiction: { '@type': 'AdministrativeArea', name: 'Australia' },
+    ...(l.status === 'passed' || l.status === 'repealed' ? { legislationPassedBy: { '@type': 'GovernmentOrganization', name: 'Parliament of Australia' } } : {}),
+    ...(FORCE[l.status] ? { legislationLegalForce: FORCE[l.status] } : {}) } })) };
 ---
-<Base title="Bills and laws passed by the Albanese Government" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands, and who raised what objections, all linked to the official record." section="laws/" ogImage={url('share/page/laws.png')} ogImageAlt="Bills and laws passed by the Albanese Government, in plain words">
+<Base title="Bills and laws passed by the Albanese Government" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands, and who raised what objections, all linked to the official record." section="laws/" jsonld={jsonld} ogImage={url('share/page/laws.png')} ogImageAlt="Bills and laws passed by the Albanese Government, in plain words">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Laws · since May 2022</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What Parliament has passed, and what’s before it</h1>

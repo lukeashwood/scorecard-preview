@@ -32,8 +32,13 @@ const groups = [
   ...SECTIONS.map((s) => ({ id: s.id, title: s.title, blurb: s.blurb, items: items.filter((i) => i.section === s.id) })),
   { id: 'other', title: 'Other figures', blurb: '', items: items.filter((i) => !known.has(i.section)) },
 ].filter((g) => g.items.length);
+// Search engines read the page as a list of charts, each pointing at its measure page where one exists, otherwise at its place on this page.
+const pageUrl = new URL(url('charts/'), Astro.site).href;
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: `Australian economy charts: every official series ${SITE.name} tracks`, url: pageUrl,
+  numberOfItems: items.length, itemListOrder: 'https://schema.org/ItemListUnordered',
+  itemListElement: groups.flatMap((g) => g.items).map((i, n) => ({ '@type': 'ListItem', position: n + 1, name: i.chartTitle ?? i.title, url: i.hasPage ? new URL(url(`measures/${i.id}/`), Astro.site).href : `${pageUrl}#${i.id}` })) };
 ---
-<Base title="Australian economy charts: every official series" description={`Every chart ${SITE.name} tracks on one page: ${items.length} official series with their full history, sources and download options.`} section="charts/" ogImage={url('share/page/charts.png')} ogImageAlt="Australian economy charts: every official series on one page">
+<Base title="Australian economy charts: every official series" description={`Every chart ${SITE.name} tracks on one page: ${items.length} official series with their full history, sources and download options.`} section="charts/" jsonld={jsonld} ogImage={url('share/page/charts.png')} ogImageAlt="Australian economy charts: every official series on one page">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Charts</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Every chart, one page</h1>

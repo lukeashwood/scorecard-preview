@@ -20,8 +20,12 @@ const NOW_RULES: TaxRules | null = tx ? { label: tx.income_year.replace(/[–—
 const TH = typicalHousehold(NOW_RULES);
 const $ = (v: number) => '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
 const pub = (m: (typeof tiles)[number]) => [...new Set(m.sources.map((s) => s.publisher))].slice(0, 2).join(', ');
+// Search engines read the tiles as a list, each pointing at its measure page.
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Australia since May 2022: the key official figures', url: new URL(url('in-60-seconds/'), Astro.site).href,
+  numberOfItems: tiles.length, itemListOrder: 'https://schema.org/ItemListUnordered',
+  itemListElement: tiles.map((m, i) => ({ '@type': 'ListItem', position: i + 1, name: `${m.title}: ${headlineText(m.headline)}${m.headline.period ? ` · ${m.headline.period}` : ''}`, url: new URL(url(`measures/${m.id}/`), Astro.site).href })) };
 ---
-<Base title="Australia since 2022 in 60 seconds: the key figures" description="Inflation, interest rates, wages, rents, debt and more: the figures most people ask about, each with its change since May 2022 and its official source." section="in-60-seconds/" ogImage={url('share/page/in-60-seconds.png')} ogImageAlt="Australia since May 2022 in 60 seconds: 8 key official figures and their change since the government took office">
+<Base title="Australia since 2022 in 60 seconds: the key figures" description="Inflation, interest rates, wages, rents, debt and more: the figures most people ask about, each with its change since May 2022 and its official source." section="in-60-seconds/" jsonld={jsonld} ogImage={url('share/page/in-60-seconds.png')} ogImageAlt="Australia since May 2022 in 60 seconds: 8 key official figures and their change since the government took office">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">What happened? · In 60 seconds</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Australia since May 2022, in 60 seconds</h1>
