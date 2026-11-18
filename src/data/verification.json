@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-17T11:06:41+00:00",
+ "generated_at": "2026-11-18T10:42:17+00:00",
  "checks_total": 516,
  "checks_passed": 446,
  "checks_warn": 69,
@@ -24,7 +24,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "inflation",
@@ -45,98 +45,98 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Electricity",
    "status": "pass",
    "critical": false,
-   "detail": "37.483523067705214 within [-60, 150]"
+   "detail": "35.889754343918526 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Insurance",
    "status": "pass",
    "critical": false,
-   "detail": "43.31594839418062 within [-60, 150]"
+   "detail": "44.22179522371672 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Rents",
    "status": "pass",
    "critical": false,
-   "detail": "24.00290944356893 within [-60, 150]"
+   "detail": "25.227300278821673 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Child care",
    "status": "pass",
    "critical": false,
-   "detail": "14.14754835807468 within [-60, 150]"
+   "detail": "15.699505173189365 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Food",
    "status": "pass",
    "critical": false,
-   "detail": "18.08449407160124 within [-60, 150]"
+   "detail": "18.878784390468507 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Health",
    "status": "pass",
    "critical": false,
-   "detail": "19.880073800737996 within [-60, 150]"
+   "detail": "19.74169741697418 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Education",
    "status": "pass",
    "critical": false,
-   "detail": "22.861842105263143 within [-60, 150]"
+   "detail": "22.94407894736843 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: Petrol & fuel",
    "status": "pass",
    "critical": false,
-   "detail": "-0.6426858513189471 within [-60, 150]"
+   "detail": "7.088729016786566 within [-60, 150]"
   },
   {
    "metric": "prices_vs_wages",
    "check": "plausible range: All prices (CPI)",
    "status": "pass",
    "critical": false,
-   "detail": "16.805571412261667 within [-60, 150]"
+   "detail": "18.324009590135848 within [-60, 150]"
   },
   {
    "metric": "real_wages",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "real_wages",
    "check": "plausible range: real wage index",
    "status": "pass",
    "critical": false,
-   "detail": "98.51 within [70, 130]"
+   "detail": "98.87 within [70, 130]"
   },
   {
    "metric": "real_wages",
    "check": "plausible range: private real wage index",
    "status": "pass",
    "critical": false,
-   "detail": "98.59 within [70, 130]"
+   "detail": "98.96 within [70, 130]"
   },
   {
    "metric": "real_wages",
    "check": "plausible range: public real wage index",
    "status": "pass",
    "critical": false,
-   "detail": "98.24 within [70, 130]"
+   "detail": "98.45 within [70, 130]"
   },
   {
    "metric": "real_wages",
@@ -150,7 +150,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "electricity",
@@ -164,7 +164,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "mortgage",
@@ -206,7 +206,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "unemployment",
@@ -227,7 +227,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "public_private_jobs",
@@ -255,7 +255,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "jobs_by_sector",
@@ -276,7 +276,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "productivity",
@@ -290,7 +290,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "gdp_per_capita",
@@ -318,7 +318,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (231 days old)"
+   "detail": "latest observation 2026-03-31 (232 days old)"
   },
   {
    "metric": "household_income",
@@ -332,7 +332,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "government_size",
@@ -346,7 +346,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "demand_growth",
@@ -374,7 +374,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "housing_accord",
@@ -388,7 +388,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "home_prices",
@@ -402,7 +402,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (231 days old)"
+   "detail": "latest observation 2026-03-31 (232 days old)"
   },
   {
    "metric": "migration",
@@ -416,7 +416,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "household_payments",
@@ -437,7 +437,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (231 days old)"
+   "detail": "latest observation 2026-03-31 (232 days old)"
   },
   {
    "metric": "people_per_home",
@@ -451,21 +451,21 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "rents_vs_wages",
    "check": "plausible range: rent rise since June qtr 2022 (%)",
    "status": "pass",
    "critical": false,
-   "detail": "24.00290944356893 within [-20, 80]"
+   "detail": "25.227300278821673 within [-20, 80]"
   },
   {
    "metric": "fuel_prices",
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "fuel_prices",
@@ -479,7 +479,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "price_to_earnings",
@@ -500,7 +500,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (140 days old)"
+   "detail": "latest observation 2026-06-30 (141 days old)"
   },
   {
    "metric": "living_standards_decades",
@@ -514,7 +514,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "employment",
@@ -528,7 +528,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (48 days old)"
+   "detail": "latest observation 2026-09-30 (49 days old)"
   },
   {
    "metric": "womens_participation",
@@ -542,7 +542,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-05-31 (170 days old)"
+   "detail": "latest observation 2026-05-31 (171 days old)"
   },
   {
    "metric": "gender_pay_gap",
@@ -3619,6 +3619,13 @@
   }
  ],
  "history": [
+  {
+   "generated_at": "2026-11-18T10:42:17+00:00",
+   "checks_total": 516,
+   "checks_passed": 446,
+   "checks_warn": 69,
+   "checks_failed": 1
+  },
   {
    "generated_at": "2026-11-17T11:06:41+00:00",
    "checks_total": 516,
