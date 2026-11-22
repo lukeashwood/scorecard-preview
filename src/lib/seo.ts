@@ -53,5 +53,31 @@ export function clip(s: string, max = 155): string {
   const t = s.replace(/\s+/g, ' ').trim();
   if (t.length <= max) return t;
   const cut = t.slice(0, max - 1);
-  return cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:]$/, '') + '…';
+  return cut.slice(0, cut.lastIndexOf(' ')).replace(/[,;:.!?]$/, '') + '…';
+}
+
+/** Like clip, but prefers to end on a whole sentence: the longest run of complete sentences that fits in `max` and is at
+    least `min` long. Falls back to the word cut when the first sentence alone is too long or too short. A sentence ends
+    at . ? or ! (optionally followed by a closing quote or bracket) and a space before a capital, digit or opening quote,
+    so abbreviations such as "e.g. physiotherapy" and "$3 million. The" are told apart. */
+export function clipSentence(s: string, max = 155, min = 70): string {
+  const t = s.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const ends: number[] = [];
+  const re = /[.?!]['’"”)\]]?(?= [A-Z0-9'‘"“(])/g;
+  for (let m = re.exec(t); m; m = re.exec(t)) ends.push(m.index + m[0].length);
+  const fit = ends.filter((n) => n <= max && n >= min);
+  if (fit.length) return t.slice(0, fit[fit.length - 1]);
+  return clip(t, max);
+}
+
+/** Build a description from `core` parts that must appear (joined, then word-cut if too long) and `extras` that are
+    appended only while each still fits whole. Used where a description is a question, a live figure and a fixed closing
+    line: the question and figure always appear, and the closing line is dropped rather than cut mid-word. */
+export function fitParts(core: (string | undefined | false)[], extras: (string | undefined | false)[] = [], max = 155): string {
+  const tidy = (xs: (string | undefined | false)[]) => xs.filter((p): p is string => !!p).map((p) => p.replace(/\s+/g, ' ').trim());
+  let out = tidy(core).join(' ');
+  if (out.length > max) return clip(out, max);
+  for (const p of tidy(extras)) { if (`${out} ${p}`.length <= max) out = `${out} ${p}`; else break; }
+  return out;
 }

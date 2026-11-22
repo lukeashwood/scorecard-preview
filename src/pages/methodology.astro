@@ -9,8 +9,23 @@ import { fmtDate } from '../lib/format';
 import type { Verdict } from '../lib/types';
 const order: Verdict[] = ['met', 'on_track', 'in_progress', 'at_risk', 'off_track', 'not_met'];
 const coloured = CONDITIONS.filter((m) => m.ed.better !== 'none'), neutral = CONDITIONS.filter((m) => m.ed.better === 'none');
+/* Common questions, answered in the words of the sections above. Each answer restates something this page already says,
+   so the FAQ and the FAQPage structured data below never claim more than the methodology does. */
+const FAQ: { q: string; a: string }[] = [
+  { q: 'Does Gov Score give the government an overall score or grade?', a: 'No. A verdict is given only where the government itself made a commitment with a number or a date in it that official statistics can test. Nothing else is given a verdict, and the verdicts are not added up into a single mark.' },
+  { q: 'Where do the figures come from?', a: 'From official publishers: the Australian Bureau of Statistics, the Reserve Bank, the Treasury and Budget papers, the Australian Office of Financial Management and the agencies that run each program. International comparisons come from the IMF and the World Bank. The one exception is market rents for new leases, which no agency publishes; that figure comes from Cotality and is labelled as such. Every figure links to its source.' },
+  { q: 'How often are the figures updated and checked?', a: 'A program re-fetches every automated series every day and tests it: whether the source is still reachable, whether the newest figure is inside a plausible range, whether it agrees with a second official source where one exists, and whether earlier figures have been revised. A failed check keeps the last verified figure on the page and marks it under review. Figures typed in from documents, commitments, verdict rules and controversy entries are checked by a person and show the date they were checked.' },
+  { q: 'How is a promise judged kept or broken?', a: 'Each commitment has a published rule, listed in full on this page, that says which official figure it is tested against and what counts as delivered by when. The latest official figure is compared with that rule to give 1 of 6 verdicts: met, on track, in progress, at risk, off track or not met. Commentary from a minister, an institution or anyone else can sit beside a verdict to explain it, but it cannot change it.' },
+  { q: 'What happens when the government changes or drops a target?', a: 'The original commitment stays on the site and is judged on its original terms: the same number and the same deadline. The new target is shown beside it with the date it changed and a link to the announcement. A changed target is not a met target.' },
+  { q: 'Is Gov Score biased towards one side of politics?', a: 'The rules do not name a party and are applied the same way whichever party is in government. A measure is never switched to a different series because it tells a better story, and it is never removed because of which way it is moving. The site does not take a side on contested questions such as how large government or migration should be. When the government changes, the same measures and rules carry over.' },
+  { q: 'What does "since the government took office" compare?', a: 'Where a figure was when the government took office against where it is now. The starting point is the last figure before the government’s first full period: May 2022 for monthly figures, the June quarter 2022 for quarterly figures and the 2021-22 financial year for annual ones. Better or worse colouring is used only where nearly everyone agrees which direction is good; otherwise the site says only higher, lower or little changed.' },
+  { q: 'Why is a particular measure not on the site?', a: 'A measure is included only when it passes 5 tests: it is official, it bears on the federal government, it has at least 5 years of comparable history, it is released at least once a year, and it is the standard series the publishing agency leads with. The main things readers expect and will not find, with the reason for each, are listed above under material measures not yet included.' },
+  { q: 'Can the figures, charts and tables be reused?', a: 'Yes. ABS and RBA material is used under Creative Commons Attribution 4.0, and this site’s own tables and calculations may be reused under the same licence: credit Gov Score and link to the page. Every measure page has a ready-made citation and a CSV download, and the data page has everything in one file.' },
+  { q: 'What happens if a figure on the site is wrong?', a: 'If a statistical agency revises a past figure, the site shows the revised series, because that is the official record. If the site makes a mistake of its own, in a figure, a calculation or a description, it is fixed and the fix is listed on the corrections page with the date and what changed.' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 ---
-<Base title="Methodology: how we check figures and verdicts" description="How figures are collected and checked, how verdicts are reached, and the full text of every rating rule." ogImage={url('share/page/methodology.png')} ogImageAlt="Gov Score methodology: how figures and verdicts are checked">
+<Base title="Methodology: how we check figures and verdicts" description="How figures are collected and checked, how verdicts are reached, and the full text of every rating rule." jsonld={faqLd} ogImage={url('share/page/methodology.png')} ogImageAlt="Gov Score methodology: how figures and verdicts are checked">
   <div class="wrap-narrow pt-10 md:pt-14">
     <p class="eyebrow">Methodology · rules v{SITE.rulesVersion} · {fmtDate(SITE.rulesDate)}</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">How this site works</h1>
@@ -93,6 +108,9 @@ const coloured = CONDITIONS.filter((m) => m.ed.better !== 'none'), neutral = CON
       </ul>
       <h2>9. Reuse</h2>
       <p>ABS and RBA material is used under Creative Commons Attribution 4.0. This site’s own tables and calculations may be reused under the same licence: credit “{SITE.name}” and link to the page. Every measure page has a ready-made citation and a CSV download, the <a href={url('data/')}>data page</a> has everything in one file, and <a href={url('make-your-own-chart/')}>Make your own chart</a> walks through redrawing a chart in a spreadsheet and crediting it.</p>
+
+      <h2 id="questions">10. Common questions</h2>
+      {FAQ.map((f) => <><h3>{f.q}</h3><p>{f.a}</p></>)}
     </div>
   </div>
 </Base>
