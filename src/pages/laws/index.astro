@@ -25,7 +25,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'S
     ...(l.status === 'passed' || l.status === 'repealed' ? { legislationPassedBy: { '@type': 'GovernmentOrganization', name: 'Parliament of Australia' } } : {}),
     ...(FORCE[l.status] ? { legislationLegalForce: FORCE[l.status] } : {}) } })) };
 ---
-<Base title="Bills and laws passed by the Albanese Government" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands, and who raised what objections, all linked to the official record." section="laws/" jsonld={jsonld} ogImage={url('share/page/laws.png')} ogImageAlt="Bills and laws passed by the Albanese Government, in plain words">
+<Base title="Bills and laws passed by the Albanese Government" description="Significant bills before the Australian Parliament since May 2022: what each does, where it stands and who objected, all linked to the official record." section="laws/" jsonld={jsonld} ogImage={url('share/page/laws.png')} ogImageAlt="Bills and laws passed by the Albanese Government, in plain words">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">Laws · since May 2022</p>
     <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">What Parliament has passed, and what’s before it</h1>

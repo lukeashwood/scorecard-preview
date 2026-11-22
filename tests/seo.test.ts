@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { MEASURE_SEO, clip } from '../src/lib/seo';
+import { MEASURE_SEO, clip, clipSentence, fitParts } from '../src/lib/seo';
 import { CONTROVERSIES } from '../src/lib/controversies';
 import { controversyTitle, controversyDescription } from '../src/lib/controversy-seo';
 import { pairFor } from '../src/lib/controversy-questions';
@@ -40,6 +40,27 @@ describe('search titles and descriptions', () => {
     expect(missing, `No share image is drawn for: ${missing.join(', ')}`).toEqual([]);
     const dup = PAGE_SHARES.map((p) => p.slug).filter((s, i, a) => a.indexOf(s) !== i);
     expect(dup).toEqual([]);
+  });
+  test('no search description is left ending mid-sentence where a whole sentence would fit', () => {
+    // Descriptions assembled by hand or by controversyDescription should end at a sentence, not at a word cut.
+    const cut = CONTROVERSIES.filter((c) => controversyDescription(c).endsWith('…')).map((c) => c.id);
+    expect(cut, `Write a CONTROVERSY_DESC entry for:\n${cut.join('\n')}`).toEqual([]);
+  });
+  test('clipSentence ends on a whole sentence inside the limit, or falls back to the word cut', () => {
+    const two = 'First sentence is here. Second sentence follows it. Third one is far too long to fit inside the limit at all.';
+    expect(clipSentence(two, 60, 20)).toBe('First sentence is here. Second sentence follows it.');
+    expect(clipSentence('Not an end e.g. physiotherapy here. Then a real end. ' + 'X'.repeat(100), 60, 20)).toBe('Not an end e.g. physiotherapy here. Then a real end.');
+    expect(clipSentence('An abbreviation e.g. physiotherapy. ' + 'x'.repeat(100), 60, 20)).toBe('An abbreviation e.g. physiotherapy…');
+    expect(clipSentence('No sentence end anywhere in this long run of words that keeps going past the limit', 40, 20).endsWith('…')).toBe(true);
+    expect(clipSentence('short', 40)).toBe('short');
+  });
+  test('fitParts keeps the question and figure, and adds the closing line only when it fits whole', () => {
+    expect(fitParts(['Is it up or down?', 'Latest: 1%.'], ['Official figures, sourced and checked daily.'], 100)).toBe('Is it up or down? Latest: 1%. Official figures, sourced and checked daily.');
+    expect(fitParts(['Is it up or down?', 'Latest: 1%.'], ['Official figures, sourced and checked daily.'], 40)).toBe('Is it up or down? Latest: 1%.');
+    const r = fitParts(['Short question?', 'Latest: ' + 'word '.repeat(40).trim() + '.'], ['Closing line.'], 100);
+    expect(r.startsWith('Short question? Latest: word')).toBe(true);
+    expect(r.length).toBeLessThanOrEqual(100);
+    expect(r.endsWith('…')).toBe(true);
   });
   test('clip cuts at a word and never passes the limit', () => {
     const s = 'word '.repeat(60).trim();

@@ -24,7 +24,7 @@ import { g20For } from '../../lib/g20';
 import { INFLUENCE_MEANING, VERDICT_MEANING } from '../../lib/editorial';
 import { fmtDate, fmtMonth, fmtPeriod, fmtStamp, headlineText, withUnit } from '../../lib/format';
 import type { Measure } from '../../lib/types';
-import { MEASURE_SEO, clip } from '../../lib/seo';
+import { MEASURE_SEO, fitParts } from '../../lib/seo';
 import { decideLine, factualHeadline, recordLine } from '../../lib/headlines';
 import { controversiesFor } from '../../lib/controversy-measures';
 import { controversyTitle } from '../../lib/controversy-seo';
@@ -48,7 +48,11 @@ const cite = `${citeAuthors} (${citeYear}). ${citeFigure}. Via ${SITE.name}, ret
 const citeApa = `${citeAuthors}. (${citeYear}). ${citeFigure} [Data set]. Retrieved ${fmtDate(GENERATED_AT)}, via ${SITE.name}: ${pageUrl}`;
 const fh = factualHeadline(m); const rec = recordLine(m);
 const seoTitle = MEASURE_SEO[m.id] ?? `${m.title}, Australia`;
-const seoDesc = clip(`${m.question} Latest: ${headlineText(m.headline)} ${m.headline.caption}${m.headline.period ? ` (${m.headline.period})` : ''}. Official figures, sourced and checked daily.`);
+// The question, then the live figure, then a closing line. The closing line, then the period, are dropped whole before
+// anything is cut mid-sentence; only a question and figure that overflow on their own are word-cut.
+const figureLine = (withPeriod: boolean) => `Latest: ${headlineText(m.headline)} ${m.headline.caption}${withPeriod && m.headline.period ? ` (${m.headline.period})` : ''}.`;
+const descTries = [fitParts([m.question, figureLine(true)], ['Official figures, sourced and checked daily.']), fitParts([m.question, figureLine(false)])];
+const seoDesc = descTries.find((d) => !d.endsWith('…')) ?? descTries[1];
 const crumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
   { '@type': 'ListItem', position: 1, name: SITE.name, item: new URL(url(), Astro.site).href },
   { '@type': 'ListItem', position: 2, name: 'Measures', item: new URL(url('measures/'), Astro.site).href },
