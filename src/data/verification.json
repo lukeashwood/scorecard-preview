@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-11-22T10:15:57+00:00",
+ "generated_at": "2026-11-23T11:14:51+00:00",
  "checks_total": 516,
- "checks_passed": 440,
- "checks_warn": 75,
+ "checks_passed": 444,
+ "checks_warn": 71,
  "checks_failed": 1,
  "checks": [
   {
@@ -24,7 +24,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "inflation",
@@ -45,7 +45,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "prices_vs_wages",
@@ -115,7 +115,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "real_wages",
@@ -150,7 +150,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "electricity",
@@ -164,7 +164,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "mortgage",
@@ -206,7 +206,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-10-31 (22 days old)"
+   "detail": "latest observation 2026-10-31 (23 days old)"
   },
   {
    "metric": "unemployment",
@@ -227,7 +227,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "public_private_jobs",
@@ -255,7 +255,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "jobs_by_sector",
@@ -276,7 +276,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "productivity",
@@ -290,7 +290,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "gdp_per_capita",
@@ -318,7 +318,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (236 days old)"
+   "detail": "latest observation 2026-03-31 (237 days old)"
   },
   {
    "metric": "household_income",
@@ -332,7 +332,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "government_size",
@@ -346,7 +346,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "demand_growth",
@@ -374,7 +374,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "housing_accord",
@@ -388,7 +388,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "home_prices",
@@ -402,7 +402,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (236 days old)"
+   "detail": "latest observation 2026-03-31 (237 days old)"
   },
   {
    "metric": "migration",
@@ -416,7 +416,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "household_payments",
@@ -437,7 +437,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-03-31 (236 days old)"
+   "detail": "latest observation 2026-03-31 (237 days old)"
   },
   {
    "metric": "people_per_home",
@@ -451,7 +451,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "rents_vs_wages",
@@ -465,7 +465,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-09-30 (53 days old)"
+   "detail": "latest observation 2026-09-30 (54 days old)"
   },
   {
    "metric": "fuel_prices",
@@ -479,7 +479,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "price_to_earnings",
@@ -500,7 +500,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-06-30 (145 days old)"
+   "detail": "latest observation 2026-06-30 (146 days old)"
   },
   {
    "metric": "living_standards_decades",
@@ -514,7 +514,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-10-31 (22 days old)"
+   "detail": "latest observation 2026-10-31 (23 days old)"
   },
   {
    "metric": "employment",
@@ -528,7 +528,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-10-31 (22 days old)"
+   "detail": "latest observation 2026-10-31 (23 days old)"
   },
   {
    "metric": "womens_participation",
@@ -542,7 +542,7 @@
    "check": "freshness",
    "status": "pass",
    "critical": false,
-   "detail": "latest observation 2026-05-31 (175 days old)"
+   "detail": "latest observation 2026-05-31 (176 days old)"
   },
   {
    "metric": "gender_pay_gap",
@@ -995,9 +995,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://data.gov.au/data/dataset/25e81c18-2083-4abe-81b6-0f530053c63f/resource/38a7cded-b3d6-41ec-bf33-b320801331e5/download/variables-in-2013-14-sample-file.xlsx"
+   "detail": "https://data.gov.au/data/dataset/25e81c18-2083-4abe-81b6-0f530053c63f/resource/38a7cded-b3d6-41ec-bf33-b320801331e5/download/variables-in-2013-14-sample-file.xlsx did not respond in time to the automated check. Verify manually"
   },
   {
    "metric": "sources",
@@ -1142,9 +1142,9 @@
   {
    "metric": "sources",
    "check": "link resolves",
-   "status": "pass",
+   "status": "warn",
    "critical": false,
-   "detail": "https://libertyvictoria.org.au/joint-media-statement-federal-governments-approach-to-building-community-harmony-will-do-real-harm-nsw-council-for-civil-liberties-liberty-victoria-and-queensland-council-for-civil-libert/"
+   "detail": "https://libertyvictoria.org.au/joint-media-statement-federal-governments-approach-to-building-community-harmony-will-do-real-harm-nsw-council-for-civil-liberties-liberty-victoria-and-queensland-council-for-civil-libert/ did not respond in time to the automated check. Verify manually"
   },
   {
    "metric": "sources",
@@ -3571,44 +3571,44 @@
   {
    "metric": "g20",
    "check": "unemployment: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/LUR/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 429: Too Many Requests); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
    "check": "gov_debt: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 404: Not Found); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
    "check": "gov_balance: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/GGXCNL_NGDP/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 404: Not Found); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
    "check": "gov_spending: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/G_X_G01_GDP_PT/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 404: Not Found); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
    "check": "gdp_pc: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/PPPPC/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 404: Not Found); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
    "check": "growth: G20 comparison",
-   "status": "warn",
+   "status": "pass",
    "critical": false,
-   "detail": "download failed (download failed for https://www.imf.org/external/datamapper/api/v1/NGDP_RPCH/ARG/AUS/BRA/CAN/CHN/FRA/DEU/IND/IDN/ITA/JPN/KOR/MEX/RUS/SAU/ZAF/TUR/GBR/USA: HTTP Error 404: Not Found); kept the copy from 2026-11-19T10:44:14+00:00"
+   "detail": "19 countries, latest year 2025"
   },
   {
    "metric": "g20",
@@ -3619,6 +3619,13 @@
   }
  ],
  "history": [
+  {
+   "generated_at": "2026-11-23T11:14:51+00:00",
+   "checks_total": 516,
+   "checks_passed": 444,
+   "checks_warn": 71,
+   "checks_failed": 1
+  },
   {
    "generated_at": "2026-11-22T10:15:57+00:00",
    "checks_total": 516,
