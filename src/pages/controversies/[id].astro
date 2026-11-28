@@ -1,4 +1,5 @@
 ---
+import { WAR_TABLE } from '../../lib/disputes-war-inflation';
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import FavButton from '../../components/FavButton.astro';
@@ -58,6 +59,18 @@ const jsonld = [
     <p class="lede mt-3">{c.summary}</p>
 
     {c.figures && <dl class="mt-8 grid gap-px overflow-hidden rounded-xl border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-4">{c.figures.map((f) => <div class="bg-surface p-4"><dt class="eyebrow">{f.label}</dt><dd class="num mt-1 font-display text-[24px] font-semibold leading-tight">{f.value}</dd><dd class="meta mt-1">{f.note}</dd></div>)}</dl>}
+    {c.id === 'war-to-blame-for-inflation' && (
+      <figure class="card card-pad mt-6">
+        <figcaption class="eyebrow">Annual inflation, latest month: same oil shock, different results</figcaption>
+        <ul class="mt-4 grid gap-2">{WAR_TABLE.map((r) => { const max = Math.max(...WAR_TABLE.map((x) => x.value)); return (
+          <li class="grid grid-cols-[130px_1fr_auto] items-center gap-3 text-[14.5px]">
+            <span class:list={[r.code === 'AUS' && 'font-extrabold']}>{r.name}</span>
+            <span class="h-5 rounded-r" style={`width:${Math.max(2, (r.value / max) * 100).toFixed(1)}%;background:${r.code === 'AUS' ? 'var(--red)' : 'var(--brand)'};opacity:${r.code === 'AUS' ? 1 : 0.55}`}></span>
+            <span class:list={['num whitespace-nowrap', r.code === 'AUS' && 'font-extrabold text-[var(--red)]']}>{r.value.toFixed(1)}% <span class="meta">{r.month}</span></span>
+          </li>); })}</ul>
+        <p class="meta mt-3">Consumer prices against the same month (or quarter) a year earlier. IMF consumer price data; Australia from the ABS monthly CPI; New Zealand from Stats NZ (quarterly). Countries publish on different days, so each is shown at its latest figure.</p>
+      </figure>
+    )}
 
     {c.points && (
       <section class="mt-10">
