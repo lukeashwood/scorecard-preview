@@ -4,6 +4,8 @@
 export interface Pair { critical: string; benign: string }
 
 export const QUESTIONS: Record<string, Pair> = {
+  'bowen-cop31-antalya-cost-no-deal': { critical: 'Why did taxpayers fund $2.2 million and free coffee for a summit that ended with no deal?', benign: '' },
+  'labor-nuclear-ban-world-moves-on': { critical: 'Why is nuclear good enough for India, China and 37 other countries, but banned in Australia?', benign: '' },
   'war-to-blame-for-inflation': { critical: 'If the war is to blame, why is Australia’s inflation higher than every other major advanced economy?', benign: 'Or is the war really the main cause?' },
   'albanese-takaichi-melons-podcast': { critical: 'Were the Prime Minister’s remarks about a foreign leader’s gift inappropriate?', benign: 'Or is this a storm in a teacup?' },
   'bowen-275-power-bill-promise-2026': { critical: 'Should the minister answer directly for a promise the figures show was not kept?', benign: 'Or is a 2021 modelling estimate being held to an unfair standard?' },

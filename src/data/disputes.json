@@ -1,1 +1,77 @@
-{ "note": "Policies and decisions in dispute, written for this site. Every strand says whether it is established, contested or not verified, and who is making the claim.", "items": [] }
+{
+ "note": "Policies and decisions in dispute, written for this site. Every strand says whether it is established, contested or not verified, and who is making the claim.",
+ "items": [
+  {
+   "id": "bowen-cop31-antalya-cost-no-deal",
+   "date": "2026-11-22",
+   "minister": "Chris Bowen",
+   "portfolio": "Minister for Climate Change and Energy",
+   "category": "Taxpayer money & entitlements",
+   "title": "Taxpayers spend $2.2 million on COP31, including a $32,100 coffee cart, and the summit Bowen helped run ends with no deal",
+   "summary": "After Australia lost its bid to host COP31 to Türkiye, Chris Bowen took the title of ‘president of negotiations’ for the summit in Antalya. Reports in the Daily Telegraph put the cost of Australia’s participation at $2.2 million, including a $32,100 contract with a Turkish firm, Espresso Akademi, to serve free coffee at the Australian pavilion. The summit ran 2 days over time and closed on 22 November 2026 without agreement on its main political decision, the Antalya Pact: the first COP to end without one since Copenhagen in 2009. The UN Secretary-General said he was ‘deeply disappointed’.",
+   "response": "The Prime Minister said that ‘participating in and in fact leading the discussions at COP is in Australia’s national interest’. Bowen said the free coffee scheme at Australia’s pavilion began when Opposition Leader Angus Taylor was energy minister.",
+   "outcome": "No overarching agreement. No inquiry or finding on the spending.",
+   "status": "no-finding",
+   "sources": [
+    {
+     "title": "‘It’s infuriating’: Ray Hadley boils Bowen and Albanese government over wasted taxpayer money ($2.2 million, Daily Telegraph figures)",
+     "url": "https://www.news24.com.au/news/its-infuriating-ray-hadley-boils-bowen-over-coffee-costs/news-story/c4c820c81b2e2fd5b0c904049a1ff4e4"
+    },
+    {
+     "title": "Australia funds free coffee for COP31 delegates ($32,000 contract with Espresso Akademi)",
+     "url": "https://wisevoter.com/world/au/2026/11/08/australia-funds-free-coffee-cop31-delegates"
+    },
+    {
+     "title": "Anthony Albanese caught between climate ambition and political reality at COP31 (ABC)",
+     "url": "https://www.abc.net.au/news/2026-11-15/climate-ambition-political-reality-cop31-albanese/107383424"
+    },
+    {
+     "title": "COP31 ends without a political deal, but some decisions survive (Climate Action)",
+     "url": "https://www.climateaction.org/news/cop31-ends-without-a-political-deal-but-some-decisions-survive"
+    },
+    {
+     "title": "U.N. COP31 climate conference ends with no agreement (CBS News)",
+     "url": "https://www.cbsnews.com/news/un-cop31-climate-conference-ends-no-agreement-fossil-fuel-debate-standstill/"
+    },
+    {
+     "title": "COP31: Key outcomes agreed at the UN climate talks in Antalya (Carbon Brief)",
+     "url": "https://www.carbonbrief.org/cop31-key-outcomes-agreed-at-the-un-climate-talks-in-antalya"
+    }
+   ],
+   "verified_on": "2026-11-28",
+   "type": "conduct"
+  },
+  {
+   "id": "labor-nuclear-ban-world-moves-on",
+   "date": "2026-11-12",
+   "minister": "Anthony Albanese and Chris Bowen",
+   "portfolio": "Prime Minister; Minister for Climate Change and Energy",
+   "category": "Decisions & judgement",
+   "title": "As 39 countries commit to triple nuclear power, Labor keeps Australia’s ban and calls lifting it a ‘pipe dream’",
+   "summary": "Nuclear power is illegal in Australia. On 12 November 2026, at the COP31 summit Bowen was helping to run, the World Nuclear Association announced that 39 countries now back the Declaration to Triple Nuclear Energy by 2050, including China, Italy, Brazil and Belgium, which joined this year. Australia has the world’s largest known uranium resources and no nuclear power. In July 2026 the Prime Minister signed an arrangement to export Australian uranium to India, which wants 100 gigawatts of nuclear power by 2047. At home, Bowen dismissed lifting the ban to let the market decide as ‘a pipe dream’.",
+   "response": "Labor says nuclear power would be too slow and too expensive, and wants to keep the ban. Bowen: “This is a pipe dream.”",
+   "outcome": "The ban stays. The Coalition says it would repeal it within 30 days of winning government.",
+   "status": "ongoing",
+   "sources": [
+    {
+     "title": "Nuclear Energy at COP31: 39 countries progress the Declaration to Triple (World Nuclear Association)",
+     "url": "https://world-nuclear.org/news-and-media/press-statements/nuclear-energy-at-cop31"
+    },
+    {
+     "title": "Chris Bowen declares nuclear to power data centres a pipe dream (The Nightly)",
+     "url": "https://thenightly.com.au/politics/chris-bowen-declares-nuclear-to-power-data-centres-a-pipe-dream-ahead-of-national-cabinet-clash-over-energy-c-22772856"
+    },
+    {
+     "title": "Australia agrees to sell uranium to India, ending a long stalemate (AP)",
+     "url": "https://abcnews.com/International/wireStory/australia-agrees-sell-uranium-india-ending-long-stalemate-134608473"
+    },
+    {
+     "title": "Nuclear energy in Australia: where the debate stands (Energy Matters)",
+     "url": "https://www.energymatters.com.au/renewable-news/nuclear-energy-australia-homeowners-debate/"
+    }
+   ],
+   "verified_on": "2026-11-28",
+   "type": "policy"
+  }
+ ]
+}
