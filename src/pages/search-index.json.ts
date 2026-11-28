@@ -18,11 +18,12 @@ export const GET: APIRoute = () => {
     ...CONTROVERSIES.map((c) => ({ type: 'controversy' as const, id: c.id, title: pairFor(c.id, c.type).critical, sub: `${c.minister} · ${c.category}`, href: url(`controversies/${c.id}/`), text: `${c.title} ${c.minister} ${c.portfolio} ${c.category} ${c.summary.slice(0, 300)}` })),
     ...(laws as any).laws.map((l: any) => ({ type: 'law' as const, id: l.id, title: l.title, sub: `Law · ${l.status}`, href: url(`laws/#${l.id}`), text: `${l.title} ${l.summary ?? ''} ${l.status}` })),
     ...LESSONS.map((l) => ({ type: 'lesson' as const, id: l.slug, title: l.title, sub: `Learn · ${l.question}`, href: url(`learn/${l.slug}/`), text: `${l.title} ${l.question} ${l.intro.join(' ')}` })),
+    { type: 'page', id: 'backflips', title: 'Backflips', sub: 'Announced, then dropped', href: url('backflips/'), text: 'backflip backflips reversal u-turn broken promise negative gearing capital gains super tax fuel excise backpacker barracks widow tax stage 3 misinformation' },
+    { type: 'page', id: 'leadership', title: 'Tired leadership', sub: 'Term limits', href: url('leadership/'), text: 'leadership albanese wong cabinet years in parliament term limits fresh blood speaking communication estimates' },
     { type: 'page', id: 'calculator', title: 'Are you better off?', sub: 'Calculator', href: url('calculator/'), text: 'calculator better off worse off pay take home mortgage rent household cost of living' },
     { type: 'page', id: 'budget-build', title: 'Build your own Federal Budget', sub: 'Interactive', href: url('budget/build/'), text: 'budget simulator deficit debt tax spending build' },
     { type: 'page', id: 'make-your-own-chart', title: 'Make your own chart', sub: 'Download the data', href: url('make-your-own-chart/'), text: 'download csv spreadsheet excel chart data reuse credit source' },
     { type: 'page', id: 'methodology', title: 'Methodology', sub: 'How the site works', href: url('methodology/'), text: 'methodology rules verdicts sources checks selection policy independence' },
-    { type: 'page', id: 'classrooms', title: 'For classrooms', sub: 'Teachers and students', href: url('classrooms/'), text: 'teachers students school classroom economics civics lesson' },
     { type: 'page', id: 'latest', title: 'Latest figures', sub: 'What landed, and when', href: url('latest/'), text: 'latest new figures changed updates feed rss' },
   ];
   return new Response(JSON.stringify(items.map((i) => ({ ...i, text: i.text.toLowerCase() }))), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });

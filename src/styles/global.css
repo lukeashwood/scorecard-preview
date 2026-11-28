@@ -1,65 +1,56 @@
 @import "tailwindcss";
 @import "@fontsource-variable/public-sans";
-@import "@fontsource-variable/newsreader";
-@import "@fontsource-variable/newsreader/wght-italic.css";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 
 /* ------------------------------------------------------------------ tokens
-   Colour belongs to no party. The base is a cool, near-neutral paper and ink; the accent is a civic indigo that the
-   reader can swap (Display menu). Status colours are separate from the accent and always travel with a word or icon.
-   "Night" is the hero backdrop: a deep blue-black used in both themes, so the particle mark and orbit always sit on dark. */
+   Reform Australia corporate identity (manual v2.1): Reform Blue #293086 leads, white gives space, Reform Red #C82028
+   is the accent for calls to action and key words only. Roughly 60% blue, 30% white, 10% red. Ink #1A1C2E,
+   panel grey #F4F5F8, body grey #6E717E. Hero and footer sit on Reform Blue. */
 :root {
-  --paper: #f7f7fb; --surface: #ffffff; --panel: #eeeef6; --rule: #dddce9; --rule-strong: #c2c0d6;
-  --ink: #12121f; --ink-2: #41405a; --ink-3: #66657f;
-  --night: #080b1a; --night-2: #10142a; --night-rule: rgb(255 255 255 / 0.1); --on-night: #f3f2fb; --on-night-2: #b2b1cc;
-  --accent-h: 252; --accent-s: 84%;
-  --brand: #5438e6; --brand-strong: #3f27c4; --on-brand: #ffffff; --brand-tint: #ece8ff; --brand-glow: #8b7bff;
-  --aurora-1: #2fd6cf; --aurora-2: #6f5cff; --aurora-3: #ff6b57;
+  --paper: #ffffff; --surface: #ffffff; --panel: #f4f5f8; --rule: #e1e3ec; --rule-strong: #c4c7d6;
+  --ink: #1a1c2e; --ink-2: #3a3d52; --ink-3: #6e717e;
+  --night: #293086; --night-2: #222877; --night-rule: rgb(255 255 255 / 0.14); --on-night: #ffffff; --on-night-2: #d3d6ee;
+  --accent-h: 236; --accent-s: 53%;
+  --brand: #293086; --brand-strong: #1e2366; --on-brand: #ffffff; --brand-tint: #e8e9f5; --brand-glow: #8a91de;
+  --red: #c82028; --red-strong: #a3181f; --on-red: #ffffff; --red-tint: #fbe8e9;
+  --aurora-1: #ffffff; --aurora-2: #293086; --aurora-3: #c82028;
   --gold: #a66a10; --gold-tint: #fbf3e0;
-  --good: #0b7a53; --good-tint: #e3f4ec; --warn: #8f5400; --warn-tint: #fbefd9; --bad: #b3261e; --bad-tint: #fbe9e7;
-  --c1: var(--brand); --c2: #0e7c86; --c3: #b9501a; --c4: #6d6a82; --grid: #e6e5f0;
-  --k1: var(--brand); --k2: #0e7c86; --k3: #b9501a; --k4: #2f6fb5; --k5: #a3327a; --k6: #5d7a1f; --k7: #6d6a82;
-  --shadow: 0 1px 2px rgb(18 18 31 / 0.05), 0 10px 28px -14px rgb(18 18 31 / 0.16);
+  --good: #1d6b4a; --good-tint: #e4f2ea; --warn: #8f5400; --warn-tint: #fbefd9; --bad: #c82028; --bad-tint: #fbe8e9;
+  --c1: var(--brand); --c2: #c82028; --c3: #6e717e; --c4: #9aa0c8; --grid: #e7e8ef;
+  --k1: var(--brand); --k2: #c82028; --k3: #5a63b8; --k4: #6e717e; --k5: #e0767b; --k6: #1a1c2e; --k7: #9aa0c8;
+  --shadow: 0 1px 2px rgb(26 28 46 / 0.05), 0 10px 28px -14px rgb(26 28 46 / 0.16);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --header-h: 64px;
   --text-scale: 1;
   color-scheme: light;
 }
-/* Accents the reader can choose. Each one is a civic colour with no party attached. */
-:root[data-accent="teal"] { --brand: #0c8a8f; --brand-strong: #086d71; --brand-tint: #dff4f4; --brand-glow: #39d6d0; }
-:root[data-accent="graphite"] { --brand: #2f2f44; --brand-strong: #1c1c2c; --brand-tint: #e9e9f1; --brand-glow: #9a99b8; }
-:root[data-accent="ocean"] { --brand: #1f5fc4; --brand-strong: #164a9c; --brand-tint: #e3ecfc; --brand-glow: #6aa3ff; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0d0f1c; --surface: #151829; --panel: #1b1f33; --rule: #2a2e46; --rule-strong: #3d4260;
-    --ink: #eeedf8; --ink-2: #bdbcd3; --ink-3: #9291ab;
-    --brand: #9d8cff; --brand-strong: #b8abff; --on-brand: #12121f; --brand-tint: #272449; --brand-glow: #b3a6ff;
-    --gold: #e0a83c; --gold-tint: #2c230f;
-    --good: #4cc38a; --good-tint: #11291f; --warn: #e5a54b; --warn-tint: #2e2210; --bad: #f2766b; --bad-tint: #341916;
-    --c2: #4fc3d1; --c3: #f0935a; --c4: #8d8aa3; --grid: #262a40;
-    --k2: #4fc3d1; --k3: #f0935a; --k4: #6aa8ee; --k5: #e57fc0; --k6: #a6c45a; --k7: #8d8aa3;
+    --paper: #12142a; --surface: #1a1d3a; --panel: #1f2347; --rule: #2c3160; --rule-strong: #404683;
+    --ink: #f3f4fb; --ink-2: #c9cbe0; --ink-3: #9a9db8;
+    --night: #1b1f5c; --night-2: #161a4d;
+    --brand: #8e96ea; --brand-strong: #b1b7f2; --on-brand: #12142a; --brand-tint: #262b5e; --brand-glow: #b1b7f2;
+    --red: #e0434b; --red-strong: #ef6a70; --red-tint: #3a1719;
+    --good: #4cc38a; --good-tint: #11291f; --warn: #e5a54b; --warn-tint: #2e2210; --bad: #f0646b; --bad-tint: #3a1719;
+    --c2: #f0646b; --c3: #9a9db8; --c4: #6a72c9; --grid: #262a52;
+    --k2: #f0646b; --k3: #8e96ea; --k4: #9a9db8; --k5: #f3a0a4; --k6: #f3f4fb; --k7: #6a72c9;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px -14px rgb(0 0 0 / 0.7);
     color-scheme: dark;
   }
-  :root:not([data-theme="light"])[data-accent="teal"] { --brand: #4fd8d3; --brand-strong: #7ae6e2; --brand-tint: #0f3335; --brand-glow: #7ff2ec; }
-  :root:not([data-theme="light"])[data-accent="graphite"] { --brand: #c9c8de; --brand-strong: #e2e1f0; --brand-tint: #2a2a3d; --brand-glow: #e0dff0; }
-  :root:not([data-theme="light"])[data-accent="ocean"] { --brand: #78aaff; --brand-strong: #9dc0ff; --brand-tint: #16284a; --brand-glow: #a9ccff; }
 }
 :root[data-theme="dark"] {
-  --paper: #0d0f1c; --surface: #151829; --panel: #1b1f33; --rule: #2a2e46; --rule-strong: #3d4260;
-  --ink: #eeedf8; --ink-2: #bdbcd3; --ink-3: #9291ab;
-  --brand: #9d8cff; --brand-strong: #b8abff; --on-brand: #12121f; --brand-tint: #272449; --brand-glow: #b3a6ff;
-  --gold: #e0a83c; --gold-tint: #2c230f;
-  --good: #4cc38a; --good-tint: #11291f; --warn: #e5a54b; --warn-tint: #2e2210; --bad: #f2766b; --bad-tint: #341916;
-  --c2: #4fc3d1; --c3: #f0935a; --c4: #8d8aa3; --grid: #262a40;
-  --k2: #4fc3d1; --k3: #f0935a; --k4: #6aa8ee; --k5: #e57fc0; --k6: #a6c45a; --k7: #8d8aa3;
+  --paper: #12142a; --surface: #1a1d3a; --panel: #1f2347; --rule: #2c3160; --rule-strong: #404683;
+  --ink: #f3f4fb; --ink-2: #c9cbe0; --ink-3: #9a9db8;
+  --night: #1b1f5c; --night-2: #161a4d;
+  --brand: #8e96ea; --brand-strong: #b1b7f2; --on-brand: #12142a; --brand-tint: #262b5e; --brand-glow: #b1b7f2;
+  --red: #e0434b; --red-strong: #ef6a70; --red-tint: #3a1719;
+  --good: #4cc38a; --good-tint: #11291f; --warn: #e5a54b; --warn-tint: #2e2210; --bad: #f0646b; --bad-tint: #3a1719;
+  --c2: #f0646b; --c3: #9a9db8; --c4: #6a72c9; --grid: #262a52;
+  --k2: #f0646b; --k3: #8e96ea; --k4: #9a9db8; --k5: #f3a0a4; --k6: #f3f4fb; --k7: #6a72c9;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 28px -14px rgb(0 0 0 / 0.7);
   color-scheme: dark;
 }
-:root[data-theme="dark"][data-accent="teal"] { --brand: #4fd8d3; --brand-strong: #7ae6e2; --brand-tint: #0f3335; --brand-glow: #7ff2ec; }
-:root[data-theme="dark"][data-accent="graphite"] { --brand: #c9c8de; --brand-strong: #e2e1f0; --brand-tint: #2a2a3d; --brand-glow: #e0dff0; }
-:root[data-theme="dark"][data-accent="ocean"] { --brand: #78aaff; --brand-strong: #9dc0ff; --brand-tint: #16284a; --brand-glow: #a9ccff; }
 /* Reader options */
 :root[data-text="large"] { --text-scale: 1.12; }
 :root[data-motion="off"] * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -74,8 +65,8 @@
   --color-good: var(--good); --color-good-tint: var(--good-tint);
   --color-warn: var(--warn); --color-warn-tint: var(--warn-tint);
   --color-bad: var(--bad); --color-bad-tint: var(--bad-tint);
-  --font-sans: "Public Sans Variable", "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Newsreader Variable", "Newsreader", Georgia, "Times New Roman", serif;
+  --font-sans: "Public Sans Variable", "Public Sans", Aptos, Arial, Helvetica, sans-serif;
+  --font-display: "Public Sans Variable", "Public Sans", Aptos, Arial, Helvetica, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --shadow-card: var(--shadow);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -101,24 +92,26 @@ a:hover { text-decoration-thickness: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* eyebrow: the small uppercase label over a heading. It names the section; it is never decoration. */
-.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.display { font-family: var(--font-display); font-weight: 560; letter-spacing: -0.015em; line-height: 1.08; }
-.h2 { font-family: var(--font-display); font-weight: 560; font-size: clamp(26px, 3.2vw, 34px); letter-spacing: -0.01em; line-height: 1.15; }
+.eyebrow { font-family: var(--font-sans); font-weight: 800; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); }
+.display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.08; }
+.h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(26px, 3.2vw, 34px); letter-spacing: -0.01em; line-height: 1.15; }
 .h3 { font-weight: 700; font-size: 18px; line-height: 1.3; letter-spacing: -0.005em; }
 .lede { font-size: clamp(17px, 1.7vw, 19px); color: var(--ink-2); max-width: 62ch; }
 .meta { font-size: 13px; color: var(--ink-3); }
-.decide { font-family: var(--font-display); font-size: 17px; font-style: italic; color: var(--ink-2); border-left: 3px solid var(--brand); padding-left: 12px; }
+.decide { font-family: var(--font-display); font-size: 17px; color: var(--ink-2); border-left: 3px solid var(--red); padding-left: 12px; }
 .mono { font-family: var(--font-mono); font-size: 0.86em; letter-spacing: -0.01em; }
 
 /* buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 10px; font-weight: 650; font-size: 15px; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform 140ms var(--ease-out), background-color 160ms ease, border-color 160ms ease, color 160ms ease; }
 .btn:active { transform: scale(0.97); }
-.btn-primary { background: var(--brand); color: var(--on-brand); }
+.btn-primary { background: var(--red); color: var(--on-red); }
+.btn-blue { background: var(--brand); color: var(--on-brand); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--rule-strong); }
 .btn-quiet { background: var(--panel); color: var(--ink); }
 .btn-sm { min-height: 36px; padding: 0 12px; font-size: 13.5px; border-radius: 8px; }
 @media (hover: hover) and (pointer: fine) {
-  .btn-primary:hover { background: var(--brand-strong); }
+  .btn-primary:hover { background: var(--red-strong); }
+  .btn-blue:hover { background: var(--brand-strong); }
   .btn-ghost:hover { border-color: var(--ink-3); background: var(--panel); }
   .btn-quiet:hover { background: var(--rule); }
 }
@@ -152,7 +145,7 @@ input[type="range"] { accent-color: var(--brand); width: 100%; min-height: 28px;
 /* long-form */
 .prose { max-width: 68ch; color: var(--ink-2); font-size: 17px; line-height: 1.7; }
 .prose > * + * { margin-top: 1.05em; }
-.prose h2 { font-family: var(--font-display); font-weight: 560; font-size: 28px; line-height: 1.2; color: var(--ink); margin-top: 1.9em; letter-spacing: -0.01em; }
+.prose h2 { font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.2; color: var(--ink); margin-top: 1.9em; letter-spacing: -0.01em; }
 .prose h3 { font-weight: 700; font-size: 18px; color: var(--ink); margin-top: 1.6em; }
 .prose ul, .prose ol { padding-left: 1.3em; display: grid; gap: 0.5em; }
 .prose ul { list-style: disc; } .prose ol { list-style: decimal; }
@@ -184,4 +177,22 @@ input[type="range"] { accent-color: var(--brand); width: 100%; min-height: 28px;
 }
 
 /* A hairline of the aurora palette along the top of the header: the one place colour appears in the chrome. */
-.aurora-line { height: 2px; background: linear-gradient(90deg, var(--aurora-1), var(--brand), var(--aurora-3)); }
+.aurora-line { height: 4px; background: linear-gradient(90deg, var(--brand) 0 70%, var(--red) 70% 100%); }
+
+/* ------------------------------------------------------------------ period switch
+   "This term" compares with the May 2025 election; "Since 2022" with May 2022, when the government took office.
+   Anything marked .p-term or .p-office shows only under its own setting. Without JavaScript, "This term" shows. */
+:root[data-period="office"] .p-term { display: none !important; }
+:root:not([data-period="office"]) .p-office { display: none !important; }
+.period-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--panel); border: 1px solid var(--rule); }
+.period-switch button { min-height: 30px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); white-space: nowrap; cursor: pointer; }
+.period-switch button[aria-pressed="true"] { background: var(--brand); color: var(--on-brand); }
+@media (max-width: 400px) { .period-switch button { padding: 0 7px; font-size: 11.5px; } }
+
+/* Footer on Reform Blue, per the identity manual (blue for hero and footer). */
+.footer-blue { background: var(--night); color: var(--on-night); }
+.footer-blue .text-ink-2, .footer-blue .text-ink-3, .footer-blue .meta, .footer-blue a { color: var(--on-night-2); }
+.footer-blue a:hover { color: #fff; }
+.footer-blue .eyebrow { color: #fff; }
+.footer-blue .border-t, .footer-blue .border-rule { border-color: var(--night-rule); }
+.footer-blue svg polygon { stroke: #fff; }

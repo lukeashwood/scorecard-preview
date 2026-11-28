@@ -77,7 +77,7 @@ export function recordLine(m: Measure): string | null {
 
 /** The line under every chart: a question each way, and the reader's call. Never a verdict of the site's own. */
 export function decideLine(m: Measure): string {
-  if (m.ed.target) return m.ed.target.owner === 'government' ? 'Is the government on track to keep this promise, or is it falling short? You decide.' : 'Is this target being met, or is it slipping? You decide.';
-  if (m.ed.better === 'none') return 'Is this the right level for Australia, or the wrong one? You decide.';
-  return 'Is Australia headed in the right direction here, or the wrong one? You decide.';
+  if (m.ed.target) return m.ed.target.owner === 'government' ? 'They made the promise. The official figures show whether they kept it.' : 'Is this target being met, or is it slipping? You decide.';
+  if (m.ed.better === 'none') return 'Check the figures, and the sources, for yourself.';
+  return 'This is what has happened on their watch, in their own official figures.';
 }

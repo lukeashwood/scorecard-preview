@@ -64,4 +64,5 @@ export const FALLBACK: Record<'policy' | 'conduct', Pair> = {
   policy: { critical: 'Was this the wrong decision?', benign: 'Or was it the right call on the evidence available?' },
   conduct: { critical: 'Does this fall short of the standard expected of a minister?', benign: 'Or is it a storm in a teacup?' },
 };
-export const pairFor = (id: string, type: 'policy' | 'conduct'): Pair => QUESTIONS[id] ?? FALLBACK[type];
+/* This edition asks the critical question only; the benign half is kept in the data above but not shown. */
+export const pairFor = (id: string, type: 'policy' | 'conduct'): Pair => ({ ...(QUESTIONS[id] ?? FALLBACK[type]), benign: '' });

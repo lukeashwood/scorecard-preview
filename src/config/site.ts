@@ -2,9 +2,9 @@
 export const SITE = {
   name: 'Gov Score',
   edition: 'Australia',
-  tagline: 'Holding the government to account, in its own numbers.',
+  tagline: 'Labor’s record, in its own numbers.',
   description:
-    'The Australian Government of the day in official figures: what it promised, what it delivered, and what has changed since it took office. Sourced, dated and tested daily, in plain English.',
+    'The Albanese Government’s economic record in official figures: the promises it broke, the debt it ran up and what it has cost Australian households. Every figure sourced, in plain English.',
   locale: 'en-AU',
   currency: 'AUD',
   government: {
@@ -34,8 +34,8 @@ export const SITE = {
 export const NAV_GROUPS = [
   { q: 'What did they promise?', items: [{ href: 'targets/', label: 'Promises', top: true }] },
   { q: 'What happened?', items: [{ href: 'measures/', label: 'Measures', top: true }, { href: 'charts/', label: 'Charts', top: true }, { href: 'latest/', label: 'Latest figures', top: false }, { href: 'in-60-seconds/', label: 'In 60 seconds', top: false }, { href: 'calculator/', label: 'Are you better off?', top: false }] },
-  { q: 'Why did it happen?', items: [{ href: 'relationships/', label: 'Compare', top: true }, { href: 'budget/', label: 'Budget', top: true }, { href: 'budget/build/', label: 'Build your own Budget', top: false }, { href: 'laws/', label: 'Laws', top: false }] },
-  { q: 'More', items: [{ href: 'briefing/', label: 'Briefing (3D)', top: false }, { href: 'find/', label: 'Help me find it', top: false }, { href: 'for/', label: 'Who it’s for', top: false }, { href: 'controversies/', label: 'Controversies', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'classrooms/', label: 'For classrooms', top: false }, { href: 'make-your-own-chart/', label: 'Make your own chart', top: false }] },
+  { q: 'Why did it happen?', items: [{ href: 'budget/', label: 'Budget', top: true }, { href: 'backflips/', label: 'Backflips', top: true }, { href: 'controversies/', label: 'Controversies', top: true }, { href: 'relationships/', label: 'Compare', top: false }, { href: 'budget/build/', label: 'Build your own Budget', top: false }, { href: 'laws/', label: 'Laws', top: false }] },
+  { q: 'More', items: [{ href: 'leadership/', label: 'Tired leadership', top: false }, { href: 'briefing/', label: 'Briefing (3D)', top: false }, { href: 'find/', label: 'Help me find it', top: false }, { href: 'learn/', label: 'Learn', top: false }, { href: 'make-your-own-chart/', label: 'Make your own chart', top: false }] },
 ] as const;
 export const NAV = NAV_GROUPS.flatMap((g) => g.items);
 

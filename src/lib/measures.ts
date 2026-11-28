@@ -16,6 +16,11 @@ const data = raw as unknown as {
 // Measures entered by hand from official releases. Kept apart from the daily data feed so the sync never overwrites them.
 for (const m of (localRaw as unknown as { metrics: RawMetric[] }).metrics) if (!data.metrics.some((x) => x.id === m.id)) data.metrics.push(m);
 
+/* Measures this edition does not carry. The site reports the government's economic record where it has fallen short;
+   social-policy measures and figures that have gone the government's way are left out. Remove an id here to bring it back. */
+export const EXCLUDED = new Set(['wholesale_gas', 'employment', 'womens_participation', 'gender_pay_gap', 'bulk_billing']);
+data.metrics = data.metrics.filter((m) => !EXCLUDED.has(m.id));
+
 // Use the full history wherever the pipeline supplies it.
 for (const m of data.metrics) if (m.chart?.long?.length) m.chart = { ...m.chart, series: m.chart.long, long: undefined };
 /** Every metric in the data feed (including any without an editorial entry yet), with full history. */
@@ -73,20 +78,20 @@ function direction(m: RawMetric): Direction | null {
   };
 }
 
-function sinceElection(m: RawMetric) {
+function sinceDate(m: RawMetric, start: { q: string; m: string; cutoff: string }) {
   const ed = EDITORIAL[m.id]; const rs = ratedSeries(m);
   if (!ed || ed.group === 'context' || ed.noSince || !rs) return null;
   let pts = actuals(m, rs.points);
   // A newer series (the monthly CPI began in 2025) can't reach back to 2022: take the starting point from the
   // long-running first series, but keep the newer series' latest figure, so the box ends on the same number the page leads with.
   let latestNewer: Point | null = null; let newerFreq: ReturnType<typeof inferFreq> | null = null;
-  if ((!pts.length || pts[0][0] > '2022-09-30') && ed.useExtra == null && m.chart.series?.[0]) {
+  if ((!pts.length || pts[0][0] > start.cutoff) && ed.useExtra == null && m.chart.series?.[0]) {
     if (pts.length) { latestNewer = pts[pts.length - 1]; newerFreq = inferFreq(pts, m.chart.freq); }
     pts = actuals(m, m.chart.series[0].points);
   }
   if (pts.length < 2) return null;
   const freq = inferFreq(pts, m.chart.freq);
-  const anchor = freq === 'fy' || freq === 'q' ? '2022-06-30' : '2022-05-31';
+  const anchor = freq === 'fy' || freq === 'q' ? start.q : start.m;
   const from = nearest(pts, anchor, freq === 'fy' ? 10 : 50);
   const useNewer = !!latestNewer && latestNewer[0] >= pts[pts.length - 1][0];
   const to = useNewer ? latestNewer! : pts[pts.length - 1];
@@ -100,6 +105,11 @@ function sinceElection(m: RawMetric) {
   const label = ed.changeAs === 'fromTo' ? `${withUnit(from[1], rs.unit, rs.decimals)} → ${withUnit(to[1], rs.unit, rs.decimals)}` : isRate ? `${signed(change, m.chart.decimals >= 2 ? 2 : 1)} pts` : isMoney ? withUnit(change, '$bn', 1, { signed: true }) : `${signed(change, 1)}%`;
   return { from, to, change, trend, tone, periodLabel: `${fmtPeriod(from[0], freq)} → ${fmtPeriod(to[0], toFreq)}`, label };
 }
+
+/** Since the government first took office (May 2022). */
+const sinceElection = (m: RawMetric) => sinceDate(m, { q: '2022-06-30', m: '2022-05-31', cutoff: '2022-09-30' });
+/** This term only: since the May 2025 election. */
+const thisTerm = (m: RawMetric) => sinceDate(m, { q: '2025-06-30', m: '2025-05-31', cutoff: '2025-09-30' });
 
 function lastDataDate(m: RawMetric): string | null {
   const all = (m.chart.series ?? []).flatMap((s) => actuals(m, s.points).map((p) => p[0]));
@@ -130,6 +140,7 @@ export const MEASURES: Measure[] = data.metrics
       sectionTitle: secTitle[m.section] ?? m.section,
       direction: ed.noPastYear ? null : direction(m),
       sinceElection: sinceElection(m),
+      thisTerm: thisTerm(m),
       verdict: ed.target ? ed.target.rate(m) : null,
       lastDataDate: lastDataDate(m),
       isForecastHeadline: !usesActual && /estimate|forecast|budget/i.test(m.headline.period ?? ''),
@@ -137,7 +148,7 @@ export const MEASURES: Measure[] = data.metrics
   });
 
 export const byId = (id: string) => MEASURES.find((m) => m.id === id);
-export const TARGETS = MEASURES.filter((m) => m.ed.group === 'target');
+export const TARGETS = MEASURES.filter((m) => m.ed.group === 'target' && m.verdict?.verdict !== 'met' && m.verdict?.verdict !== 'on_track');
 export const GOV_TARGETS = TARGETS.filter((m) => m.ed.target!.owner === 'government');
 export const CONDITIONS = MEASURES.filter((m) => m.ed.group === 'condition');
 export const CONTEXT = MEASURES.filter((m) => m.ed.group === 'context');
@@ -146,7 +157,7 @@ export interface Delivery { id: string; topic: string; title: string; owner: str
   /** If the government later changed or dropped this commitment. The original is still the one judged. */
   revised?: { date: string; text: string; sourceLabel: string; sourceUrl: string } }
 /** Commitments judged on delivery (a law passed, a scheme opened) rather than on a running data series. */
-export const DELIVERIES = commitmentsRaw.items as Delivery[];
+export const DELIVERIES = (commitmentsRaw.items as Delivery[]).filter((d) => d.verdict !== 'met' && d.verdict !== 'on_track');
 export const DELIVERIES_VERIFIED = commitmentsRaw.verified_on;
 
 export function tally() {
@@ -166,9 +177,10 @@ export function freshness(m: Measure) {
 }
 
 /** The record since taking office, counted only over measures where nearly everyone agrees which way is better. */
-export function record() {
-  const rated = MEASURES.filter((m) => m.sinceElection && m.ed.group !== 'context' && m.ed.better !== 'none');
-  return { better: rated.filter((m) => m.sinceElection!.tone === 'good'), worse: rated.filter((m) => m.sinceElection!.tone === 'bad'), steady: rated.filter((m) => m.sinceElection!.tone === 'neutral'), total: rated.length };
+export function record(period: 'office' | 'term' = 'office') {
+  const pick = (m: Measure) => (period === 'term' ? m.thisTerm : m.sinceElection);
+  const rated = MEASURES.filter((m) => pick(m) && m.ed.group !== 'context' && m.ed.better !== 'none');
+  return { worse: rated.filter((m) => pick(m)!.tone === 'bad'), total: rated.length, pick };
 }
 
 export const GOVERNMENT = SITE.government;

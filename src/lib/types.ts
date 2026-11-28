@@ -125,6 +125,7 @@ export interface Measure extends RawMetric {
   direction: Direction | null;
   /** The change since the government took office: the site's primary comparison. */
   sinceElection: { from: Point; to: Point; change: number; label: string; trend: Trend; tone: 'good' | 'bad' | 'neutral'; periodLabel: string } | null;
+  thisTerm: { from: Point; to: Point; change: number; label: string; trend: Trend; tone: 'good' | 'bad' | 'neutral'; periodLabel: string } | null;
   verdict: { verdict: Verdict; reason: string } | null;
   lastDataDate: string | null;
   isForecastHeadline: boolean;

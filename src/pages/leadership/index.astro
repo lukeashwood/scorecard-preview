@@ -1,0 +1,90 @@
+---
+/* Tired leadership: what commentators across the spectrum have said about how the government's most senior figures
+   communicate and answer questions, plus how long the Cabinet has been in Parliament. Every quote is attributed and
+   linked; nothing is paraphrased into words the person did not use. Tenure is taken from the Second Albanese ministry
+   table (year each minister entered their current seat), checked 28 November 2026. */
+import Base from '../../layouts/Base.astro';
+import { url } from '../../config/site';
+
+const YEAR = 2026;
+const CABINET: [string, string, number][] = [
+  ['Anthony Albanese', 'Prime Minister', 1996], ['Tanya Plibersek', 'Social Services', 1998], ['Catherine King', 'Infrastructure', 2001],
+  ['Penny Wong', 'Foreign Affairs', 2002], ['Tony Burke', 'Home Affairs', 2004], ['Richard Marles', 'Deputy PM, Defence', 2007],
+  ['Amanda Rishworth', 'Employment', 2007], ['Jason Clare', 'Education', 2007], ['Julie Collins', 'Agriculture', 2007],
+  ['Chris Bowen', 'Climate Change and Energy', 2010], ['Michelle Rowland', 'Attorney-General', 2010], ['Jim Chalmers', 'Treasurer', 2013],
+  ['Clare O’Neil', 'Housing', 2013], ['Don Farrell', 'Trade', 2016], ['Madeleine King', 'Resources', 2016], ['Murray Watt', 'Environment', 2016],
+  ['Malarndirri McCarthy', 'Indigenous Australians', 2016], ['Pat Conroy', 'Defence Industry', 2016], ['Anne Aly', 'Small Business', 2016],
+  ['Katy Gallagher', 'Finance', 2019], ['Mark Butler', 'Health', 2019], ['Anika Wells', 'Communications', 2019], ['Tim Ayres', 'Industry', 2019],
+];
+const total = CABINET.reduce((s, [, , y]) => s + (YEAR - y), 0);
+const avg = (total / CABINET.length).toFixed(0);
+const veterans = CABINET.filter(([, , y]) => YEAR - y >= 15).length;
+const top = CABINET.slice(0, 5);
+const TENURE_SRC = { title: 'Second Albanese ministry: Cabinet, with the year each minister entered their current seat (Wikipedia)', url: 'https://en.wikipedia.org/wiki/Second_Albanese_ministry' };
+
+interface Q { who: string; role: string; quote: string; about: string; src: { title: string; url: string } }
+const ALBO: Q[] = [
+  { who: 'Christopher Dore', role: 'The Nightly', about: 'Anthony Albanese', quote: 'At his best he’s fire, at his worst he’s a gibberer.', src: { title: 'THE FRONT DORE: Prime Minister Anthony Albanese is Australia’s equivalent to Joe Biden', url: 'https://thenightly.com.au/opinion/the-front-dore/the-front-dore-prime-minister-anthony-albanese-is-australias-equivalent-to-joe-biden-c-15022142' } },
+  { who: 'Jack Waterford', role: 'The Canberra Times', about: 'Anthony Albanese', quote: 'slapstick presentational blunders, poor skills at prevarication', src: { title: 'Albanese has time and space to address his own problems', url: 'https://www.canberratimes.com.au/story/9179307/jack-waterford-albanese-has-time-and-space-to-address-his-own-problems/' } },
+  { who: 'Cameron Milner', role: 'former Queensland Labor state secretary, in The Nightly', about: 'Anthony Albanese', quote: 'Even for Average Albo, 2026 has been a shocker.', src: { title: 'CAMERON MILNER: What if this is actually ‘Peak Albo’?', url: 'https://thenightly.com.au/opinion/cameron-milner-what-if-this-is-actually-peak-albo-c-23167052' } },
+  { who: 'Nick Feik', role: 'writer', about: 'Anthony Albanese', quote: 'little aptitude for public presentation', src: { title: 'Why Albanese is in trouble', url: 'https://nickfeik.substack.com/p/why-albanese-is-in-trouble' } },
+  { who: 'The Nightly', role: 'editorial', about: 'Anthony Albanese', quote: 'Mr Albanese became tetchy at times, as he can do', src: { title: 'EDITORIAL: Federal Budget set to leave Labor with a trust deficit', url: 'https://thenightly.com.au/opinion/editorial/editorial-federal-budget-set-to-leave-labor-with-a-trust-deficit-c-22265491' } },
+  { who: 'The New Daily', role: 'opinion', about: 'Anthony Albanese', quote: 'the general inarticulate nature of his prime ministership', src: { title: 'Hardly poetry in motion, but Albanese’s backflip can still work if he sticks the landing', url: 'https://www.thenewdaily.com.au/opinion/2024/01/30/albanese-backflip-tax' } },
+];
+const WONG: Q[] = [
+  { who: 'The Nightly', role: 'news report, Senate estimates', about: 'Penny Wong', quote: 'Penny Wong and officials from the Prime Minister’s department dodged repeated questions', src: { title: 'Anthony Albanese accused of ISIS bride ‘cover up’ after officials fail to answer basic questions', url: 'https://thenightly.com.au/politics/anthony-albanese-accused-of-isis-bride-cover-up-after-officials-fail-to-answer-basic-questions-c-20268332' } },
+  { who: 'The Nightly', role: 'news report, Senate estimates', about: 'Penny Wong and Murray Watt', quote: 'stonewalled a multi-pronged Coalition attempt', src: { title: 'Labor’s refusal to answer Dural caravan briefing timelines a ‘contradiction’ and a ‘cover-up’', url: 'https://thenightly.com.au/politics/labors-refusal-to-answer-dural-caravan-briefing-timelines-a-contradiction-and-a-cover-up-coalition-c-17831319' } },
+];
+---
+<Base title="Tired leadership: the case for fresh blood" description="Decades in Parliament and it shows: what commentators say about how Albanese, Wong and the Cabinet communicate and answer questions, and the case for term limits." section="leadership/">
+  <div class="wrap-narrow pt-10 md:pt-14">
+    <p class="eyebrow">Leadership · fresh blood</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Tired government, tired answers</h1>
+    <p class="lede mt-3">The Prime Minister has been in Parliament for {YEAR - 1996} years. His Foreign Minister for {YEAR - 2002}. When people have been in the job that long, it shows: in the way they speak, in the way they treat hard questions, and in the way they stop explaining themselves to the people who pay their wages.</p>
+
+    <section class="mt-10">
+      <h2 class="h2">The Cabinet, by years in Parliament</h2>
+      <div class="mt-5 grid gap-3 sm:grid-cols-3">
+        <div class="card card-pad"><p class="num font-display text-[44px] font-extrabold leading-none text-[var(--red)]">{total}</p><p class="mt-1 text-[14.5px] text-ink-2">combined years in their seats across the {CABINET.length}-member Cabinet</p></div>
+        <div class="card card-pad"><p class="num font-display text-[44px] font-extrabold leading-none text-[var(--red)]">{avg}</p><p class="mt-1 text-[14.5px] text-ink-2">years on average</p></div>
+        <div class="card card-pad"><p class="num font-display text-[44px] font-extrabold leading-none text-[var(--red)]">{veterans} of {CABINET.length}</p><p class="mt-1 text-[14.5px] text-ink-2">have held their seat for 15 years or more</p></div>
+      </div>
+      <div class="card mt-4 overflow-hidden">
+        <ul>{top.map(([n, p, y]) => (
+          <li class="rule-t grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-3"><span><b>{n}</b> <span class="meta">· {p}</span></span><span class="num font-bold">{YEAR - y} years <span class="meta">(since {y})</span></span></li>))}</ul>
+        <details class="group border-t border-rule"><summary class="cursor-pointer px-5 py-2.5 text-[14px] font-bold text-brand">The whole Cabinet</summary>
+          <ul>{CABINET.slice(5).map(([n, p, y]) => (
+            <li class="rule-t grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-[14.5px]"><span>{n} <span class="meta">· {p}</span></span><span class="num">{YEAR - y} years</span></li>))}</ul></details>
+      </div>
+      <p class="meta mt-2">Years since each minister entered their current seat, to {YEAR}. Source: <a href={TENURE_SRC.url} rel="noopener" target="_blank">{TENURE_SRC.title}</a>. Some ministers served in another seat or another parliament before that, so these are minimums.</p>
+    </section>
+
+    <section class="mt-12">
+      <h2 class="h2">How they talk: what the commentators say</h2>
+      <p class="mt-2 text-[15.5px] text-ink-2">The quotes below are short extracts, each linked to the full piece. They come from columnists, editorials and a former Labor state secretary, not from the government’s political opponents.</p>
+      <ul class="mt-5 grid gap-4">{ALBO.map((q) => (
+        <li class="card card-pad"><p class="font-display text-[20px] font-bold leading-snug">“{q.quote}”</p><p class="meta mt-2"><b class="text-ink">{q.who}</b>, {q.role}, on {q.about} · <a href={q.src.url} rel="noopener" target="_blank">{q.src.title}</a></p></li>))}</ul>
+      <div class="card card-pad mt-4 border-2 border-[var(--red)]">
+        <p class="eyebrow">In his own words</p>
+        <p class="mt-2 font-display text-[20px] font-bold leading-snug">“Yes. How hard is it? For the 50th time.”</p>
+        <p class="mt-2 text-[15px] text-ink-2">Anthony Albanese, April 2025, asked whether he would rule out changes to negative gearing and capital gains tax if re-elected. His government changed both in its next Budget. <a href={url('backflips/#negative-gearing-cgt')}>See the backflip</a>.</p>
+        <p class="meta mt-2"><a href="https://www.sbs.com.au/news/article/anthony-albanese-promised-he-wouldnt-touch-housing-tax-reforms-now-hes-defending-them/3vqxy06kv" rel="noopener" target="_blank">Anthony Albanese promised he wouldn’t touch housing tax reforms. Now he’s defending them (SBS)</a></p>
+      </div>
+    </section>
+
+    <section class="mt-12">
+      <h2 class="h2">Hard questions, no answers</h2>
+      <p class="mt-2 text-[15.5px] text-ink-2">Senate estimates is where ministers are meant to answer for what their departments do. Penny Wong, in the Senate since {2002}, represents the Prime Minister there.</p>
+      <ul class="mt-5 grid gap-4">{WONG.map((q) => (
+        <li class="card card-pad"><p class="font-display text-[20px] font-bold leading-snug">“{q.quote}”</p><p class="meta mt-2"><b class="text-ink">{q.who}</b>, {q.role}, on {q.about} · <a href={q.src.url} rel="noopener" target="_blank">{q.src.title}</a></p></li>))}</ul>
+      <p class="mt-4 text-[15.5px] text-ink-2">Michelle Grattan, one of the country’s most experienced press gallery journalists, wrote in August 2026 that the Prime Minister must envy South Australian Premier Peter Malinauskas’s clarity of communication, and that he doesn’t believe in admitting he’s stuffed up. <a href="https://www.indailysa.com.au/news/in-depth/2026/08/14/albanese-doesnt-believe-in-admitting-hes-stuffed-up-and-it-costs-him" rel="noopener" target="_blank">Albanese doesn’t believe in admitting he’s stuffed up, and it costs him (InDaily)</a></p>
+    </section>
+
+    <section class="mt-12 prose">
+      <h2>The case for term limits</h2>
+      <p>Nobody is suggesting long service is a crime. But a Parliament that never turns over loses touch. The longer someone sits in Canberra, the further they get from the kitchen table: from what groceries cost, what a mortgage feels like at 6%, and what it’s like to run a small business when the Tax Office changes the rules overnight.</p>
+      <p>Limits on how long an MP or senator can serve would bring in people who have lived and worked in the real economy, and who arrive with energy and something to prove. It would end the idea of politics as a 30-year career, and put the focus back on serving the country rather than staying in the job.</p>
+      <p>The record on this site is what you get from a government led by people who have been there for decades: <a href={url('backflips/')}>policies announced and then dropped</a>, <a href={url('targets/')}>promises missed</a>, and <a href={url('measures/net_worth/')}>a balance sheet going backwards</a>.</p>
+    </section>
+  </div>
+</Base>

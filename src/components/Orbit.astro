@@ -12,13 +12,12 @@ import { powerBills, wageNote, mortgageDays, ndisCoins, workCrowd, renewablesSha
 import type { Measure, Point } from '../lib/types';
 
 /* The pool of screens. The ring shows 8 at a time and moves 4 places along the pool each day, so the hero changes
-   daily. The pool alternates measures that have improved with ones that have worsened, so any window of 8 stays a
-   mix rather than leaning one way. */
+   daily. */
 const POOL: [string, string][] = [
-  ['inflation', 'line'], ['housing_accord', 'houses'], ['employment', 'crowd'], ['mortgage', 'days'],
-  ['gross_debt', 'step'], ['power_bills', 'arrows'], ['budget_balance', 'waterline'], ['real_wages', 'note'],
-  ['wholesale_gas', 'area'], ['bulk_billing', 'people'], ['gender_pay_gap', 'line'], ['renewables-82', 'sun'],
-  ['unemployment', 'area'], ['ndis', 'coins'], ['womens_participation', 'bars'], ['emissions_target', 'goal'],
+  ['inflation', 'line'], ['housing_accord', 'houses'], ['mortgage', 'days'], ['gross_debt', 'step'],
+  ['power_bills', 'arrows'], ['budget_balance', 'waterline'], ['real_wages', 'note'], ['unemployment', 'area'],
+  ['ndis', 'coins'], ['interest_costs', 'line'], ['productivity', 'area'], ['insolvencies', 'bars'],
+  ['household_income', 'line'], ['consumer_confidence', 'area'], ['spending_gdp', 'step'], ['gdp_per_capita', 'line'],
 ];
 const day = Math.floor(Date.parse(TODAY) / 864e5);
 const start = (day * 4) % POOL.length;

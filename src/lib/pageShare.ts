@@ -20,7 +20,7 @@ export const PAGE_SHARES: PageShare[] = [
     text: 'How figures are collected and checked, how verdicts are reached, and the full text of every rating rule. If a rule changes, the version number changes and the change is logged in public.',
     alt: 'Gov Score methodology: how figures and verdicts are checked' },
   { slug: 'charts', eyebrow: 'Charts', title: 'Every chart, one page',
-    text: 'All the charts we track. Switch each one between this government, the last 10 or 20 years, and how Australia compares with the G20 where a fair comparison exists.',
+    text: 'All the charts we track. Switch each one between this term, since May 2022, the last 10 or 20 years, and how Australia compares with the G20 where a fair comparison exists.',
     alt: 'Australian economy charts: every official series on one page' },
   { slug: 'relationships', eyebrow: 'Compare', title: 'Do these move together?',
     text: 'Each chart puts two official series side by side, so you can see whether one rises when the other does, at the same time or a year or two later.',
@@ -40,24 +40,18 @@ export const PAGE_SHARES: PageShare[] = [
   { slug: 'data', eyebrow: 'Data and downloads', title: 'Take the numbers with you',
     text: 'Every series on the site, free to reuse with credit. Files are rebuilt whenever the data updates.',
     alt: 'Gov Score data and downloads: every series free to reuse with credit' },
-  { slug: 'classrooms', eyebrow: 'For classrooms', title: 'Official figures, ready for the classroom',
-    text: 'Everything on this site is an official figure from the ABS, the Reserve Bank, Treasury or Parliament, with the source linked. The site gives no score of its own and applies the same published rules whichever party is in government.',
-    alt: 'Official Australian figures for Economics and Civics classrooms' },
   { slug: 'make-your-own-chart', eyebrow: 'Make your own chart', title: 'Make your own chart',
     text: 'Every chart on this site can be downloaded as a spreadsheet file and redrawn your way, for a newsletter, a classroom, a report or a post. It takes about 2 minutes and costs nothing.',
     alt: 'Make your own chart from official Australian data' },
   { slug: 'briefing', eyebrow: 'Briefing (3D)', title: 'Every measure, mapped',
     text: 'Each sphere is a topic. Its colour and glow show how many of its measures are worse than when the government took office. The small dots orbiting it are the individual measures.',
     alt: 'The Australian economy in 3D: every measure mapped' },
-  { slug: 'about', eyebrow: 'About', title: 'Why you can check everything',
-    text: 'Gov Score exists so that anyone, whether a parent at the kitchen table, a journalist on deadline or a student, can find out how the country is going without wading through a dozen government websites, and without being told what to think.',
-    alt: 'About Gov Score: why you can check everything' },
-  { slug: 'for', eyebrow: 'Who it’s for', title: 'What you get from Gov Score',
-    text: 'One set of official figures, used in different ways. Pick the one that sounds like you.',
-    alt: 'Who Gov Score is for, and what you get' },
+  { slug: 'about', eyebrow: 'About', title: 'Why this site exists',
+    text: 'Australians are paying more for groceries, power, rent and mortgages, while Canberra spends more, borrows more and misses its own targets. Gov Score puts that record in one place, in the government’s own figures.',
+    alt: 'About Gov Score' },
 ];
 
 export const pageShare = (slug: string) => PAGE_SHARES.find((p) => p.slug === slug)!;
 
 /** The tiles on the in-60-seconds page, in order; the page and its share image read the same list. */
-export const IN_60_IDS = ['inflation', 'real_wages', 'unemployment', 'gdp_per_capita', 'household_income', 'mortgage', 'home_prices', 'electricity', 'housing_accord', 'gross_debt', 'spending_gdp', 'migration'];
+export const IN_60_IDS = ['inflation', 'real_wages', 'unemployment', 'gdp_per_capita', 'household_income', 'mortgage', 'home_prices', 'electricity', 'housing_accord', 'gross_debt', 'net_worth', 'spending_gdp', 'migration'];

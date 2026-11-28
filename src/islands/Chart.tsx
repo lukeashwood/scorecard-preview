@@ -28,7 +28,7 @@ interface Props {
 
 const COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
 const roleColor = (role: string | undefined, i: number) => (role === 'muted' ? 'var(--c4)' : COLORS[i % COLORS.length]);
-const RANGES = [{ id: 'term', label: 'This government', years: -1 }, { id: '10y', label: '10 years', years: 10 }, { id: '20y', label: '20 years', years: 20 }, { id: 'all', label: 'All years', years: 0 }] as const;
+const RANGES = [{ id: 'cur', label: 'This term', years: -2 }, { id: 'term', label: 'Since May 2022', years: -1 }, { id: '10y', label: '10 years', years: 10 }, { id: '20y', label: '20 years', years: 20 }, { id: 'all', label: 'All years', years: 0 }] as const;
 
 function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null); const [w, setW] = useState(0);
@@ -52,6 +52,11 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
   const allDates = useMemo(() => series.flatMap((s) => s.points.map((p) => p[0])).sort(), [series]);
   const spanYears = allDates.length ? (parseDate(allDates[allDates.length - 1]).getTime() - parseDate(allDates[0]).getTime()) / 31557600000 : 0;
   const [range, setRange] = useState<(typeof RANGES)[number]['id']>('10y');
+  // Follow the site-wide "This term / Since May 2022" switch when the reader changes it.
+  useEffect(() => {
+    const sync = () => { const p = document.documentElement.dataset.period; setRange(p === 'office' ? 'term' : 'cur'); };
+    window.addEventListener('gs-period', sync); return () => window.removeEventListener('gs-period', sync);
+  }, []);
   const [mode, setMode] = useState<'time' | 'g20'>('time');
   const fmt = (v: number) => withUnit(v, unit, decimals);
 
@@ -59,6 +64,8 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
     const r = RANGES.find((x) => x.id === range)!;
     if (!allDates.length) return '0000';
     // "This government": from the start of the year it took office, so the starting point stays in view.
+    // "This term": from the start of 2025, so the May 2025 election and the figure before it stay in view.
+    if (r.years === -2) return '2025-01-01';
     if (r.years < 0) return term ? `${term.start.slice(0, 4)}-01-01` : '0000';
     if (r.years === 0) return '0000';
     // Count back from the latest published figure, not from the end of any Budget forecast.
@@ -85,7 +92,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
   const isTime = spec.kind !== 'hbar';
   const on = { background: 'var(--ink)', color: 'var(--paper)' };
   const rangeYears = RANGES.find((r) => r.id === range)!.years;
-  const short = isTime && mode === 'time' && allDates.length > 0 && (rangeYears < 0 ? !!term && allDates[0] > term.start : spanYears + 0.3 < rangeYears);
+  const short = isTime && mode === 'time' && allDates.length > 0 && (rangeYears === -2 ? allDates[0] > '2025-05-03' : rangeYears < 0 ? !!term && allDates[0] > term.start : spanYears + 0.3 < rangeYears);
   return (
     <figure className="m-0">
       <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -145,8 +152,9 @@ function TimeChart({ spec, series, fmt, freq, elections, term, title, height, pl
   let lo = Math.min(...vals, ...refs.map((r) => r.value), band ? band.lo : Infinity), hi = Math.max(...vals, ...refs.map((r) => r.value), band ? band.hi : -Infinity);
   if (!Number.isFinite(lo)) { lo = 0; hi = 1; }
   if (isBar || lo > 0 && lo / (hi || 1) < 0.35) lo = Math.min(0, lo); // bars and near-zero series are anchored at zero
+  if (isBar) hi = Math.max(0, hi); // negative bars hang from a visible zero line
   const padY = (hi - lo || 1) * 0.08;
-  const y = scaleLinear().domain([lo < 0 ? lo - padY : lo === 0 ? 0 : lo - padY, hi + padY]).nice(5).range([ih, 0]);
+  const y = scaleLinear().domain([lo < 0 ? lo - padY : lo === 0 ? 0 : lo - padY, hi === 0 ? 0 : hi + padY]).nice(5).range([ih, 0]);
   const yTicks = y.ticks(5);
   // Axis labels drop needless decimals ("4%" not "4.0%") unless the ticks themselves are fractional.
   const tickFmt = (v: number) => (yTicks.every((t) => Number.isInteger(t)) ? fmt(v).replace(/\.0+(?=\D*$)/, '') : fmt(v));

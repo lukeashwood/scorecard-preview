@@ -7,9 +7,10 @@ import { url } from '../config/site';
 import { fmtPeriod, inferFreq, withUnit } from '../lib/format';
 import { ratedSeries, TODAY } from '../lib/measures';
 import type { Measure, Point } from '../lib/types';
-interface Props { m: Measure; i?: number }
-const { m, i = 0 } = Astro.props;
-const se = m.sinceElection!;
+interface Props { m: Measure; i?: number; period?: 'office' | 'term' }
+const { m, i = 0, period = 'office' } = Astro.props;
+const se = (period === 'term' ? m.thisTerm : m.sinceElection)!;
+const TERM = period === 'term';
 const rs = ratedSeries(m)!;
 
 // Published actuals only, and a newer series (the monthly CPI began in 2025) is joined onto the long-running one so
@@ -20,7 +21,7 @@ if (pts.length && pts[0][0] > '2022-06-30' && m.chart.series?.[0]) {
   const start = pts[0][0];
   pts = [...actual(m.chart.series[0].points).filter((p) => p[0] < start), ...pts];
 }
-pts = pts.filter((p) => p[0] >= '2018-01-01');
+pts = pts.filter((p) => p[0] >= (TERM ? '2023-01-01' : '2018-01-01'));
 
 const freq = inferFreq(pts, m.chart.freq);
 const isIndex = rs.unit === 'index';
@@ -31,46 +32,46 @@ const caption = isIndex ? `Index, ${thenLabel} = 100` : rs.name.replace(/\s*\(.*
 
 // Line geometry, drawn at build time.
 const W = 300, H = 72, pad = 5;
-const ELECTION = '2022-05-23';
+const ELECTION = TERM ? '2025-05-03' : '2022-05-23';
 const ts = pts.map((p) => Date.parse(p[0])), vs = pts.map((p) => p[1]);
 let lo = Math.min(...vs), hi = Math.max(...vs); if (hi === lo) { hi += 1; lo -= 1; }
 const t0 = ts[0], t1 = ts[ts.length - 1] || t0 + 1;
 const X = (t: number) => pad + ((t - t0) / (t1 - t0 || 1)) * (W - pad * 2);
 const Y = (v: number) => H - pad - ((v - lo) / (hi - lo)) * (H - pad * 2);
 const ex = X(Date.parse(ELECTION));
-const split = pts.findIndex((p) => p[0] >= '2022-05-01');
+const split = pts.findIndex((p) => p[0] >= (TERM ? '2025-05-01' : '2022-05-01'));
 const path = (a: number, b: number) => pts.slice(a, b).map((p, k) => `${k ? 'L' : 'M'}${X(ts[a + k]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join('');
 const before = split > 0 ? path(0, split + 1) : '';
 const after = path(Math.max(0, split), pts.length);
 const last = pts[pts.length - 1];
 ---
-<a href={url(`measures/${m.id}/`)} class="tn card card-link rise flex flex-col" style={`--i:${i}`}>
+<a href={url(`measures/${m.id}/`)} class:list={["tn card card-link rise flex flex-col", TERM ? "p-term" : "p-office"]} style={`--i:${i}`}>
   <div class="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 px-5 pt-5">
     <h3 class="h3">{m.title}</h3>
     <DirectionBadge change={{ trend: se.trend, tone: se.tone, label: se.label }} />
   </div>
   <div class="grid grid-cols-2 gap-4 px-5 pt-4">
     <div class="border-t border-rule pt-2.5">
-      <p class="mono text-[11.5px] uppercase tracking-[0.06em] text-ink-3"><span class="block">Then</span>{thenLabel}</p>
-      <p class="num mt-1 font-display text-[clamp(30px,4vw,38px)] leading-none text-ink-3">{isIndex ? '100' : fmt(se.from[1])}</p>
+      <p class="mono text-[11.5px] uppercase tracking-[0.06em] text-ink-3"><span class="block">{TERM ? 'At the 2025 election' : 'Took office'}</span>{thenLabel}</p>
+      <p class:list={["num mt-1 whitespace-nowrap font-display leading-none text-ink-3", fmt(se.from[1]).length > 7 ? "text-[clamp(22px,2.6vw,28px)]" : "text-[clamp(30px,4vw,38px)]"]}>{isIndex ? '100' : fmt(se.from[1])}</p>
     </div>
     <div class="border-t-2 border-brand pt-2">
       <p class="mono text-[11.5px] uppercase tracking-[0.06em] text-brand"><span class="block">Now</span>{nowLabel}</p>
-      <p class="num mt-1 font-display text-[clamp(30px,4vw,38px)] font-semibold leading-none">{fmt(se.to[1])}</p>
+      <p class:list={["num mt-1 whitespace-nowrap font-display font-extrabold leading-none", fmt(se.to[1]).length > 7 ? "text-[clamp(22px,2.6vw,28px)]" : "text-[clamp(30px,4vw,38px)]"]}>{fmt(se.to[1])}</p>
     </div>
   </div>
   <p class="meta px-5 pt-2">{caption}</p>
   {pts.length > 1 && (
     <div class="mt-auto px-3 pt-4">
-      <svg class="tn-chart block w-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${m.title} since 2018. ${thenLabel}: ${isIndex ? '100' : fmt(se.from[1])}. ${nowLabel}: ${fmt(last[1])}.`}>
+      <svg class="tn-chart block w-full" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={`${m.title} since ${TERM ? 2023 : 2018}. ${thenLabel}: ${isIndex ? '100' : fmt(se.from[1])}. ${nowLabel}: ${fmt(last[1])}.`}>
         <rect x={ex} y="0" width={W - pad - ex} height={H} fill="var(--brand-tint)" opacity="0.6" />
         <line x1={ex} x2={ex} y1="0" y2={H} stroke="var(--brand)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" />
         {before && <path class="tn-line" pathLength="1" d={before} fill="none" stroke="var(--rule-strong)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />}
         <path class="tn-line tn-line-2" pathLength="1" d={after} fill="none" stroke="var(--brand)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
       </svg>
       <div class="relative h-5 mono text-[10.5px] uppercase" aria-hidden="true">
-        <span class="absolute left-0 top-1 text-ink-3">2018</span>
-        <span class="absolute top-1 pl-1 text-brand" style={`left:${((ex / W) * 100).toFixed(1)}%`}>May 2022</span>
+        <span class="absolute left-0 top-1 text-ink-3">{TERM ? '2023' : '2018'}</span>
+        <span class="absolute top-1 pl-1 text-brand" style={`left:${Math.min(80, (ex / W) * 100).toFixed(1)}%`}>{TERM ? 'May 2025' : 'May 2022'}</span>
       </div>
     </div>
   )}

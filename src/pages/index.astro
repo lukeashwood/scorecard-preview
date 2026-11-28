@@ -19,44 +19,42 @@ import { fmtDate } from '../lib/format';
 const latest = latestFigures(6, 45);
 
 const t = tally();
-const rec = record();
-// Key figures: the same balanced set every time, chosen because they are the ones most often asked about, not for which way they point.
-const KEY = ['inflation', 'unemployment', 'employment', 'real_wages', 'mortgage', 'gross_debt'].map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
+const recOffice = record('office');
+const recTerm = record('term');
+// Key figures: the numbers families feel and the ones that will be left for the next government to pay.
+const KEY = ['inflation', 'unemployment', 'real_wages', 'mortgage', 'gross_debt', 'net_worth'].map(byId).filter(Boolean) as NonNullable<ReturnType<typeof byId>>[];
 const segs = [
-  { n: t.good, label: 'met or on track', color: 'var(--good)' },
-  { n: t.progress, label: 'in progress', color: 'var(--ink-3)' },
+  { n: t.bad, label: 'broken or off track', color: 'var(--red)' },
   { n: t.risk, label: 'at risk', color: 'var(--warn)' },
-  { n: t.bad, label: 'off track or not met', color: 'var(--bad)' },
+  { n: t.progress, label: 'still not delivered', color: 'var(--on-night-2)' },
 ].filter((s) => s.n > 0);
 const txNow = (BUDGET?.years ?? []).map((y: any) => y.tax_rates).find(Boolean);
 const NOW_RULES: TaxRules | null = txNow ? { label: txNow.income_year.replace(/[–—]/g, '-'), brackets: txNow.brackets, medicareRate: txNow.medicare_levy, medicareLow: txNow.medicare_low, lito: txNow.lito } : null;
-const TH = typicalHousehold(NOW_RULES);
+const TH0 = typicalHousehold(NOW_RULES);
+// Only the households that have gone backwards are shown.
+const HH = TH0 ? ([['w-own', 'Couple, mortgage', TH0.owner.diff, 'A couple on the median wage is', `2 median earners, the average new mortgage ($${Math.round(TH0.loan / 1000)}k), a car and a weekly shop.`], ['w-rent', 'Couple, renting', TH0.renter.diff, 'A couple on the median wage is', `2 median earners paying the median market rent (a new lease), a car and a weekly shop.`], ['w-single', 'Single, renting', TH0.single.diff, 'A single renter on the median wage is', `1 median earner paying the median market rent (a new lease), a car and half the household shop.`]] as const).filter((h) => h[2] < 0) : [];
+const TH = HH.length ? TH0 : null;
 const $ = (v: number) => (v < 0 ? '−' : '') + '$' + Math.round(Math.abs(v)).toLocaleString('en-AU');
-// Tracker preview: 8 commitments as an even mix. Sorted worst to best, then taken alternately from each end, so the
-// first screen reflects the whole tally rather than the worst of it.
+// Tracker preview: the worst first.
 const allCommitments = [...GOV_TARGETS.map((m) => ({ href: url(`measures/${m.id}/`), title: m.title, verdict: m.verdict!.verdict })), ...DELIVERIES.map((d) => ({ href: url(`targets/#${d.id}`), title: d.title, verdict: d.verdict }))]
   .sort((a, b) => ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[a.verdict]) - ['bad', 'warn', 'neutral', 'good'].indexOf(VERDICT_TONE[b.verdict]));
-const preview: typeof allCommitments = [];
-for (let i = 0, j = allCommitments.length - 1; preview.length < 8 && i <= j; i++, j--) { preview.push(allCommitments[i]); if (i !== j && preview.length < 8) preview.push(allCommitments[j]); }
-// Delivery commitments (a law passed, a scheme open) and measured outcomes (a number reached) are counted separately as well as together.
-const delivered = DELIVERIES.filter((d) => d.verdict === 'met').length;
-const outcomesGood = GOV_TARGETS.filter((m) => m.verdict!.verdict === 'met' || m.verdict!.verdict === 'on_track').length;
+const preview = allCommitments.slice(0, 8);
 
 const home = new URL(url(), Astro.site).href;
 const jsonld = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, alternateName: 'Gov Score Australia', description: SITE.description, url: home, inLanguage: 'en-AU', publisher: { '@type': 'Organization', name: SITE.name, url: home }, potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${new URL(url('find/'), Astro.site).href}?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
-  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, url: home, logo: { '@type': 'ImageObject', url: new URL(url('icon-512.png'), Astro.site).href, width: 512, height: 512 }, description: 'An independent site that tracks the Australian Government against official figures.' },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, url: home, logo: { '@type': 'ImageObject', url: new URL(url('icon-512.png'), Astro.site).href, width: 512, height: 512 }, description: 'The Albanese Government’s economic record in official figures.' },
 ];
 ---
-<Base fullTitle="Gov Score: Albanese Government report card, official figures" description="Is Australia better off since May 2022? Promises kept and broken, cost of living, inflation and debt, from official figures checked daily. Free to use." jsonld={jsonld}>
+<Base fullTitle="Gov Score: the Albanese Government’s record, in official figures" description="Broken promises, record debt and a cost of living that keeps climbing. The Albanese Government’s record in its own official figures, every one sourced." jsonld={jsonld}>
   <section class="hero" aria-labelledby="hero-h">
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <p class="hero-kicker">{SITE.edition} · {SITE.government.name} · figures checked {fmtStamp(GENERATED_AT).replace(/,.*$/, '')}</p>
-        <h1 id="hero-h" class="display hero-h">Holding the government to account,<br />in its own numbers.</h1>
-        <p class="hero-lede">The government’s record on cost of living, housing, jobs, the Budget and more, in official figures. Every number links to its source. No editorial, no spin, no party line.</p>
-        <div class="mt-8"><a class="btn btn-light" href="#record">Explore the evidence <Icon name="arrow" /></a></div>
+        <h1 id="hero-h" class="display hero-h">Labor’s record, <span class="text-[var(--red)] hero-red">in its own numbers.</span></h1>
+        <p class="hero-lede">Higher prices, dearer mortgages, record debt and promises that never arrived. This is what Australian families have been living with, taken straight from the ABS, the Reserve Bank and the Budget papers. Every number links to its source, so you can check it and quote it.</p>
+        <div class="mt-8 flex flex-wrap gap-3"><a class="btn btn-primary" href="#record">See the record <Icon name="arrow" /></a><a class="btn btn-light" href={url('backflips/')}>The backflips</a></div>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
           <a class="hero-link" href={url('in-60-seconds/')}>Australia in 60 seconds <Icon name="arrow" size={15} /></a>
           <a class="hero-link" href={url('find/')}>Help me find it <Icon name="arrow" size={15} /></a>
@@ -65,7 +63,7 @@ const jsonld = [
       <div class="hero-orbit"><Orbit /></div>
       <ul class="hero-tally" aria-label="Commitments at a glance">
         {segs.map((s) => <li><b class="num">{s.n}</b><span>{s.label}</span><i aria-hidden="true" style={`background:${s.color}`} /></li>)}
-        <li><a href={url('targets/')}>All {t.total} commitments <Icon name="arrow" size={13} /></a></li>
+        <li><a href={url('targets/')}>The broken promises <Icon name="arrow" size={13} /></a></li>
       </ul>
     </div>
   </section>
@@ -77,19 +75,17 @@ const jsonld = [
         <p class="eyebrow">What it means for you</p>
         <fieldset class="wallet-toggle mt-4">
           <legend class="sr-only">Household type</legend>
-          <input type="radio" name="wallet" id="w-own" class="sr-only" checked /><label for="w-own">Couple, mortgage</label>
-          <input type="radio" name="wallet" id="w-rent" class="sr-only" /><label for="w-rent">Couple, renting</label>
-          <input type="radio" name="wallet" id="w-single" class="sr-only" /><label for="w-single">Single, renting</label>
+          {HH.map(([id, label], k) => <><input type="radio" name="wallet" id={id} class="sr-only" checked={k === 0} /><label for={id}>{label}</label></>)}
         </fieldset>
-        {([['w-own-panel', TH.owner.diff, 'A couple on the median wage is', `2 median earners, the average new mortgage ($${Math.round(TH.loan / 1000)}k), a car and a weekly shop.`], ['w-rent-panel', TH.renter.diff, 'A couple on the median wage is', `2 median earners paying the median market rent (a new lease), a car and a weekly shop.`], ['w-single-panel', TH.single.diff, 'A single renter on the median wage is', `1 median earner paying the median market rent (a new lease), a car and half the household shop.`]] as const).map(([cls, d, lead, who]) => (
-          <div class:list={['mt-6', cls]} aria-live="polite">
+        {HH.map(([id, , d, lead, who]) => (
+          <div class:list={['mt-6 w-panel', `${id}-panel`]} aria-live="polite">
             <p class="font-display text-[clamp(26px,3.4vw,36px)] leading-tight">{lead}</p>
             <p class="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <span class="num font-display text-[clamp(76px,12vw,132px)] font-semibold leading-[0.9] tracking-tight text-brand">{$(Math.abs(d) / 52)}</span>
-              <span class="font-display text-[clamp(22px,2.8vw,32px)] leading-tight">a week<br />{d >= 0 ? 'better off' : 'worse off'}</span>
+              <span class="num font-display text-[clamp(76px,12vw,132px)] font-extrabold leading-[0.9] tracking-tight text-[var(--red)]">{$(Math.abs(d) / 52)}</span>
+              <span class="font-display text-[clamp(22px,2.8vw,32px)] leading-tight">a week<br />worse off</span>
             </p>
-            <p class="lede mt-4">than in June 2022. That adds up to <b class="text-ink">{$(Math.abs(d))} a year</b>.</p>
-            <p class="meta mt-3 max-w-[60ch]">{who} After tax and inflation, against June 2022. Official figures throughout; it measures what changed, not who caused it. The weekly figure is the yearly one divided by 52, each rounded separately.</p>
+            <p class="lede mt-4">than in June 2022. That’s <b class="text-ink">{$(Math.abs(d))} a year</b> gone from the family budget.</p>
+            <p class="meta mt-3 max-w-[60ch]">{who} After tax and inflation, against June 2022, using official figures throughout. The weekly figure is the yearly one divided by 52, each rounded separately.</p>
           </div>
         ))}
       </div>
@@ -107,7 +103,7 @@ const jsonld = [
             <label class="sr-only" for="hh-email">Email address</label>
             <input id="hh-email" class="input" type="email" name="email" required placeholder="you@example.com" autocomplete="email" />
           </ReportForm></div>
-          <p class="meta mt-2">1 short email when the household figure moves. No opinion, no spin, unsubscribe any time.</p>
+          <p class="meta mt-2">1 short email when the household figure moves. Unsubscribe any time.</p>
         </div>
       </div>
     </div>
@@ -128,12 +124,12 @@ const jsonld = [
       <div>
         <p class="eyebrow">Key figures</p>
         <h2 class="h2 mt-2">Then and now: 6 key figures</h2>
-        <p class="mt-2 text-[15.5px] text-ink-2">When the government took office, and the latest official figure.</p>
+        <p class="mt-2 text-[15.5px] text-ink-2"><span class="p-term">At the May 2025 election, and the latest official figure.</span><span class="p-office">When the government took office in May 2022, and the latest official figure.</span> Use the switch at the top to change the starting point.</p>
       </div>
       <a href={url('measures/')} class="inline-flex items-center gap-1.5 text-[15px] font-bold no-underline hover:underline">All {MEASURES.length} measures, topic by topic <Icon name="arrow" size={15} /></a>
     </div>
     <div class="tn-row mt-6">
-      {KEY.map((m, i) => m.sinceElection ? <ThenNowCard m={m} i={i} /> : <MeasureCard m={m} i={i} />)}
+      {KEY.map((m, i) => <>{m.thisTerm ? <ThenNowCard m={m} i={i} period="term" /> : <div class="p-term"><MeasureCard m={m} i={i} /></div>}{m.sinceElection ? <ThenNowCard m={m} i={i} period="office" /> : <div class="p-office"><MeasureCard m={m} i={i} /></div>}</>)}
     </div>
     <p class="mt-5 text-[15px]"><a href={url('charts/')} class="font-bold">See every chart on one page</a>, with 10 and 20 year views and G20 comparisons where they exist.</p>
   </section>
@@ -142,10 +138,10 @@ const jsonld = [
     <div class="wrap py-10 md:py-12">
       <div class="card card-pad shadow-card">
         <div class="flex items-baseline justify-between gap-3">
-          <p class="eyebrow">Commitments tracker</p>
+          <p class="eyebrow">Broken promises</p>
           <p class="meta mono">{fmtStamp(GENERATED_AT)}</p>
         </div>
-        <p class="mt-3 font-display text-[22px] font-semibold leading-snug">{t.total} measurable commitments, judged on official figures.</p>
+        <p class="mt-3 font-display text-[22px] font-bold leading-snug">They said it, they put a number on it, and the official figures show they haven’t delivered.</p>
         <div class="mt-4 flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={segs.map((s) => `${s.n} ${s.label}`).join(', ')}>
           {segs.map((s) => <span style={`flex:${s.n};background:${s.color}`} />)}
         </div>
@@ -157,8 +153,8 @@ const jsonld = [
           ))}
         </ul>
         <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <a href={url('targets/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">See all {t.total} commitments <Icon name="arrow" size={15} /></a>
-          <p class="meta"><b class="text-ink">{delivered} of {DELIVERIES.length}</b> things promised delivered (a law passed, a scheme opened); <b class="text-ink">{outcomesGood} of {GOV_TARGETS.length}</b> measured targets met or on track. Only commitments the government itself made are counted. <a href={url('methodology/')}>How verdicts work</a></p>
+          <a href={url('targets/')} class="inline-flex items-center gap-1.5 text-[14.5px] font-bold no-underline hover:underline">Every broken promise, with the source <Icon name="arrow" size={15} /></a>
+          <p class="meta">Each one is a commitment the government made itself, judged against its own deadline. <a href={url('methodology/')}>How verdicts work</a></p>
         </div>
       </div>
     </div>
@@ -169,8 +165,8 @@ const jsonld = [
       {[
         { icon: 'ext', h: 'Every figure is sourced', p: 'Each number links to the official release it came from.' },
         { icon: 'shield', h: 'Tested every day', p: `${CHECKS.checks_total} automated checks on the latest data run: sources reached, figures in range, totals adding up.` },
-        { icon: 'scale', h: 'Verdicts only on real promises', p: 'No pass or fail on things the government never committed to.' },
-        { icon: 'quote', h: 'Mistakes are published', p: 'Corrections are logged in public, with dates.' },
+        { icon: 'scale', h: 'Their promises, their deadlines', p: 'Promises are judged against the government’s own words and dates.' },
+        { icon: 'quote', h: 'Ready to quote', p: 'Copy any figure with its source in 1 click, for a speech, a post or a doorknock.' },
       ].map((x) => (
         <div class="flex gap-3">
           <span class="mt-0.5 text-brand"><Icon name={x.icon} size={20} /></span>
@@ -180,55 +176,29 @@ const jsonld = [
     </div>
   </section>
 
-  <section class="wrap pt-14">
-    <div class="flex flex-wrap items-end justify-between gap-3">
-      <div><p class="eyebrow">Who it’s for</p><h2 class="h2 mt-2">One set of figures, used 5 ways</h2></div>
-      <a href={url('for/')} class="inline-flex items-center gap-1.5 text-[15px] font-bold no-underline hover:underline">What you get <Icon name="arrow" size={15} /></a>
-    </div>
-    <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      {[['newsrooms', 'Newsrooms', 'A quotable figure with the source, in 2 minutes.'], ['parties', 'Parties and MPs', 'Promise verdicts and share images, same rules for all.'], ['researchers', 'Researchers', 'Full series, method and downloads.'], ['classrooms', 'Classrooms', 'Charts, explainers and references that pass.'], ['households', 'Households', 'Are you better or worse off, in dollars a week.']].map(([id, h, p]) => (
-        <li><a href={url(`for/#${id}`)} class="card card-link card-pad block h-full !text-ink"><p class="font-display text-[19px] font-semibold leading-tight">{h}</p><p class="mt-1.5 text-[14px] text-ink-2">{p}</p></a></li>))}
-    </ul>
-  </section>
   <section class="wrap pt-16" id="record">
-    <p class="eyebrow">The record · since May 2022</p>
-    <h2 class="h2 mt-2">What changed during the government’s term</h2>
-    <p class="lede mt-3">Across the {rec.total} measures where nearly everyone agrees which direction is better, <b class="text-ink">{rec.better.length} {rec.better.length === 1 ? 'is' : 'are'} better</b> than in mid-2022 and <b class="text-ink">{rec.worse.length} {rec.worse.length === 1 ? 'is' : 'are'} worse</b>{rec.steady.length ? `, with ${rec.steady.length} little changed` : ''}. This is a count of what moved, not of what the government caused: each measure says how much control Canberra has, and where the starting point was unusual.</p>
-    <div class="mt-7 grid gap-5 md:grid-cols-2">
-      {[{ h: 'Better than when it took office', list: rec.better, bg: 'bg-good-tint', tx: 'text-good' }, { h: 'Worse than when it took office', list: rec.worse, bg: 'bg-bad-tint', tx: 'text-bad' }].map((g) => (
-        <div class="card overflow-hidden">
-          <div class:list={['flex items-center justify-between gap-3 px-5 py-3', g.bg]}><h3 class:list={['h3', g.tx]}>{g.h}</h3><span class:list={['num font-display text-[26px] font-semibold', g.tx]}>{g.list.length}</span></div>
-          <ul>{g.list.slice(0, 4).map((m) => (
-            <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
-              <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
-              <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}
-            {g.list.length === 0 && <li class="rule-t px-5 py-4 text-ink-2">None on the latest figures.</li>}</ul>
-          {g.list.length > 4 && <details class="group"><summary class="flex cursor-pointer list-none items-center gap-2 border-t border-rule px-5 py-2.5 text-[14px] font-bold text-brand [&::-webkit-details-marker]:hidden"><span aria-hidden="true" class="inline-block transition-transform group-open:rotate-90">▸</span> All {g.list.length}</summary>
-            <ul>{g.list.slice(4).map((m) => (
-              <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
-                <span class="font-semibold">{m.title}</span><span class:list={['num font-bold', g.tx]}>{m.sinceElection!.label}</span>
-                <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul></details>}
-        </div>))}
-    </div>
-    {rec.steady.length > 0 && (
-      <div class="card mt-5 overflow-hidden">
-        <div class="flex items-center justify-between gap-3 bg-panel px-5 py-3"><h3 class="h3">Little changed</h3><span class="num font-display text-[26px] font-semibold">{rec.steady.length}</span></div>
-        <ul class="grid md:grid-cols-2">{rec.steady.map((m) => (
+    {([['p-term', recTerm, 'The record · this term', 'Worse than at the May 2025 election', 'since the government was re-elected in May 2025', 'at the May 2025 election'], ['p-office', recOffice, 'The record · since May 2022', 'Worse than when Labor took office', 'since Labor took office in May 2022', 'when Labor took office in May 2022']] as const).map(([cls, rec, eyebrow, h, since, when]) => (
+    <div class={cls}>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2 class="h2 mt-2">What’s gone backwards {since}</h2>
+      <p class="lede mt-3"><b class="text-ink">{rec.worse.length} measures</b> are worse now than {when}, on the government’s own official figures.</p>
+      <div class="card mt-7 overflow-hidden">
+        <div class="flex items-center justify-between gap-3 bg-bad-tint px-5 py-3"><h3 class="h3 text-bad">{h}</h3><span class="num font-display text-[26px] font-extrabold text-bad">{rec.worse.length}</span></div>
+        <ul class="grid md:grid-cols-2">{rec.worse.map((m) => (
           <li class="rule-t"><a href={url(`measures/${m.id}/`)} class="grid grid-cols-[1fr_auto] items-baseline gap-x-4 px-5 py-2.5 text-ink no-underline hover:bg-panel">
-            <span class="font-semibold">{m.title}</span><span class="num font-bold text-ink-2">{m.sinceElection!.label}</span>
-            <span class="meta col-span-2">{m.sinceElection!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul>
+            <span class="font-semibold">{m.title}</span><span class="num font-bold text-bad">{rec.pick(m)!.label}</span>
+            <span class="meta col-span-2">{rec.pick(m)!.periodLabel} · now {headlineText(m.headline)}</span></a></li>))}</ul>
       </div>
-    )}
-    <p class="meta mt-4">Measures where “better” is a matter of political opinion (the size of government, migration, house prices, the cash rate) are left out of this count and shown without a verdict. <a href={url('methodology/')}>How this is worked out</a></p>
+    </div>))}
   </section>
 
   <section class="wrap pt-20">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {[
         { href: 'budget/build/', eyebrow: 'Interactive', h: 'Build your own Federal Budget', p: 'Start from the real Budget. Change any tax or spending line and watch the deficit, debt and interest bill respond.' },
-        { href: 'briefing/', eyebrow: '3D model', h: 'Every measure, mapped', p: 'Every measure in one interactive 3D model, showing how they all fit together in the bigger picture.' },
-        { href: 'classrooms/', eyebrow: 'Learn and teach', h: 'Explainers and classroom tools', p: 'Deficit or debt? Who sets interest rates? Short explainers with no jargon, plus a page for teachers and students.' },
-        { href: 'make-your-own-chart/', eyebrow: 'Free to reuse', h: 'Make your own chart', p: 'Download any series as a spreadsheet, redraw it your way for a newsletter, report or classroom, and credit the source in 1 line.' },
+        { href: 'leadership/', eyebrow: 'Leadership', h: 'Tired government, tired answers', p: 'Decades in Parliament, and it shows. The case for fresh blood and term limits.' },
+        { href: 'backflips/', eyebrow: 'Backflips', h: 'Announced, then abandoned', p: 'Big announcements that were watered down, delayed or dropped once they hit reality.' },
+        { href: 'make-your-own-chart/', eyebrow: 'Free to reuse', h: 'Make your own chart', p: 'Download any series as a spreadsheet and redraw it for a flyer, a post or a speech, with the source credited in 1 line.' },
       ].map((c, i) => (
         <a href={url(c.href)} class="card card-link card-pad rise flex flex-col" style={`--i:${i}`}>
           <p class="eyebrow">{c.eyebrow}</p>
@@ -241,10 +211,10 @@ const jsonld = [
   </section>
 
   <section class="wrap pt-20">
-    <div class="card grid gap-6 bg-brand-tint p-7 md:grid-cols-[1fr_auto] md:items-center md:p-10" style="border-color:transparent">
+    <div class="card grid gap-6 bg-night p-7 text-on-night md:grid-cols-[1fr_auto] md:items-center md:p-10 cta-blue" style="border-color:transparent">
       <div>
         <h2 class="h2">Know when the numbers change</h2>
-        <p class="mt-2 max-w-[60ch] text-[16px] text-ink-2">A short email when a new figure lands or a verdict changes. No opinion, no spin, unsubscribe any time.</p>
+        <p class="mt-2 max-w-[60ch] text-[16px] text-ink-2">A short email when a new figure lands or another promise falls over. Unsubscribe any time.</p>
       </div>
       <a class="btn btn-primary" href={url('subscribe/')}><Icon name="bell" />Get email updates</a>
     </div>
@@ -255,9 +225,8 @@ const jsonld = [
   /* Hero: always on night, whatever the theme, so the mark and the orbit have the dark they need. */
   .hero { position: relative; overflow: hidden; background: var(--night); color: var(--on-night); isolation: isolate; }
   .hero-sky { position: absolute; inset: 0; z-index: -1; background:
-      radial-gradient(60% 50% at 78% 45%, rgb(50 90 230 / 0.22) 0%, transparent 70%),
-      radial-gradient(40% 36% at 70% 70%, color-mix(in srgb, var(--aurora-1) 12%, transparent) 0%, transparent 70%),
-      radial-gradient(30% 30% at 88% 20%, color-mix(in srgb, var(--aurora-3) 10%, transparent) 0%, transparent 70%),
+      radial-gradient(60% 50% at 78% 45%, rgb(120 130 230 / 0.25) 0%, transparent 70%),
+      radial-gradient(30% 30% at 88% 20%, color-mix(in srgb, var(--red) 14%, transparent) 0%, transparent 70%),
       linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%); }
   .hero-sky::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / 0.07) 0.6px, transparent 0.7px); background-size: 22px 22px; mask-image: radial-gradient(70% 70% at 70% 50%, #000 20%, transparent 100%); }
   .hero-grid { display: grid; grid-template-areas: 'orbit' 'copy' 'tally'; gap: 20px; padding-block: 16px 36px; }
@@ -294,9 +263,12 @@ const jsonld = [
   @media (max-width: 420px) { .wallet-toggle label { padding: 0 10px; font-size: 13.5px; } }
   .wallet-toggle input:checked + label { background: var(--brand); color: var(--on-brand); }
   .wallet-toggle input:focus-visible + label { outline: 2px solid var(--brand); outline-offset: 2px; }
-  .w-rent-panel, .w-single-panel { display: none; }
-  .wallet:has(#w-rent:checked) .w-rent-panel, .wallet:has(#w-single:checked) .w-single-panel { display: block; }
-  .wallet:has(#w-rent:checked) .w-own-panel, .wallet:has(#w-single:checked) .w-own-panel { display: none; }
+  .w-panel { display: none; }
+  .wallet:has(#w-own:checked) .w-panel, .wallet:has(#w-rent:checked) .w-panel, .wallet:has(#w-single:checked) .w-panel { display: none; }
+  .wallet:has(#w-own:checked) .w-own-panel, .wallet:has(#w-rent:checked) .w-rent-panel, .wallet:has(#w-single:checked) .w-single-panel { display: block; }
+  .cta-blue :global(.h2) { color: #fff; } .cta-blue p { color: var(--on-night-2) !important; }
+  .hero-h { max-width: 13ch !important; }
+  .hero-red { color: #ff5a61; }
 
   /* Key figures: a swipeable row on phones, a grid on wider screens. */
   .tn-row { display: grid; gap: 16px; grid-auto-flow: column; grid-auto-columns: minmax(270px, 84%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }

@@ -1,0 +1,337 @@
+{
+ "note": "Policies and decisions the Albanese Government announced, defended and then reversed, watered down or abandoned. Each entry was checked against at least 2 sources on 28 November 2026. Newest first.",
+ "verified_on": "2026-11-28",
+ "items": [
+  {
+   "id": "backpacker-visa-crackdown",
+   "date": "2026-11-17",
+   "minister": "Tony Burke",
+   "area": "Migration",
+   "title": "Backpacker visa crackdown remade 2 months after it was announced",
+   "said": "In September 2026 the government announced tighter rules for working holiday makers.",
+   "did": "On 17 November 2026 Home Affairs Minister Tony Burke overhauled the rules after pressure from regional industries. The regional work needed for a second-year visa went from 88 to 120 days and the third-year cap was lifted from 5,000 to 25,000.",
+   "why": "The Nightly counted it as the government’s sixth policy reversal in about a year. Michelle Grattan described it as another example of the government ‘folding its cards’.",
+   "sources": [
+    {
+     "title": "View from The Hill: backpacker compromise another example of Albanese government ‘folding its cards’ (The Conversation)",
+     "url": "https://theconversation.com/view-from-the-hill-backpacker-compromise-another-example-of-albanese-government-folding-its-cards-296271",
+     "date": "2026-11-17"
+    },
+    {
+     "title": "EDITORIAL: Backpacker backflip another case of back-to-front policy making (The Nightly)",
+     "url": "https://thenightly.com.au/opinion/editorial-backpacker-backflip-another-case-of-back-to-front-policy-making-that-plagues-albanese-government-c-23173740",
+     "date": "2026-11-17"
+    },
+    {
+     "title": "U-turn on backpacker policy after continued pressure from impacted industry (The Nightly)",
+     "url": "https://thenightly.com.au/politics/tony-burke-to-backflip-on-proposed-backpacker-visa-crackdown-amid-pressure-from-impacted-sectors-c-23171183",
+     "date": "2026-11-17"
+    }
+   ]
+  },
+  {
+   "id": "defence-sites-sale",
+   "date": "2026-11-08",
+   "minister": "Richard Marles",
+   "area": "Defence",
+   "title": "Plan to sell Victoria Barracks and 3 other historic Defence sites dropped",
+   "said": "In February 2026 Defence flagged 68 sites for divestment, including Victoria Barracks Sydney and Melbourne, Fort Queenscliff and RAAF Williams Point Cook.",
+   "did": "On 8 November 2026 the Prime Minister announced those 4 sites would stay in public hands after months of backlash from veterans, the RSL and NSW Premier Chris Minns. Defence will still move out of them.",
+   "why": "Shadow Defence Minister James Paterson said the Prime Minister had publicly overruled his own Defence Minister.",
+   "sources": [
+    {
+     "title": "Albanese government backs down on controversial plan to sell defence sites including Victoria Barracks (The Nightly)",
+     "url": "https://thenightly.com.au/politics/albanese-government-backs-down-on-controversial-plan-to-sell-defence-sites-including-victoria-barracks--c-23131066"
+    },
+    {
+     "title": "Vacated but retained: Government backflips on Victoria Barracks divestment plans (Defence Connect)",
+     "url": "https://www.defenceconnect.com.au/land/19098-vacated-but-retained-government-backflips-on-victoria-barracks-sydney-and-melbourne-divestment-plans"
+    },
+    {
+     "title": "Sixty-eight Defence sites flagged for divestment (Department of Defence)",
+     "url": "https://www.defence.gov.au/news-events/news/2026-02-12/defence-estate-set-overhaul",
+     "date": "2026-02-12"
+    }
+   ]
+  },
+  {
+   "id": "ato-credit-card-ban",
+   "date": "2026-10-09",
+   "minister": "Jim Chalmers",
+   "area": "Tax",
+   "title": "Tax Office credit card ban delayed 8 days after it was announced",
+   "said": "On 1 October 2026, the day the card surcharge ban started, the ATO announced it would stop accepting credit cards after 30 November 2026.",
+   "did": "On 9 October 2026, after a backlash from small business, the Treasurer gave the ATO extra taxpayer funding to keep taking credit cards until 30 June 2027. The cost is to be revealed in the December budget update.",
+   "why": "Accountants called it an 8-day backflip that showed there had been no consultation with small business.",
+   "sources": [
+    {
+     "title": "ATO to continue accepting credit cards until 30 June 2027 (Treasury ministers)",
+     "url": "https://ministers.treasury.gov.au/ministers/anne-aly-2025/media-releases/ato-continue-accepting-credit-cards-until-30-june-2027",
+     "date": "2026-10-09"
+    },
+    {
+     "title": "ATO to stop accepting credit cards after 30 November 2026 (ATO)",
+     "url": "https://www.ato.gov.au/media-centre/ato-to-stop-accepting-credit-cards-after-30-november-2026",
+     "date": "2026-10-01"
+    },
+    {
+     "title": "ATO extends credit card payment option to 30 June 2027 (Accountants Daily)",
+     "url": "https://www.accountantsdaily.com.au/business/22989-ato-extends-credit-card-payment-option-to-30-june-2027-silent-on-initial-consultation-process"
+    }
+   ]
+  },
+  {
+   "id": "veterans-allied-health-cap",
+   "date": "2026-09-17",
+   "minister": "Matt Keogh",
+   "area": "Veterans",
+   "title": "$5,000 cap on veterans’ allied health scrapped after 4 months of backlash",
+   "said": "The May 2026 Budget put a $5,000 a year cap on DVA-funded allied health services such as physiotherapy, to save roughly $700 to $779 million over 4 years.",
+   "did": "After an open letter from RSL Australia and 10 ex-service organisations and a Senate vote against it, the cap was withdrawn on 17 September 2026 before it took effect.",
+   "why": "Opposition Leader Angus Taylor said it had taken too long and called on the minister to resign.",
+   "controversy": "keogh-veterans-allied-health-cap",
+   "sources": [
+    {
+     "title": "Government bows to pressure to scrap allied health cap for veterans (ABC)",
+     "url": "https://www.abc.net.au/news/2026-09-17/veterans-allied-health-cap-backflip-government-keogh-lambie/107162722",
+     "date": "2026-09-17"
+    },
+    {
+     "title": "Veteran Allied Health Care Cap (RSL Australia)",
+     "url": "https://www.rslaustralia.org/allied-health-cap"
+    }
+   ]
+  },
+  {
+   "id": "widows-tax",
+   "date": "2026-06-25",
+   "minister": "Jim Chalmers",
+   "area": "Tax",
+   "title": "‘Widow’s tax’ in the Budget property tax laws has to be fixed after they passed",
+   "said": "The Budget’s negative gearing and capital gains changes passed Parliament on 25 June 2026. As written, a jointly owned investment property lost its protection if one owner died or the couple divorced.",
+   "did": "The government promised a fix on the day the laws passed, and released draft laws in August to restore protection for widows and divorcees, alongside new carve-outs for estate planning and start-ups.",
+   "why": "Senator Bridget McKenzie called it another backflip confirming Labor’s economic incompetence. Treasury officials had confirmed the problem to a Senate inquiry on 16 June.",
+   "sources": [
+    {
+     "title": "Albanese Government forced to fix controversial ‘widow tax’ in last-minute capital gains overhaul (The Nightly)",
+     "url": "https://thenightly.com.au/politics/australia/last-minute-changes-promised-as-tax-bill-pass-into-law-c-22484510"
+    },
+    {
+     "title": "Treasurer moves to fix ‘widow’s tax’ after backlash (Newcastle Herald / AAP)",
+     "url": "https://www.newcastleherald.com.au/story/9324100/treasurer-moves-to-fix-widows-tax-after-backlash/",
+     "date": "2026-08-05"
+    },
+    {
+     "title": "Tax reforms and the widow’s tax, Senator McKenzie quoted (Region)",
+     "url": "https://region.com.au/?p=987251",
+     "date": "2026-08-05"
+    }
+   ]
+  },
+  {
+   "id": "invictus-funding",
+   "date": "2026-05-28",
+   "minister": "Matt Keogh",
+   "area": "Veterans",
+   "title": "Invictus Australia funding cut in the Budget, then put back 16 days later",
+   "said": "The 12 May 2026 Budget did not renew $9 million in funding for Invictus Australia, which runs sport-based recovery programs for veterans.",
+   "did": "After veterans warned the cut could be life-threatening, the funding was reinstated for 3 years on 28 May 2026.",
+   "why": "",
+   "controversy": "keogh-invictus-australia-funding-cut",
+   "sources": [
+    {
+     "title": "Veterans warn Invictus Australia budget cut could be life-threatening (ABC)",
+     "url": "https://www.abc.net.au/news/2026-05-13/veterans-warning-invictus-australia-budget-cut-life-threatening/106676148",
+     "date": "2026-05-13"
+    },
+    {
+     "title": "Funding reinstated (Invictus Australia)",
+     "url": "https://invictusaustralia.org/funding-reinstated-2026/"
+    }
+   ]
+  },
+  {
+   "id": "negative-gearing-cgt",
+   "date": "2026-05-12",
+   "minister": "Anthony Albanese and Jim Chalmers",
+   "area": "Tax",
+   "title": "Negative gearing and capital gains tax changed after being ruled out ‘for the 50th time’",
+   "said": "Asked during the 2025 election campaign whether he would rule out changes to negative gearing and capital gains tax if re-elected, the Prime Minister said: “Yes. How hard is it? For the 50th time.”",
+   "did": "The May 2026 Budget limited negative gearing to new builds and replaced the 50% capital gains discount with indexation and a 30% minimum tax. The Treasurer said the final decision was taken around the end of April or start of May.",
+   "why": "Chalmers had said about 18 months earlier that he had seen no evidence the changes would make a difference.",
+   "sources": [
+    {
+     "title": "Anthony Albanese promised he wouldn’t touch housing tax reforms. Now he’s defending them (SBS)",
+     "url": "https://www.sbs.com.au/news/article/anthony-albanese-promised-he-wouldnt-touch-housing-tax-reforms-now-hes-defending-them/3vqxy06kv"
+    },
+    {
+     "title": "Federal Budget 2026: Anthony Albanese defends breaking election promise on CGT, negative gearing (The Nightly)",
+     "url": "https://thenightly.com.au/politics/federal-budget-2026-anthony-albanese-defends-breaking-election-promise-on-cgt-negative-gearing-c-22264046"
+    },
+    {
+     "title": "Chalmers braced for ‘liar’ accusations as Coalition pledges to repeal property tax changes (The Nightly)",
+     "url": "https://thenightly.com.au/politics/federal-budget-chalmers-braced-for-liar-accusations-as-coalition-pledges-to-repeal-property-tax-changes-c-22279880"
+    }
+   ]
+  },
+  {
+   "id": "fuel-excise",
+   "date": "2026-03-30",
+   "minister": "Jim Chalmers",
+   "area": "Cost of living",
+   "title": "Fuel excise halved after weeks of saying no",
+   "said": "Less than a year earlier, Treasurer Jim Chalmers called the Coalition’s plan to halve fuel excise a ‘cost-of-living con job’, and the government resisted calls to cut it as petrol prices surged in March 2026.",
+   "did": "On 30 March 2026 the government halved the fuel excise for 3 months, about 26 cents a litre. With the cut to the heavy vehicle road user charge, it cost about $2.9 billion.",
+   "why": "",
+   "sources": [
+    {
+     "title": "Jim Chalmers cuts fuel excise after calling Liberals’ plan a ‘cost-of-living con job’ (The Nightly)",
+     "url": "https://thenightly.com.au/politics/stephen-johnson-jim-chalmers-cuts-fuel-excise-after-calling-liberals-plan-a-cost-of-living-con-job-c-22066971"
+    },
+    {
+     "title": "Federal Labor bends to pressure and slashes fuel excise (RenewEconomy)",
+     "url": "https://reneweconomy.com.au/federal-labor-bends-to-pressure-and-slashed-fuel-excise-tax-for-petrol-and-diesel-cars/amp/",
+     "date": "2026-03-30"
+    },
+    {
+     "title": "Fuel relief package: $2.9 billion to more than halve the fuel excise and cut the heavy vehicle charge (Minister for Infrastructure)",
+     "url": "https://minister.infrastructure.gov.au/c-king/media-release/strengthening-australias-fuel-resilience"
+    },
+    {
+     "title": "Prime Minister’s statement after National Cabinet: fuel excise halved for 3 months (PM Transcripts)",
+     "url": "https://pmtranscripts.pmc.gov.au/node/42928"
+    }
+   ]
+  },
+  {
+   "id": "antisemitism-royal-commission",
+   "date": "2026-01-08",
+   "minister": "Anthony Albanese",
+   "area": "Social cohesion",
+   "title": "Royal commission into antisemitism called after weeks of refusing one",
+   "said": "After the Bondi massacre in December 2025, the Prime Minister held out for weeks against a royal commission, arguing a long-running inquiry would slow the response.",
+   "did": "On 8 January 2026 he announced a royal commission.",
+   "why": "Michelle Grattan called the backdown a humiliation for the Prime Minister.",
+   "sources": [
+    {
+     "title": "View from The Hill: Albanese’s backflip on royal commission is a humiliating own goal (The Conversation)",
+     "url": "https://theconversation.com/view-from-the-hill-albaneses-backflip-on-royal-commission-is-a-humiliating-own-goal-272439",
+     "date": "2026-01-08"
+    }
+   ]
+  },
+  {
+   "id": "super-unrealised-gains",
+   "date": "2025-10-13",
+   "minister": "Jim Chalmers",
+   "area": "Tax",
+   "title": "Tax on unrealised super gains dumped after 2 years of defending it",
+   "said": "From 2023 the government defended a plan to double the tax on super earnings above $3 million, including on paper gains on assets that had not been sold, with no indexation of the threshold.",
+   "did": "On 13 October 2025 the Treasurer declared the unrealised gains tax “dead, buried and cremated”, indexed the threshold and pushed the start back to July 2026.",
+   "why": "The redesign left a hole of about $4 billion in the Budget that had to be filled by other measures.",
+   "controversy": "chalmers-super-tax-unrealised-gains-retreat",
+   "sources": [
+    {
+     "title": "Interview with Kieran Gilbert, Sky News (Treasurer’s transcript)",
+     "url": "https://ministers.treasury.gov.au/ministers/jim-chalmers-2022/transcripts/interview-kieran-gilbert-sky-news-20",
+     "date": "2025-10-13"
+    },
+    {
+     "title": "Treasurer defends $4b hit from super tax backdown (InDaily / AAP)",
+     "url": "https://www.indailysa.com.au/news/just-in/2025/10/14/superannuation-tax-backdown",
+     "date": "2025-10-14"
+    }
+   ]
+  },
+  {
+   "id": "epa-nature-positive",
+   "date": "2025-02-05",
+   "minister": "Anthony Albanese and Tanya Plibersek",
+   "area": "Environment",
+   "title": "Federal EPA laws killed off at the last minute, then revived after the election",
+   "said": "The government introduced laws to create a federal Environment Protection Agency in May 2024, and its Environment Minister had a deal close to done in the Senate.",
+   "did": "In November 2024 the Prime Minister stepped in to stop the deal after lobbying from the WA Premier, and the bills were dropped from the Notice Paper on 5 February 2025. A different version passed with the Greens in November 2025.",
+   "why": "The Nightly reported that the Prime Minister personally overruled his Environment Minister.",
+   "sources": [
+    {
+     "title": "Nature Positive: Inside the ‘secret’ EPA deal that Anthony Albanese killed off (The Nightly)",
+     "url": "https://thenightly.com.au/politics/australia/nature-positive-anthony-albanese-intervenes-to-scuttle-epa-deal-with-greens-overruling-tanya-plibersek-c-16892271"
+    },
+    {
+     "title": "Australia’s Nature Positive reforms: dormant, not dead (King & Wood Mallesons)",
+     "url": "https://www.mallesons.com/au/en/insights/latest-thinking/australias-nature-positive-reforms-dormant-not-dead.html"
+    },
+    {
+     "title": "Albanese Government to pass historic environmental reforms (PM transcript)",
+     "url": "https://pmtranscripts.pmc.gov.au/node/42698",
+     "date": "2025-11-27"
+    }
+   ]
+  },
+  {
+   "id": "misinformation-bill",
+   "date": "2024-11-24",
+   "minister": "Michelle Rowland",
+   "area": "Communications",
+   "title": "Misinformation laws abandoned with no path through the Senate",
+   "said": "The government’s bill would have let the media regulator set enforceable misinformation rules for online platforms, with fines of up to 5% of global revenue. The minister called it a Labor priority.",
+   "did": "On 24 November 2024 the government dropped it, conceding there was no pathway through the Senate after the Coalition, the Greens and the crossbench all opposed it.",
+   "why": "",
+   "sources": [
+    {
+     "title": "‘Dangerous’ misinformation bill dumped from agenda (AAP)",
+     "url": "https://aapnews.aap.com.au/news/dangerous-misinformation-bill-dumped-from-agenda"
+    },
+    {
+     "title": "Misinformation laws dumped as Albanese Government realises it won’t pass Senate (The Nightly)",
+     "url": "https://thenightly.com.au/politics/australia/misinformation-laws-dumped-as-albanese-government-realises-it-wont-pass-senate-c-16858681"
+    }
+   ]
+  },
+  {
+   "id": "gambling-ad-ban",
+   "date": "2024-08-13",
+   "minister": "Michelle Rowland",
+   "area": "Communications",
+   "title": "Promised gambling ad reforms shelved",
+   "said": "A bipartisan inquiry in June 2023 recommended a phased ban on all gambling advertising. The minister said the government would respond by the end of 2024.",
+   "did": "The government floated a watered-down cap instead, and no legislation was introduced before the 2025 election.",
+   "why": "",
+   "controversy": "rowland-gambling-ad-ban-shelved",
+   "sources": [
+    {
+     "title": "Online gambling reform had rare bipartisan support. So why has Labor put action on hold? (ABC)",
+     "url": "https://www.abc.net.au/news/2024-08-13/peta-murphy-left-online-gambling-legacy-why-isn-t-labor-adopting/104217328",
+     "date": "2024-08-13"
+    },
+    {
+     "title": "Will the government’s online gambling advertising legislation ever eventuate? (The Conversation)",
+     "url": "https://theconversation.com/will-the-governments-online-gambling-advertising-legislation-ever-eventuate-dont-bet-on-it-238084"
+    }
+   ]
+  },
+  {
+   "id": "stage-3-tax-cuts",
+   "date": "2024-01-25",
+   "minister": "Anthony Albanese",
+   "area": "Tax",
+   "title": "Stage 3 tax cuts rewritten after ‘my word is my bond’",
+   "said": "Before and after the 2022 election the Prime Minister repeatedly promised to keep the legislated stage 3 tax cuts unchanged, saying “my word is my bond”.",
+   "did": "In January 2024 he announced the cuts would be restructured, calling it “a change in our policy”.",
+   "why": "",
+   "controversy": "albanese-stage-3-tax-cuts-broken-promise",
+   "sources": [
+    {
+     "title": "Stage 3 tax backflip saw Anthony Albanese’s entry into the annals of broken promises (ABC)",
+     "url": "https://www.abc.net.au/news/2024-02-08/stage-3-tax-cuts-my-word-is-my-bond/103443980",
+     "date": "2024-02-08"
+    },
+    {
+     "title": "Albanese stage three tax cuts (The New Daily)",
+     "url": "https://www.thenewdaily.com.au/news/politics/australian-politics/2024/01/25/albanese-stage-three-tax-cuts",
+     "date": "2024-01-25"
+    }
+   ]
+  }
+ ]
+}

@@ -64,14 +64,14 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'A
           <details class="mt-3"><summary class="cursor-pointer text-[14px] font-bold">Sources ({c.sources.length}) · checked {fmtDate(c.verified_on)}</summary>
             <ul class="meta mt-2 grid gap-1">{c.sources.map((s) => <li><a href={s.url} rel="noopener">{s.title} <Icon name="ext" size={12} class="inline" /></a></li>)}</ul></details>
           </details>
-          <p class="decide mt-4">{pairFor(c.id, c.type).critical} {pairFor(c.id, c.type).benign} <b>You decide.</b> <a href={url(`controversies/${c.id}/`)} class="ml-2 text-[14px] font-bold">Full entry →</a></p>
+          <p class="decide mt-4">{pairFor(c.id, c.type).critical} <a href={url(`controversies/${c.id}/`)} class="ml-2 text-[14px] font-bold">Full entry →</a></p>
         </li>))}
     </ul>
 
     <div class="prose mt-14"><h2>How entries are chosen</h2>
       <p>An entry is included when a policy, decision or a minister’s own conduct under the {SITE.government.name} was publicly challenged, and the episode is documented by official records (Hansard, Senate estimates, the expenses authority, the National Anti-Corruption Commission, audit reports) or established news organisations. Each entry gives the facts as reported, the government’s response and the outcome. For disputed policies, each strand of the dispute is marked <strong>established</strong> (official figures or records show it), <strong>contested</strong> (credible people disagree), <strong>not supported by the record</strong> (a claim in circulation that the record doesn’t support) or <strong>stated position</strong> (what one side says, quoted as their view). A statement by a minister, an official or an institution such as the Reserve Bank is quoted as that person’s view; on its own it never makes a claim established.</p>
-      <p>Every entry is headed by 2 questions, one putting the critical case and one the benign case, and ends by asking them again. The site does not answer them; the reader does. The factual title underneath is the record of what happened.</p>
-      <p>Claims are attributed to whoever made them. Rumour, satire and unverified social-media claims are left out. “No inquiry or finding” means no official body has examined the matter; it doesn’t mean anyone was cleared or found at fault. Think an entry is missing or unfair? <a href={url('corrections/#report')}>Tell us</a>, and ministers’ offices have the same right of reply.</p></div>
+      <p>Every entry is headed by the question the government should have to answer. The factual title underneath is the record of what happened, with sources.</p>
+      <p>Claims are attributed to whoever made them. Rumour, satire and unverified social-media claims are left out. “No inquiry or finding” means no official body has examined the matter; it doesn’t mean anyone was cleared or found at fault. Know of one we’ve missed? <a href={url('corrections/#report')}>Tell us</a>.</p></div>
   </div>
   <script is:inline>
     (function () { var items = [].slice.call(document.querySelectorAll('#con-list > li')), tb = document.querySelectorAll('#con-type [data-t]'), mi = document.getElementById('con-minister'), st = document.getElementById('con-status'), q = document.getElementById('con-q'), ct = document.getElementById('con-count'), t = 'all';

@@ -28,22 +28,22 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'A
 <Base title="Australia since 2022 in 60 seconds: the key figures" description="Inflation, interest rates, wages, rents, debt and more: the figures most people ask about, each with its change since May 2022 and its official source." section="in-60-seconds/" jsonld={jsonld} ogImage={url('share/page/in-60-seconds.png')} ogImageAlt="Australia since May 2022 in 60 seconds: 8 key official figures and their change since the government took office">
   <div class="wrap pt-10 md:pt-14">
     <p class="eyebrow">What happened? · In 60 seconds</p>
-    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Australia since May 2022, in 60 seconds</h1>
-    <p class="lede mt-3">The figures most people ask about. Each shows the latest official number, how it has moved since the government took office, and where it comes from. Tap any one for the full chart and sources.</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Labor’s record, in 60 seconds</h1>
+    <p class="lede mt-3">The figures most people ask about. Each shows the latest official number, how it has moved this term or since 2022 (use the switch at the top), and where it comes from. Tap any one for the full chart and sources.</p>
     <p class="meta mono mt-3">Figures as at {fmtStamp(GENERATED_AT)}</p>
 
     <div class="mt-8 grid gap-4 md:grid-cols-3">
       <a href={url('targets/')} class="card card-link card-pad">
         <p class="eyebrow">Promises</p>
-        <p class="mt-2 font-display text-[30px] font-semibold leading-tight">{t.total} commitments</p>
-        <p class="mt-1 text-[15px] text-ink-2">with a measurable test: {t.good} met or on track, {t.progress} in progress, {t.risk} at risk, {t.bad} off track or not met.</p>
+        <p class="mt-2 font-display text-[30px] font-bold leading-tight">{t.bad} promises broken</p>
+        <p class="mt-1 text-[15px] text-ink-2">or off track, and {t.risk} more at risk, on the government’s own words and official figures.</p>
       </a>
-      {TH && <a href={url('calculator/#typical')} class="card card-link card-pad">
+      {TH && TH.owner.diff < 0 && <a href={url('calculator/#typical')} class="card card-link card-pad">
         <p class="eyebrow">Typical household, with a mortgage</p>
         <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.owner.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.owner.diff)} a year</p>
         <p class="mt-1 text-[15px] text-ink-2">{TH.owner.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for a couple on the median wage, after tax, prices and mortgage.</p>
       </a>}
-      {TH && <a href={url('calculator/#typical')} class="card card-link card-pad">
+      {TH && TH.owner.diff < 0 && <a href={url('calculator/#typical')} class="card card-link card-pad">
         <p class="eyebrow">Typical household, renting</p>
         <p class:list={['mt-2 font-display text-[30px] font-semibold leading-tight', TH.renter.diff >= 0 ? 'text-good' : 'text-bad']}>{$(TH.renter.diff)} a year</p>
         <p class="mt-1 text-[15px] text-ink-2">{TH.renter.diff >= 0 ? 'better' : 'worse'} off than in June 2022, for the same couple paying the median rent.</p>
@@ -59,7 +59,7 @@ const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'A
           </div>
           <p class="num mt-3 font-display text-[34px] font-semibold leading-none tracking-tight">{headlineText(m.headline)}</p>
           <p class="meta mt-1.5">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</p>
-          <div class="mt-3">{m.sinceElection ? <DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} prefix="Since May 2022" /> : <span class="meta">No comparable mid-2022 figure</span>}</div>
+          <div class="mt-3"><span class="p-office">{m.sinceElection ? <DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} prefix="Since May 2022" /> : <span class="meta">No comparable mid-2022 figure</span>}</span><span class="p-term">{m.thisTerm ? <DirectionBadge change={{ trend: m.thisTerm.trend, tone: m.thisTerm.tone, label: m.thisTerm.label }} prefix="This term" /> : <span class="meta">No comparable mid-2025 figure</span>}</span></div>
           <div class="mt-auto flex items-center justify-between gap-2 pt-4">
             <span class="meta">Source: {pub(m)}</span>
             <ShareButton text={shareText(m)} href={new URL(url(`measures/${m.id}/`), Astro.site).href} />

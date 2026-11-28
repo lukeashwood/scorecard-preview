@@ -1,0 +1,62 @@
+---
+/* Backflips: policies the government announced and defended, then reversed, watered down or abandoned. Entries come from
+   src/data/backflips.json, each checked against at least 2 sources where available. Newest first. */
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { url } from '../../config/site';
+import { fmtDate } from '../../lib/format';
+import raw from '../../data/backflips.json';
+
+interface Src { title: string; url: string; date?: string }
+interface Flip { id: string; date: string; minister: string; area: string; title: string; said: string; did: string; why?: string; controversy?: string; sources: Src[] }
+const ITEMS = (raw.items as Flip[]).slice().sort((a, b) => b.date.localeCompare(a.date));
+const thisTerm = ITEMS.filter((f) => f.date >= '2025-05-03').length;
+const areas = [...new Set(ITEMS.map((f) => f.area))].sort();
+const jsonld = { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Albanese Government backflips', url: new URL(url('backflips/'), Astro.site).href,
+  numberOfItems: ITEMS.length, itemListOrder: 'https://schema.org/ItemListOrderDescending',
+  itemListElement: ITEMS.map((f, i) => ({ '@type': 'ListItem', position: i + 1, name: f.title, url: new URL(url(`backflips/#${f.id}`), Astro.site).href })) };
+---
+<Base title="Albanese Government backflips" description="Announced, defended, then dropped: the Albanese Government's policy backflips on tax, super, veterans, defence, migration and more, every one sourced." section="backflips/" jsonld={jsonld}>
+  <div class="wrap pt-10 md:pt-14">
+    <p class="eyebrow">Backflips · since May 2022</p>
+    <h1 class="display mt-2 text-[clamp(34px,4.6vw,52px)]">Announced, defended, then dropped</h1>
+    <p class="lede mt-3 max-w-[70ch]">A government that knows what it’s doing gets it right the first time. This one keeps announcing policies, defending them, and then reversing them once the backlash hits. <b class="text-ink">{ITEMS.length} backflips</b> are listed here, <b class="text-ink">{thisTerm}</b> of them since the May 2025 election.</p>
+
+    <div class="no-print mt-7 flex flex-wrap gap-2" id="bf-area" role="group" aria-label="Filter by area">
+      <button type="button" class="btn btn-sm btn-ghost" data-a="all" aria-pressed="true">All <span class="num text-ink-3">{ITEMS.length}</span></button>
+      {areas.map((a) => <button type="button" class="btn btn-sm btn-ghost" data-a={a} aria-pressed="false">{a} <span class="num text-ink-3">{ITEMS.filter((f) => f.area === a).length}</span></button>)}
+    </div>
+
+    <ol class="mt-6 grid gap-4" id="bf-list">
+      {ITEMS.map((f) => (
+        <li id={f.id} class="card overflow-hidden" data-area={f.area}>
+          <div class="flex flex-wrap items-center gap-2 border-b border-rule bg-panel px-5 py-3 md:px-6">
+            <span class="pill pill-bad">{f.area}</span>
+            <span class="meta mono">{fmtDate(f.date)}</span>
+            <span class="meta">· {f.minister}</span>
+            {f.date >= '2025-05-03' && <span class="pill pill-brand ml-auto">This term</span>}
+          </div>
+          <div class="p-5 md:p-6">
+            <h2 class="font-display text-[clamp(20px,2.4vw,24px)] font-extrabold leading-snug">{f.title}</h2>
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+              <div class="rounded-xl border border-rule p-4"><p class="eyebrow !text-ink-3">What they said</p><p class="mt-1.5 text-[15.5px]">{f.said}</p></div>
+              <div class="rounded-xl border-2 border-[var(--red)] p-4"><p class="eyebrow">What happened</p><p class="mt-1.5 text-[15.5px]">{f.did}</p></div>
+            </div>
+            {f.why && <p class="decide mt-4 text-[16px]">{f.why}</p>}
+            {f.controversy && <p class="mt-3 text-[14.5px]"><a href={url(`controversies/${f.controversy}/`)} class="font-bold">The full entry on the controversies page <Icon name="arrow" size={14} class="inline" /></a></p>}
+            <details class="mt-4"><summary class="cursor-pointer text-[14.5px] font-bold text-brand">Sources ({f.sources.length})</summary>
+              <ul class="mt-2 grid gap-1.5 text-[14px]">{f.sources.map((s) => <li><a href={s.url} rel="noopener" target="_blank">{s.title}</a>{s.date && <span class="meta"> · {fmtDate(s.date)}</span>}</li>)}</ul>
+            </details>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="prose mt-14"><h2>How entries are chosen</h2>
+      <p>An entry is included when the government announced or committed to a policy or decision, defended it, and then reversed it, watered it down, delayed it or abandoned it. Each one links to its sources, and quotes are attributed to the person who said them. Checked on {fmtDate(raw.verified_on)}. Know of one we’ve missed? <a href={url('corrections/#report')}>Tell us</a>.</p></div>
+  </div>
+  <script is:inline>
+    (function () { var items = [].slice.call(document.querySelectorAll('#bf-list > li')), bs = document.querySelectorAll('#bf-area [data-a]');
+      bs.forEach(function (b) { b.addEventListener('click', function () { var a = b.getAttribute('data-a'); bs.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); items.forEach(function (li) { li.hidden = !(a === 'all' || li.dataset.area === a); }); }); }); })();
+  </script>
+</Base>

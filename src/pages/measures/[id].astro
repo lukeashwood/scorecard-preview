@@ -102,10 +102,11 @@ const jsonld = {
         <dt class="eyebrow">Latest{m.isForecastHeadline ? ' (Budget estimate)' : ''}</dt>
         <dd class="mt-2"><span class="num font-display text-[40px] font-semibold leading-none tracking-tight">{headlineText(m.headline)}</span><span class="meta mt-2 block">{m.headline.caption}{m.headline.period ? ` · ${m.headline.period}` : ''}</span></dd>
       </div>
-      <div class="bg-surface p-5">
-        <dt class="eyebrow">Since the government took office</dt>
-        <dd class="mt-3">{m.sinceElection ? <><DirectionBadge change={{ trend: m.sinceElection.trend, tone: m.sinceElection.tone, label: m.sinceElection.label }} /><span class="meta mt-2 block">{withUnit(m.sinceElection.from[1], rs!.unit, rs!.decimals)} → {withUnit(m.sinceElection.to[1], rs!.unit, rs!.decimals)} ({m.sinceElection.periodLabel})</span>{m.ed.baselineNote && <span class="meta mt-1.5 block"><b class="text-ink-2">Starting point:</b> {m.ed.baselineNote}</span>}{m.ed.betterNote && <span class="meta mt-1 block">{m.ed.betterNote}</span>}</> : <span class="meta">No comparable figure from mid-2022.</span>}</dd>
-      </div>
+      {([['p-term', m.thisTerm, 'This term (since the May 2025 election)', 'No comparable figure from mid-2025.'], ['p-office', m.sinceElection, 'Since the government took office (May 2022)', 'No comparable figure from mid-2022.']] as const).map(([cls, se, label, none]) => (
+      <div class:list={['bg-surface p-5', cls]}>
+        <dt class="eyebrow">{label}</dt>
+        <dd class="mt-3">{se ? <><DirectionBadge change={{ trend: se.trend, tone: se.tone, label: se.label }} /><span class="meta mt-2 block">{withUnit(se.from[1], rs!.unit, rs!.decimals)} → {withUnit(se.to[1], rs!.unit, rs!.decimals)} ({se.periodLabel})</span></> : <span class="meta">{none}</span>}</dd>
+      </div>))}
       <div class="bg-surface p-5">
         <dt class="eyebrow">Over the past year</dt>
         <dd class="mt-3">{m.direction ? <><DirectionBadge change={{ trend: m.direction.trend, tone: m.direction.tone, label: m.direction.changeLabel }} /><span class="meta mt-2 block">{withUnit(m.direction.prior[1], rs!.unit, rs!.decimals)} → {withUnit(m.direction.latest[1], rs!.unit, rs!.decimals)} ({m.direction.periodLabel})</span></> : <span class="meta">{m.ed.noPastYear ? 'The headline figure is the change over the past year.' : 'Not a time series, so no yearly change is shown.'}</span>}</dd>
@@ -134,7 +135,7 @@ const jsonld = {
       <Chart client:load spec={m.ed.chartNote ? { ...m.chart, note: m.ed.chartNote } : m.chart} title={m.title} unitOverride={m.ed.unitOverride} useExtra={m.ed.useExtra} elections={[...SITE.government.elections, ...(m.ed.events ?? [])]} term={{ start: SITE.government.swornIn, label: SITE.government.chartLabel }} csvName={`${m.id}-${GENERATED_AT.slice(0, 10)}`} howToHref={url('make-your-own-chart/')} csvHeader={[m.title, `Unit: ${m.ed.unitOverride ?? m.chart.unit}`, ...m.sources.map((s) => `Source: ${s.publisher}, ${s.title}, ${s.url}`), `Downloaded from ${SITE.name}, ${pageUrl}, ${GENERATED_AT.slice(0, 10)}. Credit the sources above and ${SITE.name}.`]} g20={g20For(m.id)} />
       <noscript><p class="meta">The chart needs JavaScript. The figures are in the sources below.</p></noscript>
       <p class="decide mt-4">{decideLine(m)}</p>
-      <p class="meta mt-3">Want this chart in your own newsletter, report or classroom? <a href={url('make-your-own-chart/')}>Download the data and make your own</a>, with the source line ready to paste.</p>
+      <p class="meta mt-3">Want this chart for a flyer, a post or a speech? <a href={url('make-your-own-chart/')}>Download the data and make your own</a>, with the source line ready to paste.</p>
     </section>
 
     <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">

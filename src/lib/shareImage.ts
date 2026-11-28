@@ -246,7 +246,7 @@ export function controversySvg(c: Controversy): string {
   const W = 1200, H = 630, P = 56;
   const pair = pairFor(c.id, c.type);
   const crit = wrap(pair.critical, 50, 3);
-  const ben = wrap(pair.benign, 64, 2);
+  const ben = pair.benign ? wrap(pair.benign, 64, 2) : [];
   let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="17" fill="${C.brand}" letter-spacing="1.6">${esc(`AUSTRALIA · CONTROVERSIES · ${c.category.toUpperCase()}`)}</text>`;
   let y = P + 52;
   s += textLines(crit, P, y, 48, `font-family="${SANS}" font-weight="600" font-size="40" fill="${C.ink}"`);
@@ -309,13 +309,13 @@ export function targetsSvg(): string {
   const W = 1200, H = 630, P = 56;
   const t = tally();
   let s = `<text x="${P}" y="${P + 4}" font-family="${SANS}" font-weight="600" font-size="17" fill="${C.brand}" letter-spacing="1.6">AUSTRALIA · PROMISES · WHAT DID THEY PROMISE?</text>`;
-  s += `<text x="${P}" y="${P + 62}" font-family="${SANS}" font-weight="600" font-size="46" fill="${C.ink}" letter-spacing="-0.5">Is the government doing what it said?</text>`;
-  const lede = `${t.total} commitments are tracked: ${t.good} met or on track, ${t.progress} in progress, ${t.risk} at risk and ${t.bad} off track or not met.`;
+  s += `<text x="${P}" y="${P + 62}" font-family="${SANS}" font-weight="600" font-size="46" fill="${C.ink}" letter-spacing="-0.5">The promises they haven’t kept</text>`;
+  const lede = `${t.bad} promises broken or off track and ${t.risk} at risk, on the government’s own words and official figures.`;
   const ledeLines = wrap(lede, 92, 2);
   s += textLines(ledeLines, P, P + 104, 30, `font-family="${SANS}" font-size="22" fill="${C.ink2}"`);
   // Tally bar, the same 4 colours and order as the page
   let x = P; const barW = W - 2 * P; const by = P + 104 + ledeLines.length * 30 - 4;
-  for (const [n, col] of [[t.good, TONE_FILL.good], [t.progress, TONE_FILL.neutral], [t.risk, TONE_FILL.warn], [t.bad, TONE_FILL.bad]] as [number, string][]) {
+  for (const [n, col] of [[t.bad, TONE_FILL.bad], [t.risk, TONE_FILL.warn], [t.progress, TONE_FILL.neutral]] as [number, string][]) {
     if (!n) continue; const w = (n / t.total) * barW - 3;
     s += `<rect x="${x}" y="${by}" width="${Math.max(w, 0)}" height="12" rx="4" fill="${col}"/>`; x += w + 3;
   }

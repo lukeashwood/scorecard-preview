@@ -45,6 +45,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
       var a = g('sc_accent'); if (a && a !== 'indigo') d.setAttribute('data-accent', a);
       if (g('sc_motion') === 'off') d.setAttribute('data-motion', 'off');
       if (g('sc_text') === 'large') d.setAttribute('data-text', 'large');
+      d.setAttribute('data-period', g('sc_period') === 'office' ? 'office' : 'term');
       d.classList.add('js'); })(document.documentElement);
   </script>
   <title>{fullTitle}</title>
@@ -54,7 +55,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
   <link rel="icon" href={url('favicon.ico')} sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href={url('apple-touch-icon.png')} />
   <link rel="manifest" href={url('site.webmanifest')} />
-  <meta name="theme-color" content="#080b1a" />
+  <meta name="theme-color" content="#293086" />
   <meta name="google-site-verification" content="l_yJ3ldIbXNmhg7CCztrqJ_kpc9l-NtAu3EAOJeff3g" />
   <meta property="og:type" content={ogType} />
   <meta property="og:locale" content="en_AU" />
@@ -106,9 +107,13 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
         </details>
       </nav>
       <div class="ml-auto flex items-center gap-2 lg:ml-2">
-        <SiteSearch class="hidden w-[210px] xl:block 2xl:w-[260px]" id="site-search" />
-        <a href={url('my/')} class="btn btn-ghost btn-sm hidden whitespace-nowrap sm:inline-flex" data-my-link aria-label="My Gov Score"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.5l-5.4 2.9 1-6.1L3.2 10l6.1-.9z" /></svg><span class="hidden 2xl:inline">My Gov Score</span><span class="fav-count hidden rounded-full bg-brand px-1.5 text-[11px] font-bold text-on-brand"></span></a>
+        <SiteSearch class="hidden w-[220px] 2xl:block" id="site-search" />
+        <a href={url('my/')} class="btn btn-ghost btn-sm hidden whitespace-nowrap xl:inline-flex" data-my-link aria-label="My Gov Score"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.5l-5.4 2.9 1-6.1L3.2 10l6.1-.9z" /></svg><span class="hidden 2xl:inline">My Gov Score</span><span class="fav-count hidden rounded-full bg-brand px-1.5 text-[11px] font-bold text-on-brand"></span></a>
         <a href={url('subscribe/')} class="btn btn-primary btn-sm hidden whitespace-nowrap sm:inline-flex">Get updates</a>
+        <div class="period-switch" role="group" aria-label="Compare figures from">
+          <button type="button" data-period-btn="term" title="Compare with the May 2025 election">This term</button>
+          <button type="button" data-period-btn="office" title="Compare with May 2022, when the government took office">Since 2022</button>
+        </div>
         <DisplayMenu />
         <button type="button" id="menu-btn" class="btn btn-ghost btn-sm w-9 !px-0 lg:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
@@ -131,11 +136,11 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
 
   <main id="main" tabindex="-1" class="outline-none"><slot /></main>
 
-  <footer class="site mt-24 border-t border-rule bg-panel">
+  <footer class="site footer-blue mt-24">
     <div class="wrap grid gap-10 py-12 sm:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
       <div class="max-w-md sm:col-span-3 lg:col-span-1">
         <p class="flex items-center gap-2.5 font-display text-[22px] font-semibold"><Logo size={26} />{SITE.name}</p>
-        <p class="mt-2 text-[14.5px] text-ink-2">Official Australian figures, sourced line by line. Automatic figures are tested every day; figures entered by hand show the date they were checked. Verdicts are given only where someone in authority made a measurable commitment. Everything else is shown as it is.</p>
+        <p class="mt-2 text-[14.5px] text-ink-2">The Albanese Government’s economic record, in its own official figures. Every number links to the ABS, RBA, Treasury or Budget release it came from, so you can check it and quote it with confidence.</p>
         <p class="meta mt-4">Data last checked <span class="mono">{fmtStamp(GENERATED_AT)}</span> · Rating rules v{SITE.rulesVersion}</p>
       </div>
       {[{ h: 'The record', items: [...NAV_GROUPS[0].items, ...NAV_GROUPS[1].items] }, { h: 'Explore', items: [...NAV_GROUPS[2].items, ...NAV_GROUPS[3].items] }].map((g) => (
@@ -150,7 +155,7 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     </div>
     <div class="border-t border-rule">
       <div class="wrap flex flex-wrap items-center justify-between gap-3 py-5 text-[13px] text-ink-3">
-        <p>ABS and RBA material is used under Creative Commons Attribution 4.0. Verdicts and explanations are this site’s own, made under the published rules.</p>
+        <p>ABS and RBA material is used under Creative Commons Attribution 4.0. Commentary and verdicts are this site’s own.</p>
         <p><a class="text-ink-3" href={url('corrections/')}>Spotted a mistake? Tell us.</a></p>
       </div>
     </div>
@@ -186,5 +191,18 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     count();
   })();
 </script>
+  <script is:inline>
+    (function () {
+      var d = document.documentElement;
+      function paint() { document.querySelectorAll('[data-period-btn]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-period-btn') === d.getAttribute('data-period'))); }); }
+      document.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('[data-period-btn]'); if (!b) return;
+        var v = b.getAttribute('data-period-btn'); d.setAttribute('data-period', v);
+        try { localStorage.setItem('sc_period', v); } catch (x) {}
+        paint(); window.dispatchEvent(new Event('gs-period'));
+      });
+      paint();
+    })();
+  </script>
 </body>
 </html>
