@@ -55,6 +55,7 @@ export default function Chart({ spec, title, unitOverride, elections = [], term,
   // Follow the site-wide "This term / Since May 2022" switch when the reader changes it.
   useEffect(() => {
     const sync = () => { const p = document.documentElement.dataset.period; setRange(p === 'office' ? 'term' : 'cur'); };
+    sync(); // start on the reader's chosen period
     window.addEventListener('gs-period', sync); return () => window.removeEventListener('gs-period', sync);
   }, []);
   const [mode, setMode] = useState<'time' | 'g20'>('time');

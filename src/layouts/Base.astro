@@ -134,6 +134,12 @@ const preview = import.meta.env.PUBLIC_PREVIEW === '1';
     </nav>
   </header>
 
+  <div class="period-strip no-print" role="status">
+    <div class="wrap flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-1.5">
+      <p><span class="p-term"><b>Comparing with the May 2025 election</b> (this term). Every chart and comparison starts from there.</span><span class="p-office"><b>Comparing with May 2022</b>, when Labor took office. Every chart and comparison starts from there.</span></p>
+      <p class="flex gap-3"><button type="button" data-period-btn="term" class="underline-offset-2">This term</button><button type="button" data-period-btn="office" class="underline-offset-2">Since 2022</button></p>
+    </div>
+  </div>
   <main id="main" tabindex="-1" class="outline-none"><slot /></main>
 
   <footer class="site footer-blue mt-24">

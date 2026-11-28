@@ -196,3 +196,8 @@ input[type="range"] { accent-color: var(--brand); width: 100%; min-height: 28px;
 .footer-blue .eyebrow { color: #fff; }
 .footer-blue .border-t, .footer-blue .border-rule { border-color: var(--night-rule); }
 .footer-blue svg polygon { stroke: #fff; }
+
+/* A strip under the header that says which starting point every comparison uses, and lets the reader change it. */
+.period-strip { background: var(--brand-tint); color: var(--ink); font-size: 13.5px; border-bottom: 1px solid var(--rule); }
+.period-strip button { font-weight: 700; color: var(--brand); cursor: pointer; }
+.period-strip button[aria-pressed="true"] { color: var(--red); text-decoration: underline; text-decoration-thickness: 2px; }
