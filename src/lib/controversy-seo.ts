@@ -77,6 +77,7 @@ export function controversyTitle(c: Controversy): string {
    sentences, in the same words where possible: what happened, who said what, and the outcome where it is settled.
    Entries without one fall back to the summary cut at a sentence end. */
 export const CONTROVERSY_DESC: Record<string, string> = {
+  'labor-nuclear-ban-world-moves-on': '39 countries back tripling nuclear power. Australia exports uranium to India but bans nuclear power at home, and Bowen calls lifting the ban a pipe dream.',
   'speaker-visas-incite-discord': "Since July 2024 Home Affairs has refused or cancelled visas for foreign speakers, including Candace Owens, on the ground they risk 'inciting discord'.",
   'albanese-takaichi-melons-podcast': "On the Bush Deep podcast Albanese described PM Takaichi's gift of two crown melons as 'pretty strange' but 'quite good'. Angus Taylor demanded an apology.",
   'albanese-kylie-minogue-shag-marry-date': "Asked on the Bush Deep podcast to play 'shag, marry, date' with Kylie Minogue, Albanese answered 'all of the above'. He later apologised unequivocally.",
